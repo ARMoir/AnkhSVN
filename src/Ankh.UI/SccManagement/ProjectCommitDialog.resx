@@ -112,24 +112,21 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="splitContainer1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="splitContainer1.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 12</value>
   </data>
   <data name="splitContainer1.Orientation" type="System.Windows.Forms.Orientation, System.Windows.Forms">
     <value>Horizontal</value>
-  </data>
-  <data name="pendingList.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
   </data>
   <data name="pendingList.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
@@ -137,7 +134,7 @@
   <data name="pendingList.Size" type="System.Drawing.Size, System.Drawing">
     <value>600, 185</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="pendingList.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
@@ -145,7 +142,7 @@
     <value>pendingList</value>
   </data>
   <data name="&gt;&gt;pendingList.Type" xml:space="preserve">
-    <value>Ankh.UI.PendingChanges.Commits.PendingCommitsView, Ankh.UI, Version=2.5.5016.36573, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
+    <value>Ankh.UI.PendingChanges.Commits.PendingCommitsView, Ankh.UI, Version=2.7.8495.39119, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
   </data>
   <data name="&gt;&gt;pendingList.Parent" xml:space="preserve">
     <value>splitContainer1.Panel1</value>
@@ -157,7 +154,7 @@
     <value>splitContainer1.Panel1</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Panel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Panel1.Parent" xml:space="preserve">
     <value>splitContainer1</value>
@@ -172,10 +169,10 @@
     <value>False</value>
   </data>
   <data name="issueNumberBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>500, 0</value>
+    <value>503, 0</value>
   </data>
   <data name="issueNumberBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>100, 20</value>
+    <value>100, 22</value>
   </data>
   <data name="issueNumberBox.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -187,7 +184,7 @@
     <value>issueNumberBox</value>
   </data>
   <data name="&gt;&gt;issueNumberBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;issueNumberBox.Parent" xml:space="preserve">
     <value>splitContainer1.Panel2</value>
@@ -202,7 +199,7 @@
     <value>False</value>
   </data>
   <data name="issueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>388, 3</value>
+    <value>391, 1</value>
   </data>
   <data name="issueLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>106, 17</value>
@@ -223,7 +220,7 @@
     <value>issueLabel</value>
   </data>
   <data name="&gt;&gt;issueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;issueLabel.Parent" xml:space="preserve">
     <value>splitContainer1.Panel2</value>
@@ -231,14 +228,11 @@
   <data name="&gt;&gt;issueLabel.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="logMessage.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
   <data name="logMessage.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 23</value>
   </data>
   <data name="logMessage.Size" type="System.Drawing.Size, System.Drawing">
-    <value>600, 124</value>
+    <value>600, 123</value>
   </data>
   <data name="logMessage.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -247,7 +241,7 @@
     <value>logMessage</value>
   </data>
   <data name="&gt;&gt;logMessage.Type" xml:space="preserve">
-    <value>Ankh.UI.PendingChanges.LogMessageEditor, Ankh.UI, Version=2.5.5016.36573, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
+    <value>Ankh.UI.PendingChanges.LogMessageEditor, Ankh.UI, Version=2.7.8495.39119, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
   </data>
   <data name="&gt;&gt;logMessage.Parent" xml:space="preserve">
     <value>splitContainer1.Panel2</value>
@@ -259,10 +253,10 @@
     <value>True</value>
   </data>
   <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>-3, 7</value>
+    <value>-3, 3</value>
   </data>
   <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>74, 13</value>
+    <value>93, 16</value>
   </data>
   <data name="label1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -274,7 +268,7 @@
     <value>label1</value>
   </data>
   <data name="&gt;&gt;label1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;label1.Parent" xml:space="preserve">
     <value>splitContainer1.Panel2</value>
@@ -286,7 +280,7 @@
     <value>splitContainer1.Panel2</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Panel2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Panel2.Parent" xml:space="preserve">
     <value>splitContainer1</value>
@@ -295,7 +289,7 @@
     <value>1</value>
   </data>
   <data name="splitContainer1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>600, 336</value>
+    <value>603, 336</value>
   </data>
   <data name="splitContainer1.SplitterDistance" type="System.Int32, mscorlib">
     <value>185</value>
@@ -307,7 +301,7 @@
     <value>splitContainer1</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Type" xml:space="preserve">
-    <value>Ankh.UI.VSSelectionControls.SmartSplitContainer, Ankh.UI, Version=2.5.5016.36573, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
+    <value>Ankh.UI.VSSelectionControls.SmartSplitContainer, Ankh.UI, Version=2.7.8495.39119, Culture=neutral, PublicKeyToken=d0beed809dd9333a</value>
   </data>
   <data name="&gt;&gt;splitContainer1.Parent" xml:space="preserve">
     <value>$this</value>
@@ -322,10 +316,10 @@
     <value>True</value>
   </data>
   <data name="keepLocksBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 354</value>
+    <value>12, 369</value>
   </data>
   <data name="keepLocksBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>83, 17</value>
+    <value>100, 20</value>
   </data>
   <data name="keepLocksBox.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -337,7 +331,7 @@
     <value>keepLocksBox</value>
   </data>
   <data name="&gt;&gt;keepLocksBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;keepLocksBox.Parent" xml:space="preserve">
     <value>$this</value>
@@ -352,10 +346,10 @@
     <value>True</value>
   </data>
   <data name="keepChangelistsBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 371</value>
+    <value>12, 395</value>
   </data>
   <data name="keepChangelistsBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>108, 17</value>
+    <value>134, 20</value>
   </data>
   <data name="keepChangelistsBox.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -367,7 +361,7 @@
     <value>keepChangelistsBox</value>
   </data>
   <data name="&gt;&gt;keepChangelistsBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;keepChangelistsBox.Parent" xml:space="preserve">
     <value>$this</value>
@@ -379,7 +373,7 @@
     <value>Bottom, Right</value>
   </data>
   <data name="cancelButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>537, 365</value>
+    <value>540, 392</value>
   </data>
   <data name="cancelButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -394,7 +388,7 @@
     <value>cancelButton</value>
   </data>
   <data name="&gt;&gt;cancelButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cancelButton.Parent" xml:space="preserve">
     <value>$this</value>
@@ -409,7 +403,7 @@
     <value>False</value>
   </data>
   <data name="okButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>456, 365</value>
+    <value>459, 392</value>
   </data>
   <data name="okButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -424,7 +418,7 @@
     <value>okButton</value>
   </data>
   <data name="&gt;&gt;okButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;okButton.Parent" xml:space="preserve">
     <value>$this</value>
@@ -432,14 +426,17 @@
   <data name="&gt;&gt;okButton.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
+    <value>8, 16</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>624, 400</value>
+    <value>835, 492</value>
+  </data>
+  <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Commit to Subversion</value>
@@ -448,6 +445,6 @@
     <value>ProjectCommitDialog</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>Ankh.UI.VSContainerForm, Ankh.Services, Version=2.5.5016.36451, Culture=neutral, PublicKeyToken=a8604ba8fc87eddd</value>
+    <value>Ankh.UI.VSContainerForm, Ankh.Services, Version=2.9.8495.39113, Culture=neutral, PublicKeyToken=a8604ba8fc87eddd</value>
   </data>
 </root>
