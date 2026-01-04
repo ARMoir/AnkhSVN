@@ -60,8 +60,7 @@ namespace Ankh.VS.Services
             if (!_commandMap.TryGetValue(command.Guid, out map))
                 return;
 
-            EventHandler handlers;
-            if (!map.TryGetValue(command.ID, out handlers))
+            if (!map.TryGetValue(command.ID, out EventHandler handlers))
                 return;
 
             handlers -= handler;

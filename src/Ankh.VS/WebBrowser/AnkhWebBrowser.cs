@@ -34,8 +34,6 @@ namespace Ankh.VS.WebBrowser
 
         public void Navigate(Uri url, AnkhBrowserArgs args)
         {
-            AnkhBrowserResults results;
-
             bool useExternal = args.External;
 
             IAnkhConfigurationService cs = GetService<IAnkhConfigurationService>();
@@ -51,7 +49,8 @@ namespace Ankh.VS.WebBrowser
                 }
                 catch { } // BA: log/ignore the exception, and open the URL using VS's browser service
             }
-            Navigate(url, args, out results);
+
+            Navigate(url, args, out _);
         }
 
         public void Navigate(Uri url, AnkhBrowserArgs args, out AnkhBrowserResults results)
@@ -59,25 +58,25 @@ namespace Ankh.VS.WebBrowser
             IVsWebBrowsingService browserSvc = GetService<IVsWebBrowsingService>(typeof(SVsWebBrowsingService));
 
             Guid windowGuid = new Guid(ToolWindowGuids80.WebBrowserWindow);
-            IVsWebBrowser browser;
-            IVsWindowFrame ppFrame;
-            int hr = browserSvc.CreateWebBrowser(
+            _ = browserSvc.CreateWebBrowser(
                 (uint)args.CreateFlags,
                 ref windowGuid,
                 args.BaseCaption,
                 url.ToString(),
                 new BrowserUser(),
-                out browser,
-                out ppFrame);
+                out IVsWebBrowser browser,
+                out IVsWindowFrame ppFrame);
             results = new Results(browser, ppFrame);
         }
 
         private void NavigateInExternalBrowser(Uri url)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = url.AbsoluteUri;
-            startInfo.UseShellExecute = true;
-            startInfo.Verb = "Open";
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = url.AbsoluteUri,
+                UseShellExecute = true,
+                Verb = "Open"
+            };
             Process.Start(startInfo);
         }
 
@@ -87,13 +86,8 @@ namespace Ankh.VS.WebBrowser
             readonly IVsWindowFrame _frame;
             public Results(IVsWebBrowser browser, IVsWindowFrame frame)
             {
-                if (browser == null)
-                    throw new ArgumentNullException("browser");
-                if (frame == null)
-                    throw new ArgumentNullException("frame");
-
-                _browser = browser;
-                _frame = frame;
+                _browser = browser ?? throw new ArgumentNullException("browser");
+                _frame = frame ?? throw new ArgumentNullException("frame");
             }
             
             public override IVsWebBrowser WebBrowser
