@@ -8,3 +8,4 @@ V4_bin/
 # Buildbot
 scripts/gh.cache.bat
 scripts/msbuild-version.rsp
+/Ankh.Package.vsix
