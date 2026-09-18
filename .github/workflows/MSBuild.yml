@@ -58,6 +58,7 @@ jobs:
         --no-restore
         --collect:"XPlat Code Coverage"
         --results-directory "${{ github.workspace }}\TestResults\Ankh.Tests"
+        --logger "trx;LogFileName=Ankh.Tests.trx"
         --logger "console;verbosity=normal"
         -- RunConfiguration.TargetPlatform=x64 RunConfiguration.TreatNoTestsAsError=true
 
@@ -72,6 +73,7 @@ jobs:
         --no-restore
         --collect:"XPlat Code Coverage"
         --results-directory "${{ github.workspace }}\TestResults\Ankh.VS.UnitTest"
+        --logger "trx;LogFileName=Ankh.VS.UnitTest.trx"
         --logger "console;verbosity=normal"
         -- RunConfiguration.TargetPlatform=x64 RunConfiguration.TreatNoTestsAsError=true
 
@@ -103,6 +105,172 @@ jobs:
             Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $_
           }
         }
+
+    - name: Generate README badges
+      id: readme_badges
+      if: always()
+      shell: pwsh
+      run: |
+        $badgeDir = "${{ github.workspace }}\ReadmeBadges"
+        $coveragePath = "${{ github.workspace }}\CoverageReport\Cobertura.xml"
+        $trxFiles = Get-ChildItem "${{ github.workspace }}\TestResults" -Recurse -Filter "*.trx" -ErrorAction SilentlyContinue
+
+        New-Item -ItemType Directory -Force -Path $badgeDir | Out-Null
+
+        if (-not (Test-Path $coveragePath) -or -not $trxFiles) {
+          Write-Host "Coverage or TRX results are unavailable; leaving the published badges unchanged."
+          "ready=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          exit 0
+        }
+
+        $total = 0
+        $passed = 0
+        $failed = 0
+        $skipped = 0
+
+        foreach ($trxFile in $trxFiles) {
+          [xml]$trx = Get-Content -Raw $trxFile.FullName
+          $counters = $trx.SelectSingleNode("/*[local-name()='TestRun']/*[local-name()='ResultSummary']/*[local-name()='Counters']")
+          if ($null -eq $counters) {
+            continue
+          }
+
+          $total += [int]$counters.GetAttribute("total")
+          $passed += [int]$counters.GetAttribute("passed")
+          $failed += [int]$counters.GetAttribute("failed")
+
+          $notExecuted = $counters.GetAttribute("notExecuted")
+          if ($notExecuted) {
+            $skipped += [int]$notExecuted
+          }
+        }
+
+        [xml]$coverage = Get-Content -Raw $coveragePath
+        $lineRate = [double]::Parse(
+          $coverage.coverage.GetAttribute("line-rate"),
+          [Globalization.CultureInfo]::InvariantCulture)
+        $branchRate = [double]::Parse(
+          $coverage.coverage.GetAttribute("branch-rate"),
+          [Globalization.CultureInfo]::InvariantCulture)
+
+        $linePercent = [Math]::Round($lineRate * 100, 1)
+        $branchPercent = [Math]::Round($branchRate * 100, 1)
+
+        function Get-CoverageColor([double]$percent) {
+          if ($percent -ge 80) { return "#4c1" }
+          if ($percent -ge 60) { return "#97ca00" }
+          if ($percent -ge 40) { return "#dfb317" }
+          if ($percent -ge 20) { return "#fe7d37" }
+          return "#e05d44"
+        }
+
+        function Write-Badge(
+          [string]$path,
+          [string]$label,
+          [string]$message,
+          [string]$color) {
+
+          $safeLabel = [Security.SecurityElement]::Escape($label)
+          $safeMessage = [Security.SecurityElement]::Escape($message)
+          $labelWidth = [Math]::Max(60, ($label.Length * 7) + 14)
+          $valueWidth = [Math]::Max(55, ($message.Length * 7) + 14)
+          $width = $labelWidth + $valueWidth
+          $labelX = [Math]::Round($labelWidth / 2)
+          $valueX = $labelWidth + [Math]::Round($valueWidth / 2)
+
+          $svg = @"
+        <svg xmlns="http://www.w3.org/2000/svg" width="$width" height="20" role="img" aria-label="$($safeLabel): $safeMessage">
+          <title>$($safeLabel): $safeMessage</title>
+          <mask id="round"><rect width="$width" height="20" rx="3" fill="#fff"/></mask>
+          <g mask="url(#round)">
+            <rect width="$labelWidth" height="20" fill="#555"/>
+            <rect x="$labelWidth" width="$valueWidth" height="20" fill="$color"/>
+          </g>
+          <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+            <text x="$labelX" y="14">$safeLabel</text>
+            <text x="$valueX" y="14">$safeMessage</text>
+          </g>
+        </svg>
+        "@
+
+          Set-Content -Path $path -Value $svg -Encoding utf8
+        }
+
+        if ($failed -gt 0) {
+          $testMessage = "$passed passed, $failed failed"
+          $testColor = "#e05d44"
+        }
+        elseif ($skipped -gt 0) {
+          $testMessage = "$passed passed, $skipped skipped"
+          $testColor = "#4c1"
+        }
+        else {
+          $testMessage = "$passed passing"
+          $testColor = "#4c1"
+        }
+
+        $lineMessage = $linePercent.ToString("0.0", [Globalization.CultureInfo]::InvariantCulture) + "%"
+        $branchMessage = $branchPercent.ToString("0.0", [Globalization.CultureInfo]::InvariantCulture) + "%"
+
+        Write-Badge (Join-Path $badgeDir "tests.svg") "tests" $testMessage $testColor
+        Write-Badge (Join-Path $badgeDir "coverage.svg") "line coverage" $lineMessage (Get-CoverageColor $linePercent)
+        Write-Badge (Join-Path $badgeDir "branches.svg") "branch coverage" $branchMessage (Get-CoverageColor $branchPercent)
+
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "}}# README badge values"
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Tests: $passed passed / $total total"
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Line coverage: $lineMessage"
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Branch coverage: $branchMessage"
+
+        "ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+    - name: Publish README badges
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.readme_badges.outputs.ready == 'true'
+      shell: pwsh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $remote = "https://x-access-token:$env:GITHUB_TOKEN@github.com/${{ github.repository }}.git"
+        $currentMain = (git ls-remote $remote refs/heads/main) -split "\s+" | Select-Object -First 1
+
+        if ($currentMain -ne "${{ github.sha }}") {
+          Write-Host "A newer main commit exists; skipping stale badge publication."
+          exit 0
+        }
+
+        $publishDir = Join-Path $env:RUNNER_TEMP "ankhsvn-readme-badges"
+        if (Test-Path $publishDir) {
+          Remove-Item -Recurse -Force $publishDir
+        }
+
+        git clone --quiet $remote $publishDir
+        Set-Location $publishDir
+
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        $badgeRef = git ls-remote --heads origin badges
+        if ($badgeRef) {
+          git fetch --quiet origin badges
+          git checkout -B badges origin/badges
+        }
+        else {
+          git checkout --orphan badges
+          git rm -rf . | Out-Null
+        }
+
+        Get-ChildItem -Path . -Filter "*.svg" -File -ErrorAction SilentlyContinue | Remove-Item -Force
+        Copy-Item "${{ github.workspace }}\ReadmeBadges\*.svg" .
+
+        git add *.svg
+        git diff --cached --quiet
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "README badges are already current."
+          exit 0
+        }
+
+        git commit -m "Update README badges for run #${{ github.run_number }}"
+        git push origin HEAD:badges
 
     - name: Upload coverage report
       if: always()
