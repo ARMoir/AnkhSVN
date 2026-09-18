@@ -114,18 +114,54 @@ jobs:
           CoverageReport
         if-no-files-found: error
 
-    - name: Verify VSIX contains Ankh.UI
+    - name: Verify VSIX Annotate MEF packaging (#7/#47)
       shell: pwsh
       run: |
+        # Regression guard for:
+        # https://github.com/AmpScm/AnkhSVN/issues/7
+        # https://github.com/AmpScm/AnkhSVN/issues/47
+        #
+        # The fixed Annotate viewer depends on Ankh.UI.dll being shipped as a
+        # Microsoft.VisualStudio.MefComponent. Merely packaging the DLL is not enough:
+        # without the MEF asset declaration Visual Studio will not discover the WPF margin.
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         $vsix = "${{ github.workspace }}\build\src\Ankh.Package\bin\release\Ankh.Package.vsix"
         $archive = [System.IO.Compression.ZipFile]::OpenRead($vsix)
         try {
           $uiAssembly = $archive.Entries | Where-Object { $_.FullName -match '(^|/)Ankh\.UI\.dll$' } | Select-Object -First 1
           if (-not $uiAssembly) {
-            throw "Ankh.UI.dll was not included in the generated VSIX"
+            throw "Issues #7/#47 regression: Ankh.UI.dll was not included in the generated VSIX"
           }
+
+          $manifestEntry = $archive.Entries | Where-Object { $_.FullName -match '\.vsixmanifest$' } | Select-Object -First 1
+          if (-not $manifestEntry) {
+            throw "Issues #7/#47 regression: generated VSIX does not contain a VSIX manifest"
+          }
+
+          $stream = $manifestEntry.Open()
+          $reader = New-Object System.IO.StreamReader($stream)
+          try {
+            [xml]$manifest = $reader.ReadToEnd()
+          }
+          finally {
+            $reader.Dispose()
+            $stream.Dispose()
+          }
+
+          $namespaces = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+          $namespaces.AddNamespace("v", "http://schemas.microsoft.com/developer/vsx-schema/2011")
+          $namespaces.AddNamespace("d", "http://schemas.microsoft.com/developer/vsx-schema-design/2011")
+
+          $mefAsset = $manifest.SelectSingleNode(
+            "//v:Asset[@Type='Microsoft.VisualStudio.MefComponent' and @d:ProjectName='Ankh.UI']",
+            $namespaces)
+
+          if (-not $mefAsset) {
+            throw "Issues #7/#47 regression: Ankh.UI is not declared as a Microsoft.VisualStudio.MefComponent"
+          }
+
           Write-Host "Verified VSIX contains $($uiAssembly.FullName)"
+          Write-Host "Verified Ankh.UI is declared as an Annotate-capable MEF component"
         }
         finally {
           $archive.Dispose()
