@@ -217,7 +217,7 @@ jobs:
         Write-Badge (Join-Path $badgeDir "branches.svg") "branch coverage" $branchMessage (Get-CoverageColor $branchPercent)
 
         Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
-        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "}}# README badge values"
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "### README badge values"
         Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Tests: $passed passed / $total total"
         Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Line coverage: $lineMessage"
         Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Branch coverage: $branchMessage"
