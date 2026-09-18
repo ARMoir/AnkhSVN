@@ -101,20 +101,9 @@ namespace Ankh.Commands
             else
                 foreach (SvnItem item in e.Selection.GetSelectedSvnItems(false))
                 {
-                    if (!item.IsVersioned || (item.Status.LocalNodeStatus == SvnStatus.Added && !item.Status.IsCopied))
-                        continue;
-
-                    if ( e.Command == AnkhCommand.ItemCompareBase
-                         || e.Command == AnkhCommand.ItemShowChanges)
-                    {
-                        if (!(item.IsModified || item.IsDocumentDirty)
-                            || !item.IsLocalDiffAvailable // exclude if local diff is not available
-                            )
-                            continue;
-                    }
-
-                    if (e.Command == AnkhCommand.DiffLocalItem
-                        && !NotDeletedFilter(item))
+                    if (!DiffLocalItemLogic.ShouldInclude(
+                            e.Command,
+                            DiffLocalItemSelectionInfo.From(item)))
                     {
                         continue;
                     }
@@ -122,26 +111,7 @@ namespace Ankh.Commands
                     selectedFiles.Add(item);
                 }
 
-            SvnRevisionRange revRange = null;
-            switch (e.Command)
-            {
-                case AnkhCommand.DiffLocalItem:
-                    break; // revRange null -> show selector
-                case AnkhCommand.ItemCompareBase:
-                case AnkhCommand.ItemShowChanges:
-                case AnkhCommand.DocumentShowChanges:
-                    revRange = new SvnRevisionRange(SvnRevision.Base, SvnRevision.Working);
-                    break;
-                case AnkhCommand.ItemCompareCommitted:
-                    revRange = new SvnRevisionRange(SvnRevision.Committed, SvnRevision.Working);
-                    break;
-                case AnkhCommand.ItemCompareLatest:
-                    revRange = new SvnRevisionRange(SvnRevision.Head, SvnRevision.Working);
-                    break;
-                case AnkhCommand.ItemComparePrevious:
-                    revRange = new SvnRevisionRange(SvnRevision.Previous, SvnRevision.Working);
-                    break;
-            }
+            SvnRevisionRange revRange = DiffLocalItemLogic.GetDefaultRevisionRange(e.Command);
 
             if (e.PromptUser || selectedFiles.Count > 1 || revRange == null)
             {
@@ -171,8 +141,7 @@ namespace Ankh.Commands
                 revRange = new SvnRevisionRange(start, end);
             }
 
-            if (revRange.EndRevision.RevisionType == SvnRevisionType.Working ||
-                revRange.StartRevision.RevisionType == SvnRevisionType.Working)
+            if (DiffLocalItemLogic.RequiresDocumentSave(revRange))
             {
                 // Save only the files needed
 
@@ -186,8 +155,10 @@ namespace Ankh.Commands
             {
                 AnkhDiffArgs da = new AnkhDiffArgs();
 
-                if ((item.Status.IsCopied || item.IsReplaced) &&
-                    (!revRange.StartRevision.RequiresWorkingCopy || !revRange.EndRevision.RequiresWorkingCopy))
+                if (DiffLocalItemLogic.ShouldUseCopyOrigin(
+                        item.Status.IsCopied,
+                        item.IsReplaced,
+                        revRange))
                 {
                     // The file is copied, use its origins history instead of that of the new file
                     SvnUriTarget copiedFrom = diff.GetCopyOrigin(item);
@@ -236,14 +207,6 @@ namespace Ankh.Commands
 
                 diff.RunDiff(da);
             }
-        }
-
-        static bool NotDeletedFilter(SvnItem item)
-        {
-            if (item == null)
-                throw new ArgumentNullException("item");
-
-            return !item.IsDeleteScheduled && item.Exists;
         }
     }
 }
