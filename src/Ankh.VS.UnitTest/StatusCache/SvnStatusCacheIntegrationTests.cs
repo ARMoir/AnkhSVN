@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using Ankh;
 using Ankh.Commands;
 using Ankh.Scc;
 using Ankh.Scc.Engine;
