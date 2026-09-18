@@ -226,20 +226,28 @@ namespace Ankh.Commands
                         {
                             foreach (PropertyEditItem ei in items)
                             {
-                                if (!ei.ShouldPersist)
-                                    continue;
-
-                                if (ei.Value == null)
+                                switch (ItemEditPropertiesLogic.GetPersistenceAction(
+                                    ei.ShouldPersist,
+                                    ei.OriginalValue,
+                                    ei.Value))
                                 {
-                                    if (ei.OriginalValue != null)
+                                    case PropertyPersistenceAction.Delete:
                                         wa.Client.DeleteProperty(firstVersioned.FullPath, ei.PropertyName);
-                                }
-                                else if (!ei.Value.ValueEquals(ei.OriginalValue))
-                                {
-                                    if (ei.Value.StringValue != null)
-                                        wa.Client.SetProperty(firstVersioned.FullPath, ei.PropertyName, ei.Value.StringValue);
-                                    else
-                                        wa.Client.SetProperty(firstVersioned.FullPath, ei.PropertyName, ei.Value.RawValue);
+                                        break;
+
+                                    case PropertyPersistenceAction.SetString:
+                                        wa.Client.SetProperty(
+                                            firstVersioned.FullPath,
+                                            ei.PropertyName,
+                                            ei.Value.StringValue);
+                                        break;
+
+                                    case PropertyPersistenceAction.SetRaw:
+                                        wa.Client.SetProperty(
+                                            firstVersioned.FullPath,
+                                            ei.PropertyName,
+                                            ei.Value.RawValue);
+                                        break;
                                 }
                             }
                         });
