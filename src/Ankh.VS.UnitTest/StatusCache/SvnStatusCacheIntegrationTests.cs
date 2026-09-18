@@ -79,7 +79,7 @@ namespace AnkhSvn_UnitTestProject.StatusCache
         public void TearDown()
         {
             if (_cache != null)
-                _cache.Dispose();
+                ((IDisposable)_cache).Dispose();
             if (_client != null)
                 _client.Dispose();
 
