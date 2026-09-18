@@ -35,41 +35,17 @@ namespace Ankh.Commands
     {
         static bool IsSolutionCommand(AnkhCommand command)
         {
-            switch (command)
-            {
-                case AnkhCommand.SolutionUpdateLatest:
-                case AnkhCommand.SolutionUpdateSpecific:
-                case AnkhCommand.PendingChangesUpdateLatest:
-                    return true;
-                default:
-                    return false;
-            }
+            return SolutionUpdateLogic.GetScope(command) == UpdateCommandScope.Solution;
         }
 
         static bool IsFolderCommand(AnkhCommand command)
         {
-            switch (command)
-            {
-                case AnkhCommand.FolderUpdateLatest:
-                case AnkhCommand.FolderUpdateSpecific:
-                    return true;
-                default:
-                    return false;
-            }
+            return SolutionUpdateLogic.GetScope(command) == UpdateCommandScope.Folder;
         }
 
         static bool IsHeadCommand(AnkhCommand command)
         {
-            switch (command)
-            {
-                case AnkhCommand.SolutionUpdateLatest:
-                case AnkhCommand.ProjectUpdateLatest:
-                case AnkhCommand.PendingChangesUpdateLatest:
-                case AnkhCommand.FolderUpdateLatest:
-                    return true;
-                default:
-                    return false;
-            }
+            return SolutionUpdateLogic.IsHeadCommand(command);
         }
 
         static IEnumerable<SccProject> GetSelectedProjects(BaseCommandEventArgs e)
@@ -221,7 +197,7 @@ namespace Ankh.Commands
             IProjectFileMapper mapper = e.GetService<IProjectFileMapper>();
             Uri reposRoot = null;
 
-            if (IsHeadCommand(e.Command) || e.DontPrompt)
+            if (SolutionUpdateLogic.UsesImplicitHeadRevision(e.Command, e.DontPrompt))
                 rev = SvnRevision.Head;
             else if (IsSolutionCommand(e.Command))
             {
@@ -291,20 +267,9 @@ namespace Ankh.Commands
                     else
                     {
                         si = null;
-                        string urlPath1 = origin.Uri.AbsolutePath;
-                        string urlPath2 = item.Uri.AbsolutePath;
-
-                        int i = 0;
-                        while (i < urlPath1.Length && i < urlPath2.Length
-                            && urlPath1[i] == urlPath2[i])
-                        {
-                            i++;
-                        }
-
-                        while (i > 0 && urlPath1[i - 1] != '/')
-                            i--;
-
-                        origin = new SvnOrigin(new Uri(origin.Uri, urlPath1.Substring(0, i)), origin.RepositoryRoot);
+                        origin = new SvnOrigin(
+                            SolutionUpdateLogic.GetCommonAncestorUri(origin.Uri, item.Uri),
+                            origin.RepositoryRoot);
                     }
                 }
 
@@ -345,16 +310,16 @@ namespace Ankh.Commands
             {
                 // GetAllUpdateRoots can (and probably will) return duplicates!
 
-                if (itemsToUpdate.ContainsKey(item.FullPath) || !item.IsVersioned)
-                    continue;
-
                 SvnWorkingCopy wc = item.WorkingCopy;
 
-                if (!IsHeadCommand(e.Command) && reposRoot != null)
+                if (!SolutionUpdateLogic.ShouldIncludeUpdateRoot(
+                        itemsToUpdate.ContainsKey(item.FullPath),
+                        item.IsVersioned,
+                        IsHeadCommand(e.Command),
+                        reposRoot,
+                        wc == null ? null : wc.RepositoryRoot))
                 {
-                    // Specific revisions are only valid on a single repository!
-                    if (wc != null && wc.RepositoryRoot != reposRoot)
-                        continue;
+                    continue;
                 }
 
                 UpdateGroup group;
