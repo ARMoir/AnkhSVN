@@ -22,18 +22,18 @@ namespace AnkhSvn_UnitTestProject.Commands
     [TestFixture]
     public class SolutionUpdateLogicTests
     {
-        [TestCase(AnkhCommand.SolutionUpdateLatest, UpdateCommandScope.Solution)]
-        [TestCase(AnkhCommand.SolutionUpdateSpecific, UpdateCommandScope.Solution)]
-        [TestCase(AnkhCommand.PendingChangesUpdateLatest, UpdateCommandScope.Solution)]
-        [TestCase(AnkhCommand.FolderUpdateLatest, UpdateCommandScope.Folder)]
-        [TestCase(AnkhCommand.FolderUpdateSpecific, UpdateCommandScope.Folder)]
-        [TestCase(AnkhCommand.ProjectUpdateLatest, UpdateCommandScope.Project)]
-        [TestCase(AnkhCommand.ProjectUpdateSpecific, UpdateCommandScope.Project)]
+        [TestCase(AnkhCommand.SolutionUpdateLatest, "Solution")]
+        [TestCase(AnkhCommand.SolutionUpdateSpecific, "Solution")]
+        [TestCase(AnkhCommand.PendingChangesUpdateLatest, "Solution")]
+        [TestCase(AnkhCommand.FolderUpdateLatest, "Folder")]
+        [TestCase(AnkhCommand.FolderUpdateSpecific, "Folder")]
+        [TestCase(AnkhCommand.ProjectUpdateLatest, "Project")]
+        [TestCase(AnkhCommand.ProjectUpdateSpecific, "Project")]
         public void GetScope_ClassifiesUpdateCommands(
             AnkhCommand command,
-            UpdateCommandScope expected)
+            string expected)
         {
-            Assert.That(SolutionUpdateLogic.GetScope(command), Is.EqualTo(expected));
+            Assert.That(SolutionUpdateLogic.GetScope(command).ToString(), Is.EqualTo(expected));
         }
 
         [TestCase(AnkhCommand.SolutionUpdateLatest, true)]
