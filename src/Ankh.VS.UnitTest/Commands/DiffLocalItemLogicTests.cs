@@ -145,7 +145,7 @@ namespace AnkhSvn_UnitTestProject.Commands
         public void ShouldUseCopyOrigin_RequiresCopyOrReplaceAndRepositorySide()
         {
             SvnRevisionRange repositoryToWorking =
-                new SvnRevisionRange(SvnRevision.Base, SvnRevision.Working);
+                new SvnRevisionRange(SvnRevision.Head, SvnRevision.Working);
             SvnRevisionRange workingToWorking =
                 new SvnRevisionRange(SvnRevision.Working, SvnRevision.Working);
 
