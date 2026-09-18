@@ -146,11 +146,16 @@ jobs:
         }
 
         [xml]$coverage = Get-Content -Raw $coveragePath
+        $coverageRoot = $coverage.SelectSingleNode("/*[local-name()='coverage']")
+        if ($null -eq $coverageRoot) {
+          throw "Cobertura report does not contain a coverage root element."
+        }
+
         $lineRate = [double]::Parse(
-          $coverage.coverage.GetAttribute("line-rate"),
+          $coverageRoot.GetAttribute("line-rate"),
           [Globalization.CultureInfo]::InvariantCulture)
         $branchRate = [double]::Parse(
-          $coverage.coverage.GetAttribute("branch-rate"),
+          $coverageRoot.GetAttribute("branch-rate"),
           [Globalization.CultureInfo]::InvariantCulture)
 
         $linePercent = [Math]::Round($lineRate * 100, 1)
