@@ -3,33 +3,34 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 11:59:37 AM |
-| Coverage date: | 9/19/2026 - 11:59:20 AM - 9/19/2026 - 11:59:29 AM |
+| Generated on: | 9/19/2026 - 12:43:47 PM |
+| Coverage date: | 9/19/2026 - 12:43:26 PM - 9/19/2026 - 12:43:37 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 588 |
-| Files: | 656 |
-| **Line coverage:** | 7.7% (3482 of 44900) |
-| Covered lines: | 3482 |
-| Uncovered lines: | 41418 |
-| Coverable lines: | 44900 |
-| Total lines: | 128132 |
-| **Branch coverage:** | 9.9% (2150 of 21665) |
-| Covered branches: | 2150 |
-| Total branches: | 21665 |
+| Classes: | 589 |
+| Files: | 657 |
+| **Line coverage:** | 7.7% (3495 of 44928) |
+| Covered lines: | 3495 |
+| Uncovered lines: | 41433 |
+| Coverable lines: | 44928 |
+| Total lines: | 128213 |
+| **Branch coverage:** | 9.9% (2164 of 21671) |
+| Covered branches: | 2164 |
+| Total branches: | 21671 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
 
 ## Coverage
-<details><summary>Ankh - 9.9%</summary>
+<details><summary>Ankh - 10%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh**|**9.9%**|**18.7%**|
+|**Ankh**|**10%**|**19%**|
 |Ankh.AnkhModule|0%||
 |Ankh.Commands.AddItemCommand|5.7%|14.7%|
-|Ankh.Commands.AddToSccCommands|1.9%|3.2%|
+|Ankh.Commands.AddToSccCommands|1.9%|3.3%|
+|Ankh.Commands.AddToSccLogic|100%|100%|
 |Ankh.Commands.ApplyPatch|20%|50%|
 |Ankh.Commands.BranchSolutionCommand|19.5%|37.9%|
 |Ankh.Commands.CheckForUpdates|0.8%|0%|
