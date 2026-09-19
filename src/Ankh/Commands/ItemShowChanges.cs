@@ -88,125 +88,236 @@ namespace Ankh.Commands
 
         public override void OnExecute(CommandEventArgs e)
         {
+            List<SvnItem> selectedFiles = GetSelectedFiles(e);
+            if (selectedFiles == null)
+                return;
+
+            SvnRevisionRange revisionRange;
+            if (!TryGetRevisionRange(e, selectedFiles, out revisionRange))
+                return;
+
+            SaveWorkingDocumentsIfNeeded(e, selectedFiles, revisionRange);
+
+            IAnkhDiffHandler diff = e.GetService<IAnkhDiffHandler>();
+            foreach (SvnItem item in selectedFiles)
+            {
+                if (!TryRunDiff(item, revisionRange, diff))
+                    return;
+            }
+        }
+
+        private List<SvnItem> GetSelectedFiles(CommandEventArgs e)
+        {
             List<SvnItem> selectedFiles = new List<SvnItem>();
 
             if (e.Command == AnkhCommand.DocumentShowChanges)
             {
                 SvnItem item = e.Selection.ActiveDocumentSvnItem;
+                if (item == null)
+                    return null;
 
-                if(item == null)
-                    return;
                 selectedFiles.Add(item);
+                return selectedFiles;
             }
-            else
-                foreach (SvnItem item in e.Selection.GetSelectedSvnItems(false))
-                {
-                    if (!DiffLocalItemLogic.ShouldInclude(
-                            e.Command,
-                            DiffLocalItemSelectionInfo.From(item)))
-                    {
-                        continue;
-                    }
 
+            foreach (SvnItem item in e.Selection.GetSelectedSvnItems(false))
+            {
+                if (DiffLocalItemLogic.ShouldInclude(
+                        e.Command,
+                        DiffLocalItemSelectionInfo.From(item)))
+                {
                     selectedFiles.Add(item);
                 }
-
-            SvnRevisionRange revRange = DiffLocalItemLogic.GetDefaultRevisionRange(e.Command);
-
-            if (e.PromptUser || selectedFiles.Count > 1 || revRange == null)
-            {
-                SvnRevision start = revRange == null ? SvnRevision.Base : revRange.StartRevision;
-                SvnRevision end = revRange == null ? SvnRevision.Working : revRange.EndRevision;
-
-                // should we show the path selector?
-                if (e.PromptUser || !Shift)
-                {
-                    using (CommonFileSelectorDialog dlg = new CommonFileSelectorDialog())
-                    {
-                        dlg.Text = CommandStrings.CompareFilesTitle;
-                        dlg.Items = selectedFiles;
-                        dlg.RevisionStart = start;
-                        dlg.RevisionEnd = end;
-
-                        if (dlg.ShowDialog(e.Context) != DialogResult.OK)
-                            return;
-
-                        selectedFiles.Clear();
-                        selectedFiles.AddRange(dlg.GetCheckedItems());
-                        start = dlg.RevisionStart;
-                        end = dlg.RevisionEnd;
-                    }
-                }
-
-                revRange = new SvnRevisionRange(start, end);
             }
 
-            if (DiffLocalItemLogic.RequiresDocumentSave(revRange))
-            {
-                // Save only the files needed
+            return selectedFiles;
+        }
 
-                IAnkhOpenDocumentTracker tracker = e.GetService<IAnkhOpenDocumentTracker>();
-                if (tracker != null)
-                    tracker.SaveDocuments(SvnItem.GetPaths(selectedFiles));
+        private bool TryGetRevisionRange(
+            CommandEventArgs e,
+            IList<SvnItem> selectedFiles,
+            out SvnRevisionRange revisionRange)
+        {
+            revisionRange =
+                DiffLocalItemLogic.GetDefaultRevisionRange(e.Command);
+
+            if (!e.PromptUser
+                && selectedFiles.Count <= 1
+                && revisionRange != null)
+            {
+                return true;
             }
 
-            IAnkhDiffHandler diff = e.GetService<IAnkhDiffHandler>();
-            foreach (SvnItem item in selectedFiles)
+            SvnRevision start = revisionRange == null
+                ? SvnRevision.Base
+                : revisionRange.StartRevision;
+            SvnRevision end = revisionRange == null
+                ? SvnRevision.Working
+                : revisionRange.EndRevision;
+
+            if (e.PromptUser || !Shift)
             {
-                AnkhDiffArgs da = new AnkhDiffArgs();
-
-                if (DiffLocalItemLogic.ShouldUseCopyOrigin(
-                        item.Status.IsCopied,
-                        item.IsReplaced,
-                        revRange))
+                using (CommonFileSelectorDialog dialog =
+                    new CommonFileSelectorDialog())
                 {
-                    // The file is copied, use its origins history instead of that of the new file
-                    SvnUriTarget copiedFrom = diff.GetCopyOrigin(item);
+                    dialog.Text = CommandStrings.CompareFilesTitle;
+                    dialog.Items = selectedFiles;
+                    dialog.RevisionStart = start;
+                    dialog.RevisionEnd = end;
 
-                    // TODO: Maybe handle Previous/Committed as history
+                    if (dialog.ShowDialog(e.Context) != DialogResult.OK)
+                        return false;
 
-                    if (copiedFrom != null && !revRange.StartRevision.RequiresWorkingCopy)
-                    {
-                        if (null == (da.BaseFile = diff.GetTempFile(copiedFrom, revRange.StartRevision, true)))
-                            return; // Canceled
-                        da.BaseTitle = diff.GetTitle(copiedFrom, revRange.StartRevision);
-                    }
+                    selectedFiles.Clear();
+                    foreach (SvnItem item in dialog.GetCheckedItems())
+                        selectedFiles.Add(item);
 
-                    if (copiedFrom != null && !revRange.EndRevision.RequiresWorkingCopy)
-                    {
-                        if (null == (da.MineFile = diff.GetTempFile(copiedFrom, revRange.EndRevision, true)))
-                            return; // Canceled
-                        da.MineTitle = diff.GetTitle(copiedFrom, revRange.EndRevision);
-                    }
+                    start = dialog.RevisionStart;
+                    end = dialog.RevisionEnd;
                 }
-
-                if (da.BaseFile == null)
-                {
-                    if (null == (da.BaseFile = (revRange.StartRevision == SvnRevision.Working) ? item.FullPath :
-                        diff.GetTempFile(item, revRange.StartRevision, true)))
-                    {
-                        return; // Canceled
-                    }
-
-                    da.BaseTitle = diff.GetTitle(item, revRange.StartRevision);
-                }
-
-                if (da.MineFile == null)
-                {
-                    if (null == (da.MineFile = (revRange.EndRevision == SvnRevision.Working) ? item.FullPath :
-                        diff.GetTempFile(item, revRange.EndRevision, true)))
-                    {
-                        return; // Canceled
-                    }
-
-                    da.MineTitle = diff.GetTitle(item, revRange.EndRevision);
-                }
-
-                if (!String.Equals(da.MineFile, item.FullPath, StringComparison.OrdinalIgnoreCase))
-                    da.ReadOnly = true;
-
-                diff.RunDiff(da);
             }
+
+            revisionRange = new SvnRevisionRange(start, end);
+            return true;
+        }
+
+        private static void SaveWorkingDocumentsIfNeeded(
+            CommandEventArgs e,
+            IList<SvnItem> selectedFiles,
+            SvnRevisionRange revisionRange)
+        {
+            if (!DiffLocalItemLogic.RequiresDocumentSave(revisionRange))
+                return;
+
+            IAnkhOpenDocumentTracker tracker =
+                e.GetService<IAnkhOpenDocumentTracker>();
+
+            if (tracker != null)
+                tracker.SaveDocuments(SvnItem.GetPaths(selectedFiles));
+        }
+
+        private static bool TryRunDiff(
+            SvnItem item,
+            SvnRevisionRange revisionRange,
+            IAnkhDiffHandler diff)
+        {
+            AnkhDiffArgs args;
+            if (!TryCreateDiffArgs(item, revisionRange, diff, out args))
+                return false;
+
+            diff.RunDiff(args);
+            return true;
+        }
+
+        private static bool TryCreateDiffArgs(
+            SvnItem item,
+            SvnRevisionRange revisionRange,
+            IAnkhDiffHandler diff,
+            out AnkhDiffArgs args)
+        {
+            args = new AnkhDiffArgs();
+
+            if (DiffLocalItemLogic.ShouldUseCopyOrigin(
+                    item.Status.IsCopied,
+                    item.IsReplaced,
+                    revisionRange))
+            {
+                SvnUriTarget copiedFrom = diff.GetCopyOrigin(item);
+
+                if (!TryGetCopyOriginSide(
+                        diff,
+                        copiedFrom,
+                        revisionRange.StartRevision,
+                        out args.BaseFile,
+                        out args.BaseTitle))
+                {
+                    return false;
+                }
+
+                if (!TryGetCopyOriginSide(
+                        diff,
+                        copiedFrom,
+                        revisionRange.EndRevision,
+                        out args.MineFile,
+                        out args.MineTitle))
+                {
+                    return false;
+                }
+            }
+
+            if (args.BaseFile == null
+                && !TryGetItemSide(
+                    diff,
+                    item,
+                    revisionRange.StartRevision,
+                    out args.BaseFile,
+                    out args.BaseTitle))
+            {
+                return false;
+            }
+
+            if (args.MineFile == null
+                && !TryGetItemSide(
+                    diff,
+                    item,
+                    revisionRange.EndRevision,
+                    out args.MineFile,
+                    out args.MineTitle))
+            {
+                return false;
+            }
+
+            if (!String.Equals(
+                    args.MineFile,
+                    item.FullPath,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                args.ReadOnly = true;
+            }
+
+            return true;
+        }
+
+        private static bool TryGetCopyOriginSide(
+            IAnkhDiffHandler diff,
+            SvnUriTarget copiedFrom,
+            SvnRevision revision,
+            out string file,
+            out string title)
+        {
+            file = null;
+            title = null;
+
+            if (copiedFrom == null || revision.RequiresWorkingCopy)
+                return true;
+
+            file = diff.GetTempFile(copiedFrom, revision, true);
+            if (file == null)
+                return false;
+
+            title = diff.GetTitle(copiedFrom, revision);
+            return true;
+        }
+
+        private static bool TryGetItemSide(
+            IAnkhDiffHandler diff,
+            SvnItem item,
+            SvnRevision revision,
+            out string file,
+            out string title)
+        {
+            file = revision == SvnRevision.Working
+                ? item.FullPath
+                : diff.GetTempFile(item, revision, true);
+
+            if (file == null)
+            {
+                title = null;
+                return false;
+            }
+
+            title = diff.GetTitle(item, revision);
+            return true;
         }
     }
 }
