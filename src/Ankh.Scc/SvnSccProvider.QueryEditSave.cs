@@ -213,7 +213,7 @@ namespace Ankh.Scc
             pfEditVerdict = (uint)tagVSQueryEditResult.QER_EditOK;
             prgfMoreInfo = (uint)(tagVSQueryEditResultFlags)0; // Must be 0 when verdict is QER_EditOK or you see failures like issue #624
 
-            bool allowUI = (queryFlags & (tagVSQueryEditFlags.QEF_SilentMode | tagVSQueryEditFlags.QEF_ReportOnly | tagVSQueryEditFlags.QEF_ForceEdit_NoPrompting)) == 0;
+            bool allowUI = QueryEditLogic.AllowsUI(queryFlags);
 
             bool? allowReadOnlyNonSccWrites = null;
 
@@ -246,46 +246,55 @@ namespace Ankh.Scc
 
                     Monitor.ScheduleDirtyCheck(item);
 
-                    if (item.IsReadOnlyMustLock && !item.IsDirectory)
-                    {
-                        if (!allowUI)
-                        {
-                            pfEditVerdict = (uint)tagVSQueryEditResult.QER_EditNotOK;
-                            prgfMoreInfo = (uint)(tagVSQueryEditResultFlags.QER_ReadOnlyUnderScc
-                                                   | tagVSQueryEditResultFlags.QER_NoisyCheckoutRequired);
-
-                            return VSErr.S_OK;
-                        }
-
-                        if (mustLockItems == null)
-                        {
-                            mustLockFiles = new HybridCollection<string>(StringComparer.OrdinalIgnoreCase);
-                            mustLockItems = new List<SvnItem>();
-                        }
-
-                        if (!mustLockFiles.Contains(item.FullPath))
-                        {
-                            mustLockFiles.Add(item.FullPath);
-                            mustLockItems.Add(item);
-                        }
-                    }
-                    else if (item.IsReadOnly)
+                    bool allowReadOnlyWrites = true;
+                    if (QueryEditLogic.NeedsReadOnlyNonSccPolicy(
+                            item.IsReadOnlyMustLock,
+                            item.IsDirectory,
+                            item.IsReadOnly))
                     {
                         if (!allowReadOnlyNonSccWrites.HasValue)
                             allowReadOnlyNonSccWrites = AllowReadOnlyNonSccWrites();
 
-                        if (!allowReadOnlyNonSccWrites.Value)
-                        {
-                            if (!allowUI)
-                            {
-                                pfEditVerdict = (uint)tagVSQueryEditResult.QER_EditNotOK;
-                                prgfMoreInfo = (uint)(tagVSQueryEditResultFlags.QER_InMemoryEditNotAllowed
-                                                       | tagVSQueryEditResultFlags.QER_ReadOnlyNotUnderScc
-                                                       | tagVSQueryEditResultFlags.QER_NoisyPromptRequired);
+                        allowReadOnlyWrites = allowReadOnlyNonSccWrites.Value;
+                    }
 
-                                return VSErr.S_OK;
+                    QueryEditFileAction action = QueryEditLogic.GetFileAction(
+                        item.IsReadOnlyMustLock,
+                        item.IsDirectory,
+                        item.IsReadOnly,
+                        allowUI,
+                        allowReadOnlyWrites);
+
+                    switch (action)
+                    {
+                        case QueryEditFileAction.RejectMustLock:
+                            pfEditVerdict = (uint)tagVSQueryEditResult.QER_EditNotOK;
+                            prgfMoreInfo = (uint)(tagVSQueryEditResultFlags.QER_ReadOnlyUnderScc
+                                                   | tagVSQueryEditResultFlags.QER_NoisyCheckoutRequired);
+                            return VSErr.S_OK;
+
+                        case QueryEditFileAction.QueueMustLock:
+                            if (mustLockItems == null)
+                            {
+                                mustLockFiles = new HybridCollection<string>(StringComparer.OrdinalIgnoreCase);
+                                mustLockItems = new List<SvnItem>();
                             }
 
+                            if (!mustLockFiles.Contains(item.FullPath))
+                            {
+                                mustLockFiles.Add(item.FullPath);
+                                mustLockItems.Add(item);
+                            }
+                            break;
+
+                        case QueryEditFileAction.RejectReadOnly:
+                            pfEditVerdict = (uint)tagVSQueryEditResult.QER_EditNotOK;
+                            prgfMoreInfo = (uint)(tagVSQueryEditResultFlags.QER_InMemoryEditNotAllowed
+                                                   | tagVSQueryEditResultFlags.QER_ReadOnlyNotUnderScc
+                                                   | tagVSQueryEditResultFlags.QER_NoisyPromptRequired);
+                            return VSErr.S_OK;
+
+                        case QueryEditFileAction.QueueReadOnly:
                             if (readOnlyEditFiles == null)
                             {
                                 readOnlyEditFiles = new HybridCollection<string>(StringComparer.OrdinalIgnoreCase);
@@ -297,8 +306,7 @@ namespace Ankh.Scc
                                 readOnlyEditFiles.Add(item.FullPath);
                                 readOnlyItems.Add(item);
                             }
-                        }
-                        // else // allow editting
+                            break;
                     }
                 }
                 if (mustLockItems != null)
