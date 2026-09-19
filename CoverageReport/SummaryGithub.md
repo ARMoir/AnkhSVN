@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 12:31:13 AM |
-| Coverage date: | 9/19/2026 - 12:31:00 AM - 9/19/2026 - 12:31:06 AM |
+| Generated on: | 9/19/2026 - 1:17:17 AM |
+| Coverage date: | 9/19/2026 - 1:16:57 AM - 9/19/2026 - 1:17:07 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 567 |
-| Files: | 646 |
-| **Line coverage:** | 6.4% (2844 of 44016) |
-| Covered lines: | 2844 |
-| Uncovered lines: | 41172 |
-| Coverable lines: | 44016 |
-| Total lines: | 126419 |
-| **Branch coverage:** | 8.4% (1826 of 21621) |
-| Covered branches: | 1826 |
-| Total branches: | 21621 |
+| Classes: | 569 |
+| Files: | 647 |
+| **Line coverage:** | 6.6% (2923 of 44079) |
+| Covered lines: | 2923 |
+| Uncovered lines: | 41156 |
+| Coverable lines: | 44079 |
+| Total lines: | 126519 |
+| **Branch coverage:** | 8.6% (1880 of 21623) |
+| Covered branches: | 1880 |
+| Total branches: | 21623 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -593,11 +593,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 3.2%</summary>
+<details><summary>Ankh.VS - 5.1%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**3.2%**|**1.7%**|
+|**Ankh.VS**|**5.1%**|**3.9%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -637,7 +637,9 @@
 |Ankh.VS.Services.InternalDiff|0%|0%|
 |Ankh.VS.SolutionExplorer.FileIconMapper|74.3%|61.9%|
 |Ankh.VS.SolutionExplorer.SolutionExplorerStrings|0%|0%|
+|Ankh.VS.SolutionExplorer.StatusImageInfo|100%||
 |Ankh.VS.SolutionExplorer.StatusImageMapper|0%|0%|
+|Ankh.VS.SolutionExplorer.StatusImageMapperLogic|100%|100%|
 |Ankh.VS.SolutionExplorer.Win32TreeView|0%|0%|
 |Ankh.VS.TextEditor.CodeEditorWindow|0%|0%|
 |Ankh.VS.TextEditor.TextEditorFactory|0%||
