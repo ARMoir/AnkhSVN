@@ -3,19 +3,19 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 3:09:20 AM |
-| Coverage date: | 9/19/2026 - 3:08:57 AM - 9/19/2026 - 3:09:09 AM |
+| Generated on: | 9/19/2026 - 3:15:33 AM |
+| Coverage date: | 9/19/2026 - 3:15:16 AM - 9/19/2026 - 3:15:25 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 585 |
 | Files: | 654 |
-| **Line coverage:** | 7.5% (3397 of 44759) |
-| Covered lines: | 3397 |
-| Uncovered lines: | 41362 |
+| **Line coverage:** | 7.6% (3406 of 44759) |
+| Covered lines: | 3406 |
+| Uncovered lines: | 41353 |
 | Coverable lines: | 44759 |
 | Total lines: | 127818 |
-| **Branch coverage:** | 9.6% (2101 of 21667) |
-| Covered branches: | 2101 |
+| **Branch coverage:** | 9.7% (2105 of 21667) |
+| Covered branches: | 2105 |
 | Total branches: | 21667 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -215,11 +215,11 @@
 |Ankh.VSPackage.WorkingCopyExplorerToolWindow|0%||
 
 </details>
-<details><summary>Ankh.Scc - 6.5%</summary>
+<details><summary>Ankh.Scc - 6.7%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Scc**|**6.5%**|**5.8%**|
+|**Ankh.Scc**|**6.7%**|**5.8%**|
 |Ankh.Scc.AnkhSccModule|0%||
 |Ankh.Scc.Commands.MarkProjectDirty|12.5%|0%|
 |Ankh.Scc.Commands.PendingChangeTicker|14.2%|0%|
@@ -234,7 +234,7 @@
 |Ankh.Scc.ProjectMap.SccSvnProject|0%||
 |Ankh.Scc.ProjectNotifier|0%|0%|
 |Ankh.Scc.ProjectTracker|0%|0%|
-|Ankh.Scc.ProjectTrackerOriginLogic|59%|71.4%|
+|Ankh.Scc.ProjectTrackerOriginLogic|86.3%|85.7%|
 |Ankh.Scc.QueryEditLogic|100%|100%|
 |Ankh.Scc.Resources|0%|0%|
 |Ankh.Scc.SccUI.ChangeSolutionRoot|0%|0%|
@@ -260,11 +260,11 @@
 |Ankh.Scc.ThePendingChangeCollection|0%||
 
 </details>
-<details><summary>Ankh.Services - 12.8%</summary>
+<details><summary>Ankh.Services - 12.9%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Services**|**12.8%**|**11.9%**|
+|**Ankh.Services**|**12.9%**|**12%**|
 |Ankh.AnkhInstanceConditionalAttribute|46.6%|50%|
 |Ankh.AnkhRuntime|31.9%|24.3%|
 |Ankh.AnkhService|10.8%|6.4%|
@@ -349,7 +349,7 @@
 |Ankh.Services.XCastInt32|0%||
 |Ankh.Services.XCastUInt32|0%||
 |Ankh.SvnClientAction|0%|0%|
-|Ankh.SvnItem|38.6%|25.7%|
+|Ankh.SvnItem|39.1%|26.1%|
 |Ankh.SvnPoolClient|0%|0%|
 |Ankh.SvnPoolRemoteSession|0%|0%|
 |Ankh.UI.AnkhCommandHook|0%|0%|
