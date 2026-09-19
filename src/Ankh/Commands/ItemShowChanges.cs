@@ -224,47 +224,71 @@ namespace Ankh.Commands
             {
                 SvnUriTarget copiedFrom = diff.GetCopyOrigin(item);
 
+                string baseFile;
+                string baseTitle;
                 if (!TryGetCopyOriginSide(
                         diff,
                         copiedFrom,
                         revisionRange.StartRevision,
-                        out args.BaseFile,
-                        out args.BaseTitle))
+                        out baseFile,
+                        out baseTitle))
                 {
                     return false;
                 }
 
+                args.BaseFile = baseFile;
+                args.BaseTitle = baseTitle;
+
+                string mineFile;
+                string mineTitle;
                 if (!TryGetCopyOriginSide(
                         diff,
                         copiedFrom,
                         revisionRange.EndRevision,
-                        out args.MineFile,
-                        out args.MineTitle))
+                        out mineFile,
+                        out mineTitle))
                 {
                     return false;
                 }
+
+                args.MineFile = mineFile;
+                args.MineTitle = mineTitle;
             }
 
-            if (args.BaseFile == null
-                && !TryGetItemSide(
-                    diff,
-                    item,
-                    revisionRange.StartRevision,
-                    out args.BaseFile,
-                    out args.BaseTitle))
+            if (args.BaseFile == null)
             {
-                return false;
+                string baseFile;
+                string baseTitle;
+                if (!TryGetItemSide(
+                        diff,
+                        item,
+                        revisionRange.StartRevision,
+                        out baseFile,
+                        out baseTitle))
+                {
+                    return false;
+                }
+
+                args.BaseFile = baseFile;
+                args.BaseTitle = baseTitle;
             }
 
-            if (args.MineFile == null
-                && !TryGetItemSide(
-                    diff,
-                    item,
-                    revisionRange.EndRevision,
-                    out args.MineFile,
-                    out args.MineTitle))
+            if (args.MineFile == null)
             {
-                return false;
+                string mineFile;
+                string mineTitle;
+                if (!TryGetItemSide(
+                        diff,
+                        item,
+                        revisionRange.EndRevision,
+                        out mineFile,
+                        out mineTitle))
+                {
+                    return false;
+                }
+
+                args.MineFile = mineFile;
+                args.MineTitle = mineTitle;
             }
 
             if (!String.Equals(
