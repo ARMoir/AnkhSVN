@@ -35,7 +35,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.RangeOfRevisions,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.RangeOfRevisions,
                     mergeRevisions: "2-4, 7"));
 
             Assert.That(model.MergeTarget, Is.EqualTo(@"C:\wc"));
@@ -53,7 +53,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.Reintegrate,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.Reintegrate,
                     mergeRevisions: null));
 
             Assert.That(model.Revisions, Is.EqualTo(MergeStrings.All));
@@ -64,7 +64,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.TwoDifferentTrees,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.TwoDifferentTrees,
                     hasSecondSource: true,
                     fromRevision: 10,
                     toRevision: 20));
@@ -83,7 +83,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.TwoDifferentTrees,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.TwoDifferentTrees,
                     hasSecondSource: false,
                     fromRevision: -1,
                     toRevision: -1));
@@ -107,7 +107,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.RangeOfRevisions,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.RangeOfRevisions,
                     binary: option,
                     text: option));
 
@@ -125,7 +125,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.RangeOfRevisions,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.RangeOfRevisions,
                     depth: depth));
 
             Assert.That(
@@ -143,7 +143,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.RangeOfRevisions,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.RangeOfRevisions,
                     ignoreAncestry: ignoreAncestry,
                     allowObstructions: allowObstructions));
 
@@ -160,7 +160,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         {
             MergeSummaryModel model = MergeSummaryLogic.Build(
                 Input(
-                    MergeWizard.MergeType.RangeOfRevisions,
+                    Ankh.UI.MergeWizard.MergeWizard.MergeType.RangeOfRevisions,
                     binary:
                         (MergeOptionsPage.ConflictResolutionOption)Int32.MaxValue,
                     text:
@@ -173,7 +173,7 @@ namespace AnkhSvn_UnitTestProject.MergeWizard
         }
 
         static MergeSummaryInput Input(
-            MergeWizard.MergeType type,
+            Ankh.UI.MergeWizard.MergeWizard.MergeType type,
             string mergeRevisions = "5-8",
             bool hasSecondSource = true,
             long fromRevision = 1,
