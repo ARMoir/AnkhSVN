@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 using SharpSvn;
 
 namespace Ankh.Commands
@@ -26,6 +29,21 @@ namespace Ankh.Commands
 
     internal static class ItemEditPropertiesLogic
     {
+        public static bool HasPersistableChanges(
+            IEnumerable<bool> shouldPersist)
+        {
+            if (shouldPersist == null)
+                throw new ArgumentNullException("shouldPersist");
+
+            foreach (bool value in shouldPersist)
+            {
+                if (value)
+                    return true;
+            }
+
+            return false;
+        }
+
         public static PropertyPersistenceAction GetPersistenceAction(
             bool shouldPersist,
             SvnPropertyValue originalValue,

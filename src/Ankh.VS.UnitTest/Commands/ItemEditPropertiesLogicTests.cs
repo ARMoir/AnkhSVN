@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 using Ankh.Commands;
 using NUnit.Framework;
 using SharpSvn;
@@ -21,6 +24,32 @@ namespace AnkhSvn_UnitTestProject.Commands
     [TestFixture]
     public class ItemEditPropertiesLogicTests
     {
+        [Test]
+        public void HasPersistableChanges_RejectsNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => ItemEditPropertiesLogic.HasPersistableChanges(null));
+        }
+
+        [Test]
+        public void HasPersistableChanges_DetectsAnyPersistableItem()
+        {
+            Assert.That(
+                ItemEditPropertiesLogic.HasPersistableChanges(
+                    new[] { false, false, true, false }),
+                Is.True);
+
+            Assert.That(
+                ItemEditPropertiesLogic.HasPersistableChanges(
+                    new[] { false, false }),
+                Is.False);
+
+            Assert.That(
+                ItemEditPropertiesLogic.HasPersistableChanges(
+                    new List<bool>()),
+                Is.False);
+        }
+
         [Test]
         public void GetPersistenceAction_IgnoresItemsNotMarkedForPersistence()
         {
