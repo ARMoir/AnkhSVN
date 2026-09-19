@@ -138,6 +138,8 @@ namespace AnkhSvn_UnitTestProject.Diff
             Assert.That(normal.TargetColumn, Is.EqualTo(20));
         }
 
+        [TestCase(Keys.Up, Keys.Control | Keys.Shift)]
+        [TestCase(Keys.Down, Keys.Control | Keys.Shift)]
         [TestCase(Keys.Left, Keys.Control)]
         [TestCase(Keys.Right, Keys.Control)]
         [TestCase(Keys.PageUp, Keys.Control)]
