@@ -71,17 +71,18 @@ namespace AnkhSvn_UnitTestProject.Scc
         }
 
         [Test]
-        public void InferOrigin_UsesKnownParentCopy()
+        public void InferOrigin_UsesKnownChildCopyToInferParent()
         {
             string root = Path.GetPathRoot(Environment.CurrentDirectory);
-            string newName = Path.Combine(root, "dest", "folder", "child.cs");
-            string copiedRoot = Path.Combine(root, "dest", "folder");
+            string newName = Path.Combine(root, "dest", "folder");
+            string copiedChild = Path.Combine(newName, "child.cs");
             string originRoot = Path.Combine(root, "source", "folder");
+            string originChild = Path.Combine(originRoot, "child.cs");
 
             SortedList<string, string> origins =
                 new SortedList<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    { copiedRoot, originRoot }
+                    { copiedChild, originChild }
                 };
 
             string result =
@@ -89,9 +90,7 @@ namespace AnkhSvn_UnitTestProject.Scc
                     newName,
                     origins);
 
-            Assert.That(
-                result,
-                Is.EqualTo(Path.Combine(originRoot, "child.cs")));
+            Assert.That(result, Is.EqualTo(originRoot));
         }
 
         [Test]
