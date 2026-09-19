@@ -267,14 +267,17 @@ jobs:
         Get-ChildItem -Path . -Filter "*.svg" -File -ErrorAction SilentlyContinue | Remove-Item -Force
         Copy-Item "${{ github.workspace }}\ReadmeBadges\*.svg" .
 
-        git add *.svg
+        New-Item -ItemType Directory -Force -Path "CoverageReport" | Out-Null
+        Copy-Item "${{ github.workspace }}\CoverageReport\SummaryGithub.md" "CoverageReport\SummaryGithub.md" -Force
+
+        git add *.svg CoverageReport/SummaryGithub.md
         git diff --cached --quiet
         if ($LASTEXITCODE -eq 0) {
-          Write-Host "README badges are already current."
+          Write-Host "README badges and coverage summary are already current."
           exit 0
         }
 
-        git commit -m "Update README badges for run #${{ github.run_number }}"
+        git commit -m "Update README metrics for run #${{ github.run_number }}"
         git push origin HEAD:badges
 
     - name: Upload coverage report

@@ -5,6 +5,8 @@
 ![Line coverage](https://raw.githubusercontent.com/ARMoir/AnkhSVN/badges/coverage.svg)
 ![Branch coverage](https://raw.githubusercontent.com/ARMoir/AnkhSVN/badges/branches.svg)
 
+[View detailed coverage report](https://github.com/ARMoir/AnkhSVN/blob/badges/CoverageReport/SummaryGithub.md)
+
 AnkhSVN integrates Apache Subversion working-copy and repository operations directly into Visual Studio.
 
 > **Supported Visual Studio versions:** Visual Studio 2022 and later. Current packages are x64-only; the pre-VS2022 package and test infrastructure have been retired.
