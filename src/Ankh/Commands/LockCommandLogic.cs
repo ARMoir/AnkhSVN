@@ -20,7 +20,7 @@ namespace Ankh.Commands
 {
     internal static class LockCommandLogic
     {
-        static Regex _guessOwnerRegex;
+        static Regex _quotedValueRegex;
 
         public static bool IsLockCandidate(
             bool isFile,
@@ -56,19 +56,20 @@ namespace Ankh.Commands
 
         public static string GuessUserFromError(string message)
         {
-            if (_guessOwnerRegex == null)
+            if (_quotedValueRegex == null)
             {
-                _guessOwnerRegex = new Regex(
-                    "^[^']+ ['»](?<path>.*?)['«][^']+ ['»](?<user>.*?)['«][^']+( ['»].*?['«][^']*)*$",
+                _quotedValueRegex = new Regex(
+                    "['»](?<value>.*?)['«]",
                     RegexOptions.Compiled
                         | RegexOptions.ExplicitCapture
                         | RegexOptions.Singleline);
             }
 
-            Match match = _guessOwnerRegex.Match(message);
-            return match.Success
-                ? match.Groups["user"].Value
-                : null;
+            MatchCollection values = _quotedValueRegex.Matches(message);
+            if (values.Count < 2)
+                return null;
+
+            return values[1].Groups["value"].Value;
         }
 
         public static string BuildAlreadyLockedMessage(
