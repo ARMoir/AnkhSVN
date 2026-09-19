@@ -209,10 +209,10 @@ namespace Ankh.Scc
         /// <returns></returns>
         sealed class QueryEditQueues
         {
-            public HybridCollection<string> MustLockFiles { get; set; }
-            public List<SvnItem> MustLockItems { get; set; }
-            public HybridCollection<string> ReadOnlyFiles { get; set; }
-            public List<SvnItem> ReadOnlyItems { get; set; }
+            public HybridCollection<string> MustLockFiles;
+            public List<SvnItem> MustLockItems;
+            public HybridCollection<string> ReadOnlyFiles;
+            public List<SvnItem> ReadOnlyItems;
         }
 
         public int QueryEditFiles(uint rgfQueryEdit, int cFiles, string[] rgpszMkDocuments, uint[] rgrgf, VSQEQS_FILE_ATTRIBUTE_DATA[] rgFileInfo, out uint pfEditVerdict, out uint prgfMoreInfo)
