@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 11:40:29 AM |
-| Coverage date: | 9/19/2026 - 11:40:09 AM - 9/19/2026 - 11:40:19 AM |
+| Generated on: | 9/19/2026 - 11:48:59 AM |
+| Coverage date: | 9/19/2026 - 11:48:37 AM - 9/19/2026 - 11:48:48 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 587 |
 | Files: | 655 |
-| **Line coverage:** | 7.7% (3454 of 44799) |
+| **Line coverage:** | 7.7% (3454 of 44840) |
 | Covered lines: | 3454 |
-| Uncovered lines: | 41345 |
-| Coverable lines: | 44799 |
-| Total lines: | 127914 |
-| **Branch coverage:** | 9.8% (2133 of 21671) |
+| Uncovered lines: | 41386 |
+| Coverable lines: | 44840 |
+| Total lines: | 127987 |
+| **Branch coverage:** | 9.8% (2133 of 21673) |
 | Covered branches: | 2133 |
-| Total branches: | 21671 |
+| Total branches: | 21673 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -215,11 +215,11 @@
 |Ankh.VSPackage.WorkingCopyExplorerToolWindow|0%||
 
 </details>
-<details><summary>Ankh.Scc - 6.7%</summary>
+<details><summary>Ankh.Scc - 6.6%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Scc**|**6.7%**|**5.8%**|
+|**Ankh.Scc**|**6.6%**|**5.8%**|
 |Ankh.Scc.AnkhSccModule|0%||
 |Ankh.Scc.Commands.MarkProjectDirty|12.5%|0%|
 |Ankh.Scc.Commands.PendingChangeTicker|14.2%|0%|
