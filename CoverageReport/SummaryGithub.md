@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 2:46:01 AM |
-| Coverage date: | 9/19/2026 - 2:45:39 AM - 9/19/2026 - 2:45:51 AM |
+| Generated on: | 9/19/2026 - 2:50:46 AM |
+| Coverage date: | 9/19/2026 - 2:50:28 AM - 9/19/2026 - 2:50:37 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 583 |
 | Files: | 652 |
-| **Line coverage:** | 7.5% (3368 of 44604) |
+| **Line coverage:** | 7.5% (3368 of 44632) |
 | Covered lines: | 3368 |
-| Uncovered lines: | 41236 |
-| Coverable lines: | 44604 |
-| Total lines: | 127482 |
-| **Branch coverage:** | 9.4% (2047 of 21660) |
+| Uncovered lines: | 41264 |
+| Coverable lines: | 44632 |
+| Total lines: | 127559 |
+| **Branch coverage:** | 9.4% (2047 of 21662) |
 | Covered branches: | 2047 |
-| Total branches: | 21660 |
+| Total branches: | 21662 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -71,7 +71,7 @@
 |Ankh.Commands.RevertItemCommand|3.4%|8.6%|
 |Ankh.Commands.RevertItemLogic|100%|100%|
 |Ankh.Commands.SolutionCommitCommand|42.3%|36.3%|
-|Ankh.Commands.SolutionUpdateCommand|15.3%|22.3%|
+|Ankh.Commands.SolutionUpdateCommand|13.4%|21.9%|
 |Ankh.Commands.SolutionUpdateLogic|100%|100%|
 |Ankh.Commands.SolutionUpdatePlan|100%|100%|
 |Ankh.Commands.SwitchItemCommand|12.9%|31.1%|
