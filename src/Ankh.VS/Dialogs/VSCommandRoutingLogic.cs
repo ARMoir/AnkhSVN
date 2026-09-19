@@ -95,7 +95,7 @@ namespace Ankh.VS.Dialogs
             int hResult,
             int commandTranslated)
         {
-            return hResult == VSErr.S_OK && commandTranslated != 0;
+            return hResult == VSConstants.S_OK && commandTranslated != 0;
         }
 
         static VSCommandRoutingKeyPlan Plan(
