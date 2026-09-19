@@ -153,22 +153,33 @@ namespace Ankh.Scc
             {
                 SvnItem item = StatusCache[file];
 
-                if (i >= n) // This is a subitem!
-                {
-                    if (item.IsModified)
-                        sb.AppendFormat(format, item.Name, Resources.ToolTipModified).AppendLine();
-                }
+                GlyphTipIndicators indicators = GlyphTipLogic.GetIndicators(
+                    i >= n,
+                    item.IsModified,
+                    item.IsConflicted,
+                    item.IsObstructed,
+                    item.IsFile,
+                    item.Exists,
+                    item.IsVersioned,
+                    item.IsDeleteScheduled,
+                    item.IsLocked);
 
-                if (item.IsConflicted)
+                if ((indicators & GlyphTipIndicators.Modified) != 0)
+                    sb.AppendFormat(format, item.Name, Resources.ToolTipModified).AppendLine();
+
+                if ((indicators & GlyphTipIndicators.Conflict) != 0)
                     sb.AppendFormat(format, item.Name, Resources.ToolTipConflict).AppendLine();
 
-                if (item.IsObstructed)
-                    sb.AppendFormat(format, item.Name, item.IsFile ? Resources.ToolTipFileObstructed : Resources.ToolTipDirObstructed).AppendLine();
+                if ((indicators & GlyphTipIndicators.FileObstructed) != 0)
+                    sb.AppendFormat(format, item.Name, Resources.ToolTipFileObstructed).AppendLine();
 
-                if (!item.Exists && item.IsVersioned && !item.IsDeleteScheduled)
+                if ((indicators & GlyphTipIndicators.DirectoryObstructed) != 0)
+                    sb.AppendFormat(format, item.Name, Resources.ToolTipDirObstructed).AppendLine();
+
+                if ((indicators & GlyphTipIndicators.DoesNotExist) != 0)
                     sb.AppendFormat(format, item.Name, Resources.ToolTipDoesNotExist).AppendLine();
 
-                if (item.IsLocked)
+                if ((indicators & GlyphTipIndicators.Locked) != 0)
                     sb.AppendFormat(format, item.Name, Resources.ToolTipLocked).AppendLine();
                 i++;
 
