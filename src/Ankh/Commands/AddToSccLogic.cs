@@ -34,6 +34,67 @@ namespace Ankh.Commands
 
     internal static class AddToSccLogic
     {
+        public static bool ShouldDisableBeforeLookup(
+            bool solutionExists,
+            bool projectCommand,
+            bool emptySolution,
+            bool otherSccProviderActive)
+        {
+            return !solutionExists
+                || (projectCommand && emptySolution)
+                || otherSccProviderActive;
+        }
+
+        public static bool ShouldDisableForMissingServices(
+            bool hasSccService,
+            bool hasStatusCache)
+        {
+            return !hasSccService || !hasStatusCache;
+        }
+
+        public static bool ShouldDisableSolutionCommand(
+            bool hasSolutionFilename,
+            bool isSolutionManaged)
+        {
+            return !hasSolutionFilename || isSolutionManaged;
+        }
+
+        public static bool ShouldDisableSolutionItem(
+            bool exists,
+            bool isFile,
+            bool needsWorkingCopyUpgrade)
+        {
+            return !exists || !isFile || needsWorkingCopyUpgrade;
+        }
+
+        public static bool ShouldHideSolutionContext(
+            bool isVersioned,
+            bool isIgnored,
+            bool isSolutionSelected)
+        {
+            return !isVersioned && isIgnored && !isSolutionSelected;
+        }
+
+        public static bool ShouldSkipProjectUpdate(
+            bool hasProjectInfo,
+            bool isSccBindable,
+            bool projectDirectoryVersioned,
+            bool isProjectManaged)
+        {
+            if (!hasProjectInfo || !isSccBindable)
+                return true;
+
+            return projectDirectoryVersioned && isProjectManaged;
+        }
+
+        public static bool ShouldHideProjectContext(
+            int selectionPass,
+            bool hasProjectFile,
+            bool projectFileIgnored)
+        {
+            return selectionPass > 1 && hasProjectFile && projectFileIgnored;
+        }
+
         public static AddToSccProjectAction GetProjectAction(
             bool isSccBindable,
             bool sameWorkingCopy,

@@ -22,6 +22,128 @@ namespace AnkhSvn_UnitTestProject.Commands
     [TestFixture]
     public class AddToSccLogicTests
     {
+        [TestCase(false, false, false, false, true)]
+        [TestCase(true, true, true, false, true)]
+        [TestCase(true, false, false, true, true)]
+        [TestCase(true, false, false, false, false)]
+        public void ShouldDisableBeforeLookup_CoversInitialGuard(
+            bool solutionExists,
+            bool projectCommand,
+            bool emptySolution,
+            bool otherProvider,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldDisableBeforeLookup(
+                    solutionExists,
+                    projectCommand,
+                    emptySolution,
+                    otherProvider),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(false, true, true)]
+        [TestCase(true, false, true)]
+        [TestCase(true, true, false)]
+        public void ShouldDisableForMissingServices_RequiresBothServices(
+            bool hasScc,
+            bool hasCache,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldDisableForMissingServices(hasScc, hasCache),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(false, false, true)]
+        [TestCase(true, true, true)]
+        [TestCase(true, false, false)]
+        public void ShouldDisableSolutionCommand_RequiresUnmanagedFilename(
+            bool hasFilename,
+            bool managed,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldDisableSolutionCommand(hasFilename, managed),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(false, true, false, true)]
+        [TestCase(true, false, false, true)]
+        [TestCase(true, true, true, true)]
+        [TestCase(true, true, false, false)]
+        public void ShouldDisableSolutionItem_RequiresUsableWorkingCopyItem(
+            bool exists,
+            bool isFile,
+            bool needsUpgrade,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldDisableSolutionItem(
+                    exists,
+                    isFile,
+                    needsUpgrade),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(false, true, false, true)]
+        [TestCase(false, true, true, false)]
+        [TestCase(false, false, false, false)]
+        [TestCase(true, true, false, false)]
+        public void ShouldHideSolutionContext_OnlyForIgnoredUnversionedContextItem(
+            bool versioned,
+            bool ignored,
+            bool solutionSelected,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldHideSolutionContext(
+                    versioned,
+                    ignored,
+                    solutionSelected),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(false, true, false, false, true)]
+        [TestCase(true, false, false, false, true)]
+        [TestCase(true, true, true, true, true)]
+        [TestCase(true, true, true, false, false)]
+        [TestCase(true, true, false, true, false)]
+        public void ShouldSkipProjectUpdate_HandlesBindableAndManagedStates(
+            bool hasInfo,
+            bool bindable,
+            bool directoryVersioned,
+            bool managed,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldSkipProjectUpdate(
+                    hasInfo,
+                    bindable,
+                    directoryVersioned,
+                    managed),
+                Is.EqualTo(expected));
+        }
+
+        [TestCase(0, true, true, false)]
+        [TestCase(1, true, true, false)]
+        [TestCase(2, false, true, false)]
+        [TestCase(2, true, false, false)]
+        [TestCase(2, true, true, true)]
+        public void ShouldHideProjectContext_PreservesSelectionPassBehavior(
+            int pass,
+            bool hasProjectFile,
+            bool ignored,
+            bool expected)
+        {
+            Assert.That(
+                AddToSccLogic.ShouldHideProjectContext(
+                    pass,
+                    hasProjectFile,
+                    ignored),
+                Is.EqualTo(expected));
+        }
+
         [TestCase(false, false, false, false, "Skip")]
         [TestCase(false, true, false, true, "Skip")]
         [TestCase(true, true, false, false, "ManageExisting")]
