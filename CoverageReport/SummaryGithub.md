@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 1:17:17 AM |
-| Coverage date: | 9/19/2026 - 1:16:57 AM - 9/19/2026 - 1:17:07 AM |
+| Generated on: | 9/19/2026 - 1:39:16 AM |
+| Coverage date: | 9/19/2026 - 1:38:59 AM - 9/19/2026 - 1:39:07 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 569 |
-| Files: | 647 |
-| **Line coverage:** | 6.6% (2923 of 44079) |
-| Covered lines: | 2923 |
-| Uncovered lines: | 41156 |
-| Coverable lines: | 44079 |
-| Total lines: | 126519 |
-| **Branch coverage:** | 8.6% (1880 of 21623) |
-| Covered branches: | 1880 |
-| Total branches: | 21623 |
+| Classes: | 571 |
+| Files: | 648 |
+| **Line coverage:** | 6.8% (3034 of 44151) |
+| Covered lines: | 3034 |
+| Uncovered lines: | 41117 |
+| Coverable lines: | 44151 |
+| Total lines: | 126638 |
+| **Branch coverage:** | 8.9% (1931 of 21630) |
+| Covered branches: | 1931 |
+| Total branches: | 21630 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -107,11 +107,11 @@
 |Ankh.Settings.SolutionSettings|13%|24.5%|
 
 </details>
-<details><summary>Ankh.Diff - 4.1%</summary>
+<details><summary>Ankh.Diff - 7.5%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Diff**|**4.1%**|**5.5%**|
+|**Ankh.Diff**|**7.5%**|**9.6%**|
 |Ankh.Diff.Caret|0%|0%|
 |Ankh.Diff.DiffUtils.AddCopyList|0%|0%|
 |Ankh.Diff.DiffUtils.BinaryDiff|0%|0%|
@@ -121,6 +121,8 @@
 |Ankh.Diff.DiffUtils.Controls.DiffOptions|0%|0%|
 |Ankh.Diff.DiffUtils.Controls.DiffOverview|0%|0%|
 |Ankh.Diff.DiffUtils.Controls.DiffView|0%|0%|
+|Ankh.Diff.DiffUtils.Controls.DiffViewKeyAction|100%||
+|Ankh.Diff.DiffUtils.Controls.DiffViewKeyLogic|97.7%|96.2%|
 |Ankh.Diff.DiffUtils.Controls.DiffViewLine|0%||
 |Ankh.Diff.DiffUtils.Controls.DiffViewLines|0%|0%|
 |Ankh.Diff.DiffUtils.Controls.DiffViewPosition|0%|0%|
