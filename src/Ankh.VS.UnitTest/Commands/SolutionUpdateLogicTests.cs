@@ -170,5 +170,136 @@ namespace AnkhSvn_UnitTestProject.Commands
                     null),
                 Is.True);
         }
+
+        [Test]
+        public void UpdatePlan_GroupsAcceptedRootsByWorkingCopy()
+        {
+            SolutionUpdatePlan plan = new SolutionUpdatePlan();
+            Uri repo = new Uri("https://example.invalid/svn/");
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\wc\one",
+                    true,
+                    true,
+                    repo,
+                    repo,
+                    @"C:\wc"),
+                Is.True);
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\wc\two",
+                    true,
+                    true,
+                    repo,
+                    repo,
+                    @"C:\wc"),
+                Is.True);
+
+            Assert.That(plan.GroupCount, Is.EqualTo(1));
+
+            UpdateGroup group = null;
+            foreach (UpdateGroup candidate in plan.Groups)
+                group = candidate;
+
+            Assert.That(group, Is.Not.Null);
+            Assert.That(group.WorkingCopyRoot, Is.EqualTo(@"C:\wc"));
+            CollectionAssert.AreEqual(
+                new[] { @"C:\wc\one", @"C:\wc\two" },
+                group.Nodes);
+        }
+
+        [Test]
+        public void UpdatePlan_RejectsDuplicateUnversionedAndWrongRepositoryRoots()
+        {
+            SolutionUpdatePlan plan = new SolutionUpdatePlan();
+            Uri repo = new Uri("https://example.invalid/svn/");
+            Uri other = new Uri("https://other.invalid/svn/");
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\wc\one",
+                    true,
+                    false,
+                    repo,
+                    repo,
+                    @"C:\wc"),
+                Is.True);
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\wc\one",
+                    true,
+                    false,
+                    repo,
+                    repo,
+                    @"C:\wc"),
+                Is.False);
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\wc\unversioned",
+                    false,
+                    false,
+                    repo,
+                    repo,
+                    @"C:\wc"),
+                Is.False);
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"D:\other\item",
+                    true,
+                    false,
+                    repo,
+                    other,
+                    @"D:\other"),
+                Is.False);
+
+            Assert.That(plan.GroupCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void UpdatePlan_HeadUpdateAcceptsMultipleRepositories()
+        {
+            SolutionUpdatePlan plan = new SolutionUpdatePlan();
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"C:\a\one",
+                    true,
+                    true,
+                    new Uri("https://example.invalid/a/"),
+                    new Uri("https://example.invalid/a/"),
+                    @"C:\a"),
+                Is.True);
+
+            Assert.That(
+                plan.TryAddRoot(
+                    @"D:\b\two",
+                    true,
+                    true,
+                    new Uri("https://example.invalid/a/"),
+                    new Uri("https://example.invalid/b/"),
+                    @"D:\b"),
+                Is.True);
+
+            Assert.That(plan.GroupCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void UpdatePlan_RejectsMissingWorkingCopyRootForAcceptedItem()
+        {
+            SolutionUpdatePlan plan = new SolutionUpdatePlan();
+
+            Assert.Throws<ArgumentNullException>(
+                () => plan.TryAddRoot(
+                    @"C:\wc\one",
+                    true,
+                    true,
+                    null,
+                    null,
+                    null));
+        }
     }
 }

@@ -155,31 +155,6 @@ namespace Ankh.Commands
             }
         }
 
-        sealed class UpdateGroup
-        {
-            readonly string _wcroot;
-            readonly List<string> _files;
-
-            public UpdateGroup(string wcroot)
-            {
-                if (string.IsNullOrEmpty(wcroot))
-                    throw new ArgumentNullException("wcroot");
-
-                _wcroot = wcroot;
-                _files = new List<string>();
-            }
-
-            public string WorkingCopyRoot
-            {
-                get { return _wcroot; }
-            }
-
-            public List<string> Nodes
-            {
-                get { return _files; }
-            }
-        }
-
         public override void OnExecute(CommandEventArgs e)
         {
             IAnkhServiceEvents ci = e.GetService<IAnkhServiceEvents>();
@@ -299,8 +274,7 @@ namespace Ankh.Commands
                 }
             }
 
-            Dictionary<string, SvnItem> itemsToUpdate = new Dictionary<string, SvnItem>(StringComparer.OrdinalIgnoreCase);
-            SortedList<string, UpdateGroup> groups = new SortedList<string, UpdateGroup>(StringComparer.OrdinalIgnoreCase);
+            SolutionUpdatePlan plan = new SolutionUpdatePlan();
 
             // Get a list of all documents below the specified paths that are open in editors inside VS
             HybridCollection<string> lockPaths = new HybridCollection<string>(StringComparer.OrdinalIgnoreCase);
@@ -309,29 +283,18 @@ namespace Ankh.Commands
             foreach (SvnItem item in GetAllUpdateRoots(e))
             {
                 // GetAllUpdateRoots can (and probably will) return duplicates!
-
                 SvnWorkingCopy wc = item.WorkingCopy;
 
-                if (!SolutionUpdateLogic.ShouldIncludeUpdateRoot(
-                        itemsToUpdate.ContainsKey(item.FullPath),
+                if (!plan.TryAddRoot(
+                        item.FullPath,
                         item.IsVersioned,
                         IsHeadCommand(e.Command),
                         reposRoot,
-                        wc == null ? null : wc.RepositoryRoot))
+                        wc == null ? null : wc.RepositoryRoot,
+                        wc == null ? null : wc.FullPath))
                 {
                     continue;
                 }
-
-                UpdateGroup group;
-
-                if (!groups.TryGetValue(wc.FullPath, out group))
-                {
-                    group = new UpdateGroup(wc.FullPath);
-                    groups.Add(wc.FullPath, group);
-                }
-
-                group.Nodes.Add(item.FullPath);
-                itemsToUpdate.Add(item.FullPath, item);
 
                 foreach (string file in documentTracker.GetDocumentsBelow(item.FullPath))
                 {
@@ -364,7 +327,7 @@ namespace Ankh.Commands
                 e.GetService<IProgressRunner>().RunModal(title, pa,
                     delegate(object sender, ProgressWorkerArgs a)
                     {
-                        PerformUpdate(e, a, rev, allowUnversionedObstructions, updateExternals, setDepthInfinity, groups.Values, ih, out updateResult);
+                        PerformUpdate(e, a, rev, allowUnversionedObstructions, updateExternals, setDepthInfinity, plan.Groups, ih, out updateResult);
                     });
 
                 if (ci != null && updateResult != null && IsSolutionCommand(e.Command))

@@ -23,6 +23,79 @@ namespace Ankh.Commands
         Folder
     }
 
+    internal sealed class UpdateGroup
+    {
+        readonly string _wcroot;
+        readonly System.Collections.Generic.List<string> _files;
+
+        public UpdateGroup(string wcroot)
+        {
+            if (string.IsNullOrEmpty(wcroot))
+                throw new ArgumentNullException("wcroot");
+
+            _wcroot = wcroot;
+            _files = new System.Collections.Generic.List<string>();
+        }
+
+        public string WorkingCopyRoot
+        {
+            get { return _wcroot; }
+        }
+
+        public System.Collections.Generic.List<string> Nodes
+        {
+            get { return _files; }
+        }
+    }
+
+    internal sealed class SolutionUpdatePlan
+    {
+        readonly System.Collections.Generic.Dictionary<string, bool> _included =
+            new System.Collections.Generic.Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        readonly System.Collections.Generic.SortedList<string, UpdateGroup> _groups =
+            new System.Collections.Generic.SortedList<string, UpdateGroup>(StringComparer.OrdinalIgnoreCase);
+
+        public System.Collections.Generic.IEnumerable<UpdateGroup> Groups
+        {
+            get { return _groups.Values; }
+        }
+
+        public int GroupCount
+        {
+            get { return _groups.Count; }
+        }
+
+        public bool TryAddRoot(
+            string fullPath,
+            bool isVersioned,
+            bool isHeadCommand,
+            Uri selectedRepositoryRoot,
+            Uri itemRepositoryRoot,
+            string workingCopyRoot)
+        {
+            if (!SolutionUpdateLogic.ShouldIncludeUpdateRoot(
+                    _included.ContainsKey(fullPath),
+                    isVersioned,
+                    isHeadCommand,
+                    selectedRepositoryRoot,
+                    itemRepositoryRoot))
+            {
+                return false;
+            }
+
+            UpdateGroup group;
+            if (!_groups.TryGetValue(workingCopyRoot, out group))
+            {
+                group = new UpdateGroup(workingCopyRoot);
+                _groups.Add(workingCopyRoot, group);
+            }
+
+            group.Nodes.Add(fullPath);
+            _included.Add(fullPath, true);
+            return true;
+        }
+    }
+
     internal static class SolutionUpdateLogic
     {
         public static UpdateCommandScope GetScope(AnkhCommand command)
