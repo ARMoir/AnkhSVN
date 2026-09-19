@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 2:06:47 AM |
-| Coverage date: | 9/19/2026 - 2:06:27 AM - 9/19/2026 - 2:06:37 AM |
+| Generated on: | 9/19/2026 - 2:12:44 AM |
+| Coverage date: | 9/19/2026 - 2:12:27 AM - 9/19/2026 - 2:12:35 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 577 |
-| Files: | 650 |
-| **Line coverage:** | 7.3% (3279 of 44389) |
-| Covered lines: | 3279 |
-| Uncovered lines: | 41110 |
-| Coverable lines: | 44389 |
-| Total lines: | 127031 |
-| **Branch coverage:** | 9.2% (2008 of 21629) |
-| Covered branches: | 2008 |
-| Total branches: | 21629 |
+| Classes: | 580 |
+| Files: | 651 |
+| **Line coverage:** | 7.4% (3331 of 44502) |
+| Covered lines: | 3331 |
+| Uncovered lines: | 41171 |
+| Coverable lines: | 44502 |
+| Total lines: | 127233 |
+| **Branch coverage:** | 9.3% (2030 of 21641) |
+| Covered branches: | 2030 |
+| Total branches: | 21641 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -601,11 +601,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 5.1%</summary>
+<details><summary>Ankh.VS - 6.2%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**5.1%**|**3.9%**|
+|**Ankh.VS**|**6.2%**|**4.7%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -620,10 +620,13 @@
 |Ankh.VS.LanguageServices.Core.AnkhCodeWindowManager|0%|0%|
 |Ankh.VS.LanguageServices.Core.AnkhColorizer|0%|0%|
 |Ankh.VS.LanguageServices.Core.AnkhEditorFactory|0%|0%|
+|Ankh.VS.LanguageServices.Core.AnkhEditorFactoryLogic|100%|100%|
 |Ankh.VS.LanguageServices.Core.AnkhLanguage|0%|0%|
 |Ankh.VS.LanguageServices.Core.AnkhLanguageDropDownBar|0%|0%|
 |Ankh.VS.LanguageServices.Core.AnkhLanguagePreferences|0%|0%|
 |Ankh.VS.LanguageServices.Core.AnkhViewFilter|0%|0%|
+|Ankh.VS.LanguageServices.Core.EditorExtensionDecision|100%||
+|Ankh.VS.LanguageServices.Core.EditorLanguageDecision|100%||
 |Ankh.VS.LanguageServices.LogMessages.LogMessageColorizer|0%|0%|
 |Ankh.VS.LanguageServices.LogMessages.LogMessageLanguage|0%||
 |Ankh.VS.LanguageServices.UnifiedDiff.UnifiedDiffColorizer|0%|0%|
