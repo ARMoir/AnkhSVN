@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 1:52:09 AM |
-| Coverage date: | 9/19/2026 - 1:51:55 AM - 9/19/2026 - 1:52:02 AM |
+| Generated on: | 9/19/2026 - 2:01:26 AM |
+| Coverage date: | 9/19/2026 - 2:01:05 AM - 9/19/2026 - 2:01:16 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 574 |
-| Files: | 649 |
-| **Line coverage:** | 7% (3140 of 44244) |
-| Covered lines: | 3140 |
-| Uncovered lines: | 41104 |
-| Coverable lines: | 44244 |
-| Total lines: | 126808 |
-| **Branch coverage:** | 9.1% (1971 of 21636) |
-| Covered branches: | 1971 |
-| Total branches: | 21636 |
+| Classes: | 577 |
+| Files: | 650 |
+| **Line coverage:** | 7.3% (3272 of 44353) |
+| Covered lines: | 3272 |
+| Uncovered lines: | 41081 |
+| Coverable lines: | 44353 |
+| Total lines: | 126978 |
+| **Branch coverage:** | 9.2% (2002 of 21623) |
+| Covered branches: | 2002 |
+| Total branches: | 21623 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -369,11 +369,11 @@
 |Ankh.VSVersion|10.7%|9.5%|
 
 </details>
-<details><summary>Ankh.UI - 5.4%</summary>
+<details><summary>Ankh.UI - 6.1%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.UI**|**5.4%**|**6.4%**|
+|**Ankh.UI**|**6.1%**|**6.9%**|
 |Ankh.UI.AddRepositoryRootDialog|0%|0%|
 |Ankh.UI.AnkhUIModule|0%||
 |Ankh.UI.Annotate.AnnotateEditorControl|0%|0%|
@@ -427,7 +427,10 @@
 |Ankh.UI.MergeWizard.MergeSourceRangeOfRevisionsPage|0%|0%|
 |Ankh.UI.MergeWizard.MergeSourceReintegratePage|0%|0%|
 |Ankh.UI.MergeWizard.MergeSourceTwoDifferentTreesPage|0%|0%|
-|Ankh.UI.MergeWizard.MergeStrings|13.6%|100%|
+|Ankh.UI.MergeWizard.MergeStrings|29.4%|100%|
+|Ankh.UI.MergeWizard.MergeSummaryInput|100%||
+|Ankh.UI.MergeWizard.MergeSummaryLogic|100%|100%|
+|Ankh.UI.MergeWizard.MergeSummaryModel|100%||
 |Ankh.UI.MergeWizard.MergeSummaryPage|0%|0%|
 |Ankh.UI.MergeWizard.MergeTypePage|0%|0%|
 |Ankh.UI.MergeWizard.MergeUtils|0%|0%|
