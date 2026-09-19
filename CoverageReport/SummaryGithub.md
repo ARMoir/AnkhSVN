@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 1:42:57 AM |
-| Coverage date: | 9/19/2026 - 1:42:42 AM - 9/19/2026 - 1:42:50 AM |
+| Generated on: | 9/19/2026 - 1:52:09 AM |
+| Coverage date: | 9/19/2026 - 1:51:55 AM - 9/19/2026 - 1:52:02 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 571 |
-| Files: | 648 |
-| **Line coverage:** | 6.8% (3036 of 44151) |
-| Covered lines: | 3036 |
-| Uncovered lines: | 41115 |
-| Coverable lines: | 44151 |
-| Total lines: | 126638 |
-| **Branch coverage:** | 8.9% (1933 of 21630) |
-| Covered branches: | 1933 |
-| Total branches: | 21630 |
+| Classes: | 574 |
+| Files: | 649 |
+| **Line coverage:** | 7% (3140 of 44244) |
+| Covered lines: | 3140 |
+| Uncovered lines: | 41104 |
+| Coverable lines: | 44244 |
+| Total lines: | 126808 |
+| **Branch coverage:** | 9.1% (1971 of 21636) |
+| Covered branches: | 1971 |
+| Total branches: | 21636 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -213,11 +213,11 @@
 |Ankh.VSPackage.WorkingCopyExplorerToolWindow|0%||
 
 </details>
-<details><summary>Ankh.Scc - 3.9%</summary>
+<details><summary>Ankh.Scc - 6.1%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Scc**|**3.9%**|**3.7%**|
+|**Ankh.Scc**|**6.1%**|**5%**|
 |Ankh.Scc.AnkhSccModule|0%||
 |Ankh.Scc.Commands.MarkProjectDirty|12.5%|0%|
 |Ankh.Scc.Commands.PendingChangeTicker|14.2%|0%|
@@ -235,7 +235,10 @@
 |Ankh.Scc.Resources|0%|0%|
 |Ankh.Scc.SccUI.ChangeSolutionRoot|0%|0%|
 |Ankh.Scc.SccUI.ChangeSourceControl|0%|0%|
+|Ankh.Scc.SccUI.ChangeSourceControlLogic|100%|100%|
+|Ankh.Scc.SccUI.ChangeSourceControlProjectBinding|100%||
 |Ankh.Scc.SccUI.ChangeSourceControlRow|0%|0%|
+|Ankh.Scc.SccUI.ChangeSourceControlSelectionState|100%|100%|
 |Ankh.Scc.SccUI.Commands.ChangeSourceControlCommand|6%|10%|
 |Ankh.Scc.SccUI.Commands.MakeNonSccFileWritableCommand|6.6%|0%|
 |Ankh.Scc.SccUI.EditReadOnlyFileDialog|0%|0%|
