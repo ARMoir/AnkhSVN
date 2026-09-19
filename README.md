@@ -1,17 +1,17 @@
 # AnkhSVN - Subversion Support for Visual Studio
 
-[![Build & tests](https://github.com/ARMoir/AnkhSVN/actions/workflows/MSBuild.yml/badge.svg?branch=main)](https://github.com/ARMoir/AnkhSVN/actions/workflows/MSBuild.yml)
-![Tests](https://raw.githubusercontent.com/ARMoir/AnkhSVN/badges/tests.svg)
-![Line coverage](https://raw.githubusercontent.com/ARMoir/AnkhSVN/badges/coverage.svg)
-![Branch coverage](https://raw.githubusercontent.com/ARMoir/AnkhSVN/badges/branches.svg)
+[![Build & tests](../../actions/workflows/MSBuild.yml/badge.svg?branch=main)](../../actions/workflows/MSBuild.yml)
+![Tests](../../raw/badges/tests.svg)
+![Line coverage](../../raw/badges/coverage.svg)
+![Branch coverage](../../raw/badges/branches.svg)
 
-[View detailed coverage report](https://github.com/ARMoir/AnkhSVN/blob/badges/CoverageReport/SummaryGithub.md)
+[View detailed coverage report](../../blob/badges/CoverageReport/SummaryGithub.md)
 
 AnkhSVN integrates Apache Subversion working-copy and repository operations directly into Visual Studio.
 
 > **Supported Visual Studio versions:** Visual Studio 2022 and later. Current packages are x64-only; the pre-VS2022 package and test infrastructure have been retired.
 
-This repository carries ongoing modernization, documentation, regression-testing, and Visual Studio compatibility work for [AnkhSVN upstream](https://github.com/AmpScm/AnkhSVN).
+AnkhSVN is actively maintained with ongoing modernization, documentation, regression testing, and Visual Studio compatibility improvements.
 
 ## Highlights
 
@@ -26,7 +26,7 @@ This repository carries ongoing modernization, documentation, regression-testing
 
 ### Install
 
-Current builds are published through this repository's [GitHub Releases](https://github.com/ARMoir/AnkhSVN/releases).
+Current builds are published through this repository's [GitHub Releases](../../releases).
 
 Download the Visual Studio 2022+ VSIX from the latest release, install it, and restart Visual Studio if prompted.
 
@@ -91,7 +91,7 @@ The badges at the top of this README are updated from the latest main-branch CI 
 
 Bug reports, fixes, tests, documentation improvements, and compatibility updates are welcome.
 
-For the original project, issue history, and upstream development, see [AmpScm/AnkhSVN](https://github.com/AmpScm/AnkhSVN).
+Use [GitHub Issues](../../issues) for bug reports and feature requests, and [Pull Requests](../../pulls) for proposed changes.
 
 ## License
 
