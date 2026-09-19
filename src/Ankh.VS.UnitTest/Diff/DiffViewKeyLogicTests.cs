@@ -81,20 +81,20 @@ namespace AnkhSvn_UnitTestProject.Diff
             Assert.That(action.ScrollVertically, Is.False);
         }
 
-        [TestCase(Keys.PageUp, Keys.None, -1, true, DiffViewKeyOperation.OffsetPosition)]
-        [TestCase(Keys.PageDown, Keys.None, 1, true, DiffViewKeyOperation.OffsetPosition)]
-        [TestCase(Keys.PageUp, Keys.Shift, -1, false, DiffViewKeyOperation.ExtendSelection)]
-        [TestCase(Keys.PageDown, Keys.Shift, 1, false, DiffViewKeyOperation.ExtendSelection)]
+        [TestCase(Keys.PageUp, Keys.None, -1, true, "OffsetPosition")]
+        [TestCase(Keys.PageDown, Keys.None, 1, true, "OffsetPosition")]
+        [TestCase(Keys.PageUp, Keys.Shift, -1, false, "ExtendSelection")]
+        [TestCase(Keys.PageDown, Keys.Shift, 1, false, "ExtendSelection")]
         public void GetAction_MapsPageMovement(
             Keys key,
             Keys modifiers,
             int pageFactor,
             bool scrollVertically,
-            DiffViewKeyOperation operation)
+            string operation)
         {
             DiffViewKeyAction action = Action(key, modifiers);
 
-            AssertAction(action, operation);
+            Assert.That(action.Operation.ToString(), Is.EqualTo(operation));
             Assert.That(action.PageFactor, Is.EqualTo(pageFactor));
             Assert.That(action.ScrollVertically, Is.EqualTo(scrollVertically));
             Assert.That(action.LineDelta, Is.Zero);
