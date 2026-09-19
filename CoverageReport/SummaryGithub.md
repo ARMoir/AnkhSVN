@@ -3,30 +3,30 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 2:12:44 AM |
-| Coverage date: | 9/19/2026 - 2:12:27 AM - 9/19/2026 - 2:12:35 AM |
+| Generated on: | 9/19/2026 - 2:18:36 AM |
+| Coverage date: | 9/19/2026 - 2:18:22 AM - 9/19/2026 - 2:18:29 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 580 |
 | Files: | 651 |
-| **Line coverage:** | 7.4% (3331 of 44502) |
+| **Line coverage:** | 7.4% (3331 of 44571) |
 | Covered lines: | 3331 |
-| Uncovered lines: | 41171 |
-| Coverable lines: | 44502 |
-| Total lines: | 127233 |
-| **Branch coverage:** | 9.3% (2030 of 21641) |
+| Uncovered lines: | 41240 |
+| Coverable lines: | 44571 |
+| Total lines: | 127368 |
+| **Branch coverage:** | 9.3% (2030 of 21649) |
 | Covered branches: | 2030 |
-| Total branches: | 21641 |
+| Total branches: | 21649 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
 
 ## Coverage
-<details><summary>Ankh - 9.5%</summary>
+<details><summary>Ankh - 9.4%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh**|**9.5%**|**18.2%**|
+|**Ankh**|**9.4%**|**18.2%**|
 |Ankh.AnkhModule|0%||
 |Ankh.Commands.AddItemCommand|5.7%|14.7%|
 |Ankh.Commands.AddToSccCommands|1.9%|3.2%|
@@ -37,7 +37,7 @@
 |Ankh.Commands.CommandBase|50%||
 |Ankh.Commands.CommandStrings|0%|0%|
 |Ankh.Commands.CreatePatch|8.1%|12.5%|
-|Ankh.Commands.DiffLocalItem|10.8%|12.2%|
+|Ankh.Commands.DiffLocalItem|5.9%|11.2%|
 |Ankh.Commands.DiffLocalItemLogic|96.1%|97.6%|
 |Ankh.Commands.DiffLocalItemSelectionInfo|70.2%|0%|
 |Ankh.Commands.ItemAddToPending|40%|39.2%|
