@@ -206,19 +206,19 @@ namespace AnkhSvn_UnitTestProject.Dialogs
         {
             Assert.That(
                 VSCommandRoutingLogic.ShouldConsumeTranslatedCommand(
-                    VSErr.S_OK,
+                    VSConstants.S_OK,
                     1),
                 Is.True);
 
             Assert.That(
                 VSCommandRoutingLogic.ShouldConsumeTranslatedCommand(
-                    VSErr.S_OK,
+                    VSConstants.S_OK,
                     0),
                 Is.False);
 
             Assert.That(
                 VSCommandRoutingLogic.ShouldConsumeTranslatedCommand(
-                    VSErr.S_FALSE,
+                    VSConstants.S_FALSE,
                     1),
                 Is.False);
         }
