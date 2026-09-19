@@ -70,68 +70,23 @@ namespace Ankh.VS.SolutionExplorer
             if (item == null)
                 throw new ArgumentNullException("item");
 
-            if (item.IsConflicted || item.IsObstructed || item.IsTreeConflicted)
-                return AnkhGlyph.InConflict;
-            else if (item.IsReadOnlyMustLock)
-                return AnkhGlyph.MustLock;
-            else if (!item.IsVersioned)
-            {
-                if (!item.Exists)
-                    return AnkhGlyph.FileMissing;
-                else if (item.IsIgnored)
-                    return AnkhGlyph.Ignored;
-                else if (item.IsVersionable)
-                {
-                    if (item.InSolution)
-                        return item.IsSccExcluded ? AnkhGlyph.Ignored : AnkhGlyph.ShouldBeAdded;
-                    else
-                        return AnkhGlyph.None;
-                }
-                else
-                    return AnkhGlyph.None;
-            }
-            
-			switch (item.Status.CombinedStatus)
-            {
-                case SvnStatus.Normal:
-                    if (item.IsDocumentDirty)
-                        return AnkhGlyph.FileDirty;
-                    else if (item.IsLocked)
-                        return AnkhGlyph.LockedNormal;
-                    else
-                        return AnkhGlyph.Normal;
-                case SvnStatus.Modified:
-                    return item.IsLocked ? AnkhGlyph.LockedModified : AnkhGlyph.Modified;
-                case SvnStatus.Replaced:
-                    return AnkhGlyph.CopiedOrMoved;
-                case SvnStatus.Added:
-                    return item.Status.IsCopied ? AnkhGlyph.CopiedOrMoved : AnkhGlyph.Added;
-
-                case SvnStatus.Missing:
-                    if (item.IsCasingConflicted)
-                        return AnkhGlyph.InConflict;
-                    else
-                        return AnkhGlyph.Deleted;
-                case SvnStatus.Deleted:
-                    if (item.Exists && item.InSolution)
-                        return item.IsSccExcluded ? AnkhGlyph.Ignored : AnkhGlyph.ShouldBeAdded;
-                    return AnkhGlyph.Deleted;
-
-                case SvnStatus.Conflicted: // Should have been handled above
-                case SvnStatus.Obstructed:
-                    return AnkhGlyph.InConflict;
-
-                case SvnStatus.Ignored: // Should have been handled above
-                    return AnkhGlyph.Ignored;
-
-                case SvnStatus.External:
-                case SvnStatus.Incomplete:
-                    return AnkhGlyph.InConflict;
-
-                case SvnStatus.Zero:
-                default:
-                    return AnkhGlyph.None;
-            }
+            return StatusImageMapperLogic.GetGlyph(
+                new StatusImageInfo(
+                    item.IsConflicted,
+                    item.IsObstructed,
+                    item.IsTreeConflicted,
+                    item.IsReadOnlyMustLock,
+                    item.IsVersioned,
+                    item.Exists,
+                    item.IsIgnored,
+                    item.IsVersionable,
+                    item.InSolution,
+                    item.IsSccExcluded,
+                    item.Status.CombinedStatus,
+                    item.IsDocumentDirty,
+                    item.IsLocked,
+                    item.Status.IsCopied,
+                    item.IsCasingConflicted));
         }
     }
 }
