@@ -3,30 +3,30 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/19/2026 - 2:41:03 AM |
-| Coverage date: | 9/19/2026 - 2:40:43 AM - 9/19/2026 - 2:40:53 AM |
+| Generated on: | 9/19/2026 - 2:46:01 AM |
+| Coverage date: | 9/19/2026 - 2:45:39 AM - 9/19/2026 - 2:45:51 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 581 |
+| Classes: | 583 |
 | Files: | 652 |
-| **Line coverage:** | 7.4% (3342 of 44590) |
-| Covered lines: | 3342 |
-| Uncovered lines: | 41248 |
-| Coverable lines: | 44590 |
-| Total lines: | 127446 |
-| **Branch coverage:** | 9.4% (2042 of 21656) |
-| Covered branches: | 2042 |
-| Total branches: | 21656 |
+| **Line coverage:** | 7.5% (3368 of 44604) |
+| Covered lines: | 3368 |
+| Uncovered lines: | 41236 |
+| Coverable lines: | 44604 |
+| Total lines: | 127482 |
+| **Branch coverage:** | 9.4% (2047 of 21660) |
+| Covered branches: | 2047 |
+| Total branches: | 21660 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
 
 ## Coverage
-<details><summary>Ankh - 9.4%</summary>
+<details><summary>Ankh - 9.7%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh**|**9.4%**|**18.2%**|
+|**Ankh**|**9.7%**|**18.3%**|
 |Ankh.AnkhModule|0%||
 |Ankh.Commands.AddItemCommand|5.7%|14.7%|
 |Ankh.Commands.AddToSccCommands|1.9%|3.2%|
@@ -71,14 +71,16 @@
 |Ankh.Commands.RevertItemCommand|3.4%|8.6%|
 |Ankh.Commands.RevertItemLogic|100%|100%|
 |Ankh.Commands.SolutionCommitCommand|42.3%|36.3%|
-|Ankh.Commands.SolutionUpdateCommand|14.4%|21.9%|
+|Ankh.Commands.SolutionUpdateCommand|15.3%|22.3%|
 |Ankh.Commands.SolutionUpdateLogic|100%|100%|
+|Ankh.Commands.SolutionUpdatePlan|100%|100%|
 |Ankh.Commands.SwitchItemCommand|12.9%|31.1%|
 |Ankh.Commands.UI.RefreshCommand|30%|100%|
 |Ankh.Commands.UI.ShowToolWindows|0%|0%|
 |Ankh.Commands.UnifiedDiffCommand|3.3%|11.5%|
 |Ankh.Commands.UnlockCommand|8.3%|9%|
 |Ankh.Commands.UpdateFiles|13%|22%|
+|Ankh.Commands.UpdateGroup|87.5%|50%|
 |Ankh.Commands.UpgradeWorkingCopy|10.9%|10.7%|
 |Ankh.Commands.ViewRepositoryFileCommand|23.5%|50%|
 |Ankh.Commands.WorkingCopyExplorer.ExportCommand|19%|37.5%|
