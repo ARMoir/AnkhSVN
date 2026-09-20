@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Ankh.Commands;
 
 namespace Ankh.UI.VSSelectionControls
 {
@@ -496,6 +497,8 @@ namespace Ankh.UI.VSSelectionControls
         private bool _setHeaderStyle;
 
         bool _isThemed;
+        bool _ownerDrawDarkHeader;
+
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
@@ -504,13 +507,143 @@ namespace Ankh.UI.VSSelectionControls
 
             UpdateSortGlyphs();
 
-            if (!OwnerDraw)
-            {
-                if (!_isThemed)
-                    NativeMethods.SetWindowTheme(Handle, "Explorer", null);
+            if (!OwnerDraw && !_isThemed)
+                NativeMethods.SetWindowTheme(Handle, "Explorer", null);
 
-                NativeMethods.SendMessage(Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, (IntPtr)LVS_EX_DOUBLEBUFFER, (IntPtr)LVS_EX_DOUBLEBUFFER);
+            NativeMethods.SendMessage(
+                Handle,
+                LVM_SETEXTENDEDLISTVIEWSTYLE,
+                (IntPtr)LVS_EX_DOUBLEBUFFER,
+                (IntPtr)LVS_EX_DOUBLEBUFFER);
+        }
+
+        protected override void OnDrawColumnHeader(DrawListViewColumnHeaderEventArgs e)
+        {
+            if (!_ownerDrawDarkHeader)
+            {
+                e.DrawDefault = true;
+                return;
             }
+
+            Color headerBack = ControlPaint.Light(BackColor, 0.08f);
+            Color headerFore = ForeColor;
+            Color border = ControlPaint.Light(BackColor, 0.20f);
+
+            using (SolidBrush background = new SolidBrush(headerBack))
+                e.Graphics.FillRectangle(background, e.Bounds);
+
+            using (Pen pen = new Pen(border))
+            {
+                e.Graphics.DrawLine(
+                    pen,
+                    e.Bounds.Left,
+                    e.Bounds.Bottom - 1,
+                    e.Bounds.Right,
+                    e.Bounds.Bottom - 1);
+
+                e.Graphics.DrawLine(
+                    pen,
+                    e.Bounds.Right - 1,
+                    e.Bounds.Top,
+                    e.Bounds.Right - 1,
+                    e.Bounds.Bottom);
+            }
+
+            SmartColumn smartColumn = e.Header as SmartColumn;
+            bool sorted = smartColumn != null && SortColumns.Contains(smartColumn);
+            bool descending = sorted && smartColumn.ReverseSort;
+
+            int padding = Math.Max(6, Font.Height / 3);
+            int glyphSize = Math.Max(6, Font.Height / 2);
+            Rectangle textBounds = new Rectangle(
+                e.Bounds.Left + padding,
+                e.Bounds.Top,
+                Math.Max(0, e.Bounds.Width - (padding * 2)),
+                e.Bounds.Height);
+
+            if (sorted)
+                textBounds.Width = Math.Max(0, textBounds.Width - glyphSize - padding);
+
+            TextFormatFlags flags =
+                TextFormatFlags.VerticalCenter |
+                TextFormatFlags.EndEllipsis |
+                TextFormatFlags.SingleLine |
+                TextFormatFlags.NoPrefix;
+
+            switch (e.Header.TextAlign)
+            {
+                case HorizontalAlignment.Center:
+                    flags |= TextFormatFlags.HorizontalCenter;
+                    break;
+                case HorizontalAlignment.Right:
+                    flags |= TextFormatFlags.Right;
+                    break;
+                default:
+                    flags |= TextFormatFlags.Left;
+                    break;
+            }
+
+            TextRenderer.DrawText(
+                e.Graphics,
+                e.Header.Text,
+                Font,
+                textBounds,
+                headerFore,
+                flags);
+
+            if (sorted)
+                DrawDarkSortGlyph(e.Graphics, e.Bounds, headerFore, glyphSize, descending);
+        }
+
+        static void DrawDarkSortGlyph(
+            Graphics graphics,
+            Rectangle bounds,
+            Color color,
+            int size,
+            bool descending)
+        {
+            int centerX = bounds.Right - Math.Max(8, size);
+            int centerY = bounds.Top + bounds.Height / 2;
+            int half = Math.Max(3, size / 2);
+
+            Point[] points;
+            if (descending)
+            {
+                points = new[]
+                {
+                    new Point(centerX - half, centerY - half / 2),
+                    new Point(centerX + half, centerY - half / 2),
+                    new Point(centerX, centerY + half / 2 + 1)
+                };
+            }
+            else
+            {
+                points = new[]
+                {
+                    new Point(centerX - half, centerY + half / 2),
+                    new Point(centerX + half, centerY + half / 2),
+                    new Point(centerX, centerY - half / 2 - 1)
+                };
+            }
+
+            using (SolidBrush brush = new SolidBrush(color))
+                graphics.FillPolygon(brush, points);
+        }
+
+        protected override void OnDrawItem(DrawListViewItemEventArgs e)
+        {
+            if (_ownerDrawDarkHeader)
+                e.DrawDefault = true;
+
+            base.OnDrawItem(e);
+        }
+
+        protected override void OnDrawSubItem(DrawListViewSubItemEventArgs e)
+        {
+            if (_ownerDrawDarkHeader)
+                e.DrawDefault = true;
+
+            base.OnDrawSubItem(e);
         }
 
         /// <summary>
@@ -1262,7 +1395,15 @@ namespace Ankh.UI.VSSelectionControls
         {
             ShowSelectAllCheckBox = false; // Not supported by VS theming. Disable to avoid problems and unnecessary work :(
 
+            IAnkhCommandStates states = sender.GetService<IAnkhCommandStates>();
+            _ownerDrawDarkHeader = SmartListViewThemeLogic.ShouldOwnerDrawDarkHeader(
+                e.Cancel,
+                states != null && states.ThemeDark,
+                SystemInformation.HighContrast);
+
+            OwnerDraw = _ownerDrawDarkHeader;
             _isThemed = !e.Cancel;
+
             try
             {
                 base.OnParentChanged(EventArgs.Empty); // Recreate handle, keeping state

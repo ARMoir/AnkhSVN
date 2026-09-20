@@ -567,6 +567,61 @@ namespace Ankh.WpfPackage.Services
 
             if (combo.ForeColor != combo.Parent.ForeColor)
                 combo.ForeColor = combo.Parent.ForeColor;
+
+            combo.DrawItem -= ThemeComboDrawItem;
+
+            if (UseDarkNativeTheme)
+            {
+                combo.FlatStyle = FlatStyle.Flat;
+                combo.DrawMode = DrawMode.OwnerDrawFixed;
+                combo.DrawItem += ThemeComboDrawItem;
+            }
+            else
+            {
+                combo.DrawMode = DrawMode.Normal;
+                combo.FlatStyle = FlatStyle.Standard;
+            }
+        }
+
+        void ThemeComboDrawItem(object sender, DrawItemEventArgs e)
+        {
+            ComboBox combo = sender as ComboBox;
+            if (combo == null)
+                return;
+
+            bool editPortion = (e.State & DrawItemState.ComboBoxEdit) != 0;
+            bool selected = (e.State & DrawItemState.Selected) != 0 && !editPortion;
+
+            Color backColor = selected ? SystemColors.Highlight : combo.BackColor;
+            Color foreColor = selected ? SystemColors.HighlightText : combo.ForeColor;
+
+            using (SolidBrush background = new SolidBrush(backColor))
+                e.Graphics.FillRectangle(background, e.Bounds);
+
+            string text = e.Index >= 0 && e.Index < combo.Items.Count
+                ? combo.GetItemText(combo.Items[e.Index])
+                : combo.Text;
+
+            Rectangle textBounds = new Rectangle(
+                e.Bounds.Left + 3,
+                e.Bounds.Top,
+                Math.Max(0, e.Bounds.Width - 6),
+                e.Bounds.Height);
+
+            TextRenderer.DrawText(
+                e.Graphics,
+                text,
+                combo.Font,
+                textBounds,
+                foreColor,
+                TextFormatFlags.Left |
+                TextFormatFlags.VerticalCenter |
+                TextFormatFlags.EndEllipsis |
+                TextFormatFlags.NoPrefix |
+                TextFormatFlags.SingleLine);
+
+            if ((e.State & DrawItemState.Focus) != 0 && !editPortion)
+                e.DrawFocusRectangle();
         }
 
         void ThemeOne(SplitContainer panel)
