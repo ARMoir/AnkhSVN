@@ -1,0 +1,34 @@
+name: Cleanup old v2.9 history
+
+# FORK-ONLY TEMPLATE.
+# Keep this file on the fork-maintenance branch.
+# Copy it temporarily into .github/workflows/cleanup-v29.yml on a disposable cleanup-v29 branch.
+
+on:
+  push:
+    branches:
+      - cleanup-v29
+
+permissions:
+  contents: write
+  deployments: write
+  packages: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run v2.9 cleanup
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./fork-maintenance/cleanup-v29.ps1 -Repo "${{ github.repository }}" -Owner "${{ github.repository_owner }}" -Execute
+
+      - name: Delete temporary cleanup branch
+        if: success()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api --method DELETE "repos/${{ github.repository }}/git/refs/heads/cleanup-v29"
