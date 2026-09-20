@@ -12,15 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.VisualStudio.Shell.Interop;
+
 namespace Ankh.Scc
 {
     internal static class SccGlyphDisplayLogic
     {
-        public static AnkhGlyph GetDisplayGlyph(AnkhGlyph glyph)
+        public static VsStateIcon GetStateIcon(AnkhGlyph glyph, int glyphOffset)
         {
-            return glyph == AnkhGlyph.ShouldBeAdded
-                ? AnkhGlyph.Added
-                : glyph;
+            VsStateIcon icon = (VsStateIcon)glyph;
+
+            if (icon == VsStateIcon.STATEICON_BLANK
+                || icon == VsStateIcon.STATEICON_NOSTATEICON)
+            {
+                return icon;
+            }
+
+            // Added through ChildChanged are the four custom SCC slots
+            // supplied by GetCustomGlyphList (12-15). Use those native slots
+            // directly. The legacy +16 overflow remains only for the standard
+            // glyphs where it is known to render correctly in modern VS.
+            if (glyph >= AnkhGlyph.Added)
+                return icon;
+
+            return (VsStateIcon)((int)icon + glyphOffset);
         }
     }
 }
