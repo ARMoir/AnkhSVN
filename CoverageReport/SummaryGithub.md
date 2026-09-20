@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 9:04:56 PM |
-| Coverage date: | 9/20/2026 - 9:04:37 PM - 9/20/2026 - 9:04:47 PM |
+| Generated on: | 9/20/2026 - 10:22:03 PM |
+| Coverage date: | 9/20/2026 - 10:21:43 PM - 9/20/2026 - 10:21:54 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 600 |
 | Files: | 668 |
-| **Line coverage:** | 8.3% (3807 of 45623) |
-| Covered lines: | 3807 |
-| Uncovered lines: | 41816 |
-| Coverable lines: | 45623 |
-| Total lines: | 129817 |
-| **Branch coverage:** | 10.8% (2364 of 21879) |
+| **Line coverage:** | 8.3% (3808 of 45643) |
+| Covered lines: | 3808 |
+| Uncovered lines: | 41835 |
+| Coverable lines: | 45643 |
+| Total lines: | 129855 |
+| **Branch coverage:** | 10.8% (2364 of 21885) |
 | Covered branches: | 2364 |
-| Total branches: | 21879 |
+| Total branches: | 21885 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -621,7 +621,7 @@
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.7%**|**8.8%**|
+|**Ankh.VS**|**9.7%**|**8.7%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
