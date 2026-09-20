@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 7:58:04 PM |
-| Coverage date: | 9/20/2026 - 7:57:44 PM - 9/20/2026 - 7:57:54 PM |
+| Generated on: | 9/20/2026 - 8:11:12 PM |
+| Coverage date: | 9/20/2026 - 8:10:51 PM - 9/20/2026 - 8:11:02 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 597 |
-| Files: | 665 |
-| **Line coverage:** | 8.2% (3742 of 45315) |
-| Covered lines: | 3742 |
-| Uncovered lines: | 41573 |
-| Coverable lines: | 45315 |
-| Total lines: | 129183 |
-| **Branch coverage:** | 10.6% (2327 of 21776) |
-| Covered branches: | 2327 |
-| Total branches: | 21776 |
+| Classes: | 598 |
+| Files: | 666 |
+| **Line coverage:** | 8.3% (3805 of 45446) |
+| Covered lines: | 3805 |
+| Uncovered lines: | 41641 |
+| Coverable lines: | 45446 |
+| Total lines: | 129476 |
+| **Branch coverage:** | 10.8% (2360 of 21823) |
+| Covered branches: | 2360 |
+| Total branches: | 21823 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -267,15 +267,15 @@
 |Ankh.Scc.ThePendingChangeCollection|0%||
 
 </details>
-<details><summary>Ankh.Services - 14%</summary>
+<details><summary>Ankh.Services - 13.9%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Services**|**14%**|**13.2%**|
+|**Ankh.Services**|**13.9%**|**13.1%**|
 |Ankh.AnkhInstanceConditionalAttribute|46.6%|50%|
 |Ankh.AnkhRuntime|31.9%|24.3%|
-|Ankh.AnkhService|10.8%|6.4%|
-|Ankh.AnkhServiceContainer|75%||
+|Ankh.AnkhService|11.4%|6.4%|
+|Ankh.AnkhServiceContainer|87.5%||
 |Ankh.AnkhServiceEvents|2.1%|0%|
 |Ankh.AnkhServiceProviderWrapper|0%|0%|
 |Ankh.Collections.CollectionChangedEventArgs|0%|0%|
@@ -381,7 +381,7 @@
 |Ankh.VS.WpfServices.UI.VSWpfDialog|0%|0%|
 |Ankh.VS.WpfServices.UI.VSWpfDialogBase|0%|0%|
 |Ankh.VSAssemblies|0%|0%|
-|Ankh.VSVersion|10.7%|9.5%|
+|Ankh.VSVersion|0%|0%|
 
 </details>
 <details><summary>Ankh.UI - 6.1%</summary>
@@ -616,11 +616,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 8.6%</summary>
+<details><summary>Ankh.VS - 9.8%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**8.6%**|**7.5%**|
+|**Ankh.VS**|**9.8%**|**8.8%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -663,7 +663,8 @@
 |Ankh.VS.Services.DiffMergeInstance|0%|0%|
 |Ankh.VS.Services.GlobalCommandHook|0%|0%|
 |Ankh.VS.Services.InternalDiff|0%|0%|
-|Ankh.VS.SolutionExplorer.FileIconMapper|74.3%|61.9%|
+|Ankh.VS.SolutionExplorer.FileIconMapper|68.7%|70.7%|
+|Ankh.VS.SolutionExplorer.FileIconMapperDpiLogic|60%|60%|
 |Ankh.VS.SolutionExplorer.SolutionExplorerStrings|0%|0%|
 |Ankh.VS.SolutionExplorer.StatusImageInfo|100%||
 |Ankh.VS.SolutionExplorer.StatusImageMapper|0%|0%|
