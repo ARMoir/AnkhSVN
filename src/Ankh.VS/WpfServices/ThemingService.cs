@@ -406,16 +406,22 @@ namespace Ankh.WpfPackage.Services
                 toolBar.Renderer = renderer;
         }
 
-        private void ThemeOne(Button button)
+        private void ThemeOne(Button button, bool forDialog)
         {
             if (button.Parent != null && button.Font != button.Parent.Font)
                 button.Font = button.Parent.Font;
 
-            if (button.BackColor != SystemColors.ButtonFace)
-                button.BackColor = SystemColors.ButtonFace;
+            bool themed = button.IsHandleCreated
+                && VSThemeWindow(button.Handle, forDialog);
 
-            if (button.ForeColor != SystemColors.WindowText)
-                button.ForeColor = SystemColors.WindowText;
+            if (!themed && button.Parent != null)
+            {
+                if (button.BackColor != button.Parent.BackColor)
+                    button.BackColor = button.Parent.BackColor;
+
+                if (button.ForeColor != button.Parent.ForeColor)
+                    button.ForeColor = button.Parent.ForeColor;
+            }
         }
 
         const __VSSYSCOLOREX VSCOLOR_BRANDEDUI_TITLE = (__VSSYSCOLOREX)__VSSYSCOLOREX2.VSCOLOR_BRANDEDUI_TITLE;
@@ -563,6 +569,13 @@ namespace Ankh.WpfPackage.Services
                 || MaybeTheme<Button>(ThemeOne, control, forDialog)
                 || MaybeTheme<ContainerControl>(ThemeOne, control, forDialog)
                 || MaybeTheme<ScrollableControl>(ThemeOne, control, forDialog);
+
+            // Controls without an Ankh-specific color adapter (for example
+            // CheckBox, RadioButton, GroupBox and TabControl) should still use
+            // Visual Studio's native theming instead of retaining Windows
+            // light-theme rendering inside a themed dialog.
+            if (!ok && control.IsHandleCreated)
+                VSThemeWindow(control.Handle, forDialog);
         }
     }
 }

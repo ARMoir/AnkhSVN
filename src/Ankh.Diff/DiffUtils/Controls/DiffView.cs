@@ -42,6 +42,7 @@ using System.Collections;
 using Ankh.Diff.DiffUtils;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Ankh.UI;
 
 /*
  * Chad discovered that with lines over about 25000 characters long, that GDI+
@@ -84,6 +85,28 @@ namespace Ankh.Diff.DiffUtils.Controls
             DiffOptions.OptionsChanged += m_OptionsChangedHandler;
 
             Cursor = Cursors.IBeam;
+        }
+
+        private IWinFormsThemingService GetThemingService()
+        {
+            Control control = this;
+
+            while (control != null)
+            {
+                IContextControl contextControl = control as IContextControl;
+                if (contextControl != null && contextControl.Context != null)
+                {
+                    IWinFormsThemingService themer =
+                        contextControl.Context.GetService<IWinFormsThemingService>();
+
+                    if (themer != null)
+                        return themer;
+                }
+
+                control = control.Parent;
+            }
+
+            return null;
         }
 
         public void SetData(IList<string> StringList, EditScript Script, bool bUseA)
@@ -188,7 +211,7 @@ namespace Ankh.Diff.DiffUtils.Controls
 
         public bool Find(FindData Data)
         {
-            FindDlg Dlg = new FindDlg();
+            FindDlg Dlg = new FindDlg(GetThemingService());
 
             //If text is selected on a single line, then use that for the new Find text.
             string strOriginalFindText = Data.Text;
@@ -470,7 +493,7 @@ namespace Ankh.Diff.DiffUtils.Controls
                 int iMaxLineNumber = m_StringList.Count;
                 if (iMaxLineNumber > 0)
                 {
-                    GoToDlg Dlg = new GoToDlg();
+                    GoToDlg Dlg = new GoToDlg(GetThemingService());
                     int iLine;
                     if (Dlg.Execute(this, iMaxLineNumber, out iLine))
                     {
