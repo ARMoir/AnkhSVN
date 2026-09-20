@@ -21,6 +21,7 @@ using Ankh.Scc;
 using SharpSvn;
 using System.IO;
 using System.Globalization;
+using System.Drawing.Drawing2D;
 
 namespace Ankh.VS.SolutionExplorer
 {
@@ -51,17 +52,40 @@ namespace Ankh.VS.SolutionExplorer
                 if (images == null)
                     return null;
 
-                Bitmap bitmap = (Bitmap)Image.FromStream(images, true);
-
-                ImageList imageList = new ImageList
+                using (Bitmap bitmap = (Bitmap)Image.FromStream(images, true))
                 {
-                    ImageSize = new Size(width, bitmap.Height)
-                };
-                bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
+                    bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
 
-                imageList.Images.AddStrip(bitmap);
+                    int dpi = FileIconMapperDpiLogic.GetCurrentDpi();
+                    int targetWidth = FileIconMapperDpiLogic.GetPixelSize(width, dpi);
+                    int targetHeight = FileIconMapperDpiLogic.GetPixelSize(bitmap.Height, dpi);
+                    int count = bitmap.Width / width;
 
-                return imageList;
+                    ImageList imageList = new ImageList
+                    {
+                        ColorDepth = ColorDepth.Depth32Bit,
+                        ImageSize = new Size(targetWidth, targetHeight)
+                    };
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        Bitmap glyph = new Bitmap(targetWidth, targetHeight);
+                        using (Graphics graphics = Graphics.FromImage(glyph))
+                        {
+                            graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                            graphics.PixelOffsetMode = PixelOffsetMode.Half;
+                            graphics.DrawImage(
+                                bitmap,
+                                new Rectangle(0, 0, targetWidth, targetHeight),
+                                new Rectangle(i * width, 0, width, bitmap.Height),
+                                GraphicsUnit.Pixel);
+                        }
+
+                        imageList.Images.Add(glyph);
+                    }
+
+                    return imageList;
+                }
             }
         }
 
