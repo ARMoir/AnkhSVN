@@ -85,6 +85,16 @@ namespace Ankh.UI.RepositoryExplorer
                             if (!urlBox.Items.Contains(uri))
                                 urlBox.Items.Add(uri);
                         }
+
+                    IWinFormsThemingService themer = Context.GetService<IWinFormsThemingService>();
+                    if (themer != null)
+                    {
+                        // RepositoryTreeView can recreate its native handle
+                        // while roots and image lists are initialized. Reapply
+                        // the dialog theme after that initialization completes.
+                        themer.ThemeRecursive(reposBrowser, true);
+                        themer.ThemeRecursive(urlBox, true);
+                    }
                 }
             }
         }

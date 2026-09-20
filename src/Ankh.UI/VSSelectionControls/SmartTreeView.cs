@@ -115,7 +115,15 @@ namespace Ankh.UI.VSSelectionControls
             if (SmartListView.IsXPPlus)
             {
                 if (_useDarkNativeTheme)
+                {
+                    if (Parent != null)
+                    {
+                        BackColor = Parent.BackColor;
+                        ForeColor = Parent.ForeColor;
+                    }
+
                     NativeMethods.SetWindowTheme(Handle, "DarkMode_Explorer", null);
+                }
                 else if (!_inVSTheming)
                     NativeMethods.SetWindowTheme(Handle, "Explorer", null);
 
