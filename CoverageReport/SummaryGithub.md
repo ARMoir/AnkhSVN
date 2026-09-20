@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 7:38:59 PM |
-| Coverage date: | 9/20/2026 - 7:38:40 PM - 9/20/2026 - 7:38:50 PM |
+| Generated on: | 9/20/2026 - 7:58:04 PM |
+| Coverage date: | 9/20/2026 - 7:57:44 PM - 9/20/2026 - 7:57:54 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 597 |
 | Files: | 665 |
-| **Line coverage:** | 8.2% (3740 of 45285) |
-| Covered lines: | 3740 |
-| Uncovered lines: | 41545 |
-| Coverable lines: | 45285 |
-| Total lines: | 129111 |
-| **Branch coverage:** | 10.6% (2327 of 21754) |
+| **Line coverage:** | 8.2% (3742 of 45315) |
+| Covered lines: | 3742 |
+| Uncovered lines: | 41573 |
+| Coverable lines: | 45315 |
+| Total lines: | 129183 |
+| **Branch coverage:** | 10.6% (2327 of 21776) |
 | Covered branches: | 2327 |
-| Total branches: | 21754 |
+| Total branches: | 21776 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -113,11 +113,11 @@
 |Ankh.Settings.SolutionSettings|13%|24.5%|
 
 </details>
-<details><summary>Ankh.Diff - 7.6%</summary>
+<details><summary>Ankh.Diff - 7.5%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Diff**|**7.6%**|**9.8%**|
+|**Ankh.Diff**|**7.5%**|**9.7%**|
 |Ankh.Diff.Caret|0%|0%|
 |Ankh.Diff.DiffUtils.AddCopyList|0%|0%|
 |Ankh.Diff.DiffUtils.BinaryDiff|0%|0%|
@@ -267,11 +267,11 @@
 |Ankh.Scc.ThePendingChangeCollection|0%||
 
 </details>
-<details><summary>Ankh.Services - 13.9%</summary>
+<details><summary>Ankh.Services - 14%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Services**|**13.9%**|**13.2%**|
+|**Ankh.Services**|**14%**|**13.2%**|
 |Ankh.AnkhInstanceConditionalAttribute|46.6%|50%|
 |Ankh.AnkhRuntime|31.9%|24.3%|
 |Ankh.AnkhService|10.8%|6.4%|
@@ -367,7 +367,7 @@
 |Ankh.UI.AnkhToolWindowControl|0%|0%|
 |Ankh.UI.VSCommandHandler|0%|0%|
 |Ankh.UI.VSContainerForm|4.7%|0%|
-|Ankh.UI.VSDialogForm|10.5%|3.6%|
+|Ankh.UI.VSDialogForm|11.8%|3.6%|
 |Ankh.UI.VSEditorControl|0%|0%|
 |Ankh.UI.VSTextEditor|14.3%|8.7%|
 |Ankh.UI.VSTextEditorScrollEventArgs|0%||
