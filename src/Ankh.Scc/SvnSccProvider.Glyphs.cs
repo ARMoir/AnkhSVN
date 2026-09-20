@@ -32,6 +32,25 @@ namespace Ankh.Scc
             return GetPathGlyph(path, true);
         }
 
+        protected override AnkhGlyph GetProjectNodeGlyph(string path)
+        {
+            AnkhGlyph glyph = GetPathGlyph(path);
+            if (glyph != AnkhGlyph.None)
+                return glyph;
+
+            SvnItem item = StatusCache[path];
+            if (item == null)
+                return glyph;
+
+            return ProjectNodeGlyphLogic.GetGlyph(
+                glyph,
+                item.Exists,
+                item.IsVersioned,
+                item.IsIgnored,
+                item.IsVersionable,
+                ProjectMap.IsSccExcluded(path));
+        }
+
         AnkhGlyph GetPathGlyph(string path, bool lookForChildren)
         {
             SvnItem item = StatusCache[path];

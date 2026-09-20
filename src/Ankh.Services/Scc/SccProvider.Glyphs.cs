@@ -145,7 +145,7 @@ namespace Ankh.Scc
                         continue;
                     }
 
-                    AnkhGlyph glyph = GetPathGlyph(file);
+                    AnkhGlyph glyph = GetProjectNodeGlyph(file);
 
                     if (rgsiGlyphs != null)
                     {
@@ -170,6 +170,11 @@ namespace Ankh.Scc
             {
                 return VSErr.GetHRForException(e);
             }
+        }
+
+        protected virtual AnkhGlyph GetProjectNodeGlyph(string path)
+        {
+            return GetPathGlyph(path);
         }
 
         public abstract AnkhGlyph GetPathGlyph(string path);
