@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 
+using Ankh.Services;
 using Ankh.VS.Selection;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
