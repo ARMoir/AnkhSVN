@@ -154,7 +154,7 @@ namespace Ankh.Scc
                         if (icon == VsStateIcon.STATEICON_BLANK || icon == VsStateIcon.STATEICON_NOSTATEICON)
                             rgsiGlyphs[i] = icon;
                         else
-                            rgsiGlyphs[i] = SccGlyphIndexLogic.GetStateIcon(glyph, _baseIndex);
+                            rgsiGlyphs[i] = (VsStateIcon)((int)icon + _glyphOffset);
                     }
 
                     if (rgdwSccStatus != null)
@@ -188,9 +188,7 @@ namespace Ankh.Scc
             if (hier == null)
                 return;
 
-            int glyph = (int)SccGlyphIndexLogic.GetStateIcon(
-                GetPathGlyph(sf),
-                _baseIndex);
+            int glyph = (int)GetPathGlyph(sf) + _glyphOffset;
 
             hier.SetProperty(VSItemId.Root, (int)__VSHPROPID.VSHPROPID_StateIconIndex, glyph);
         }
@@ -205,7 +203,8 @@ namespace Ankh.Scc
             hier.SetProperty(VSItemId.Root, (int)__VSHPROPID.VSHPROPID_StateIconIndex, (int)AnkhGlyph.Blank);
         }
 
-        uint _baseIndex = (uint)VsStateIcon.STATEICON_MAXINDEX;
+        int _glyphOffset;
+        uint _baseIndex;
         System.Windows.Forms.ImageList _glyphList;
 
         protected void DisposeGlyphList()
@@ -250,10 +249,26 @@ namespace Ankh.Scc
                 _glyphList = null;
             }
 
-            // Visual Studio supplies the first state-icon index reserved for
-            // this provider's custom image list. Image 0 maps to baseIndex,
-            // image 1 to baseIndex + 1, and so on. Use that contract directly
-            // instead of the old VS11-era +16 overflow trick.
+            // Visual Studio 2002-2010 use a System TreeView control which
+            // supports up to 16 glyph images. 12 of those are filled by
+            // Visual Studio and the other 4 are overridable.
+            // In these versions AnkhSVN provides its 4 images here. (It also
+            // forces its own imagelist in the treeview to support more glyphs)
+            //
+            // 'Visual Studio 11' switched to a WPF control which supports more
+            // common controls, but the api isn't extended (yet). We now provide
+            // the same 4 glyphs, but add the entire list of images at the end
+            // (offset + 16)
+            //
+            // In VS11 when someone asks for a glyph we provide the higher value.
+            // If a user uses the old control (read=Classviewer) it will overflow
+            // and provide the default icon, but if it is the new solution explorer
+            // it won't overflow and provide our nice glyph.
+
+            // In an attempt to trick the VS2010 'Solution navigator' extension we
+            // try to do the same overflow trick in 2010. The solution explorer will
+            // then just fall back to our forced image control
+
             if (StatusImages == null)
             {
                 pdwImageListHandle = IntPtr.Zero;
@@ -261,6 +276,25 @@ namespace Ankh.Scc
             }
 
             _glyphList = StatusImages.CreateStatusImageList();
+
+            if (VSVersion.VS2012OrLater)
+            {
+                for (int i = 0; i < 16; i++)
+                {
+                    using (System.Drawing.Image img = _glyphList.Images[i])
+                    {
+                        _glyphList.Images.Add(img);
+                    }
+                }
+                _glyphOffset = 16;
+            }
+
+            // Now we delete all images before BaseIndex, to properly align our images
+            for (int i = (int)baseIndex - 1; i >= 0; i--)
+            {
+                _glyphList.Images.RemoveAt(i);
+            }
+
             _baseIndex = baseIndex;
             pdwImageListHandle = _glyphList.Handle;
 
@@ -268,4 +302,3 @@ namespace Ankh.Scc
         }
     }
 }
-
