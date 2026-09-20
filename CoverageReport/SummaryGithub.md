@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 10:50:13 PM |
-| Coverage date: | 9/20/2026 - 10:49:51 PM - 9/20/2026 - 10:50:01 PM |
+| Generated on: | 9/20/2026 - 10:59:44 PM |
+| Coverage date: | 9/20/2026 - 10:59:24 PM - 9/20/2026 - 10:59:35 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 604 |
+| Classes: | 605 |
 | Files: | 671 |
-| **Line coverage:** | 8.3% (3810 of 45883) |
-| Covered lines: | 3810 |
-| Uncovered lines: | 42073 |
-| Coverable lines: | 45883 |
-| Total lines: | 130345 |
-| **Branch coverage:** | 10.7% (2368 of 21995) |
-| Covered branches: | 2368 |
-| Total branches: | 21995 |
+| **Line coverage:** | 8.3% (3840 of 45959) |
+| Covered lines: | 3840 |
+| Uncovered lines: | 42119 |
+| Coverable lines: | 45959 |
+| Total lines: | 130483 |
+| **Branch coverage:** | 10.8% (2385 of 22027) |
+| Covered branches: | 2385 |
+| Total branches: | 22027 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -619,11 +619,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 9.2%</summary>
+<details><summary>Ankh.VS - 9.7%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.2%**|**8.5%**|
+|**Ankh.VS**|**9.7%**|**9%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -682,6 +682,7 @@
 |Ankh.VS.WpfServices.WpfEditorInfoService|0%|0%|
 |Ankh.WpfPackage.Services.DarkComboBoxPainter|0%|0%|
 |Ankh.WpfPackage.Services.DarkNumericUpDownPainter|0%|0%|
+|Ankh.WpfPackage.Services.ThemeReflectionLogic|73.1%|70.8%|
 |Ankh.WpfPackage.Services.ThemingService|0%|0%|
 |Ankh.WpfPackage.Services.ThreadedWaitService|0%|0%|
 |Ankh.WpfPackage.Services.WinFormsNativeThemeLogic|100%|100%|
