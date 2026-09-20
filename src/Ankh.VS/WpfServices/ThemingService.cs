@@ -484,16 +484,49 @@ namespace Ankh.WpfPackage.Services
             if (button.Parent != null && button.Font != button.Parent.Font)
                 button.Font = button.Parent.Font;
 
-            bool themed = button.IsHandleCreated
-                && VSThemeWindow(button.Handle, forDialog);
+            bool darkButton = WinFormsNativeThemeLogic.ShouldUseDarkButtonRendering(
+                UseDarkNativeTheme);
 
-            if (!themed && button.Parent != null)
+            if (darkButton && button.Parent != null)
             {
-                if (button.BackColor != button.Parent.BackColor)
-                    button.BackColor = button.Parent.BackColor;
+                // Native WinForms button painting can retain a light face even
+                // when IVsUIShell6.ThemeWindow reports success. In VS dark mode
+                // use explicit VS-derived colors so enabled and disabled buttons
+                // remain consistent with the dialog surface.
+                button.UseVisualStyleBackColor = false;
+                button.FlatStyle = FlatStyle.Flat;
+
+                Color backColor = ControlPaint.Light(button.Parent.BackColor, 0.05f);
+                Color borderColor = ControlPaint.Light(button.Parent.BackColor, 0.22f);
+                Form owner = button.FindForm();
+
+                if (owner != null
+                    && ReferenceEquals(owner.AcceptButton, button)
+                    && button.Enabled)
+                {
+                    borderColor = SystemColors.Highlight;
+                }
+
+                if (button.BackColor != backColor)
+                    button.BackColor = backColor;
 
                 if (button.ForeColor != button.Parent.ForeColor)
                     button.ForeColor = button.Parent.ForeColor;
+
+                button.FlatAppearance.BorderSize = 1;
+                button.FlatAppearance.BorderColor = borderColor;
+                button.FlatAppearance.MouseOverBackColor =
+                    ControlPaint.Light(button.Parent.BackColor, 0.10f);
+                button.FlatAppearance.MouseDownBackColor =
+                    ControlPaint.Light(button.Parent.BackColor, 0.16f);
+            }
+            else
+            {
+                button.FlatStyle = FlatStyle.Standard;
+                button.UseVisualStyleBackColor = true;
+
+                if (button.IsHandleCreated)
+                    VSThemeWindow(button.Handle, forDialog);
             }
         }
 

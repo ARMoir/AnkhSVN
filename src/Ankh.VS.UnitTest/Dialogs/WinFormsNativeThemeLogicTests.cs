@@ -34,6 +34,15 @@ namespace AnkhSvn_UnitTestProject.Dialogs
                 Is.EqualTo(expected));
         }
 
+        [TestCase(true, true)]
+        [TestCase(false, false)]
+        public void DarkButtonsFollowDarkNativeTheme(bool useDarkNativeTheme, bool expected)
+        {
+            Assert.That(
+                WinFormsNativeThemeLogic.ShouldUseDarkButtonRendering(useDarkNativeTheme),
+                Is.EqualTo(expected));
+        }
+
         [Test]
         public void NativeThemeClassNamesMatchSupportedWindowsDarkSubThemes()
         {
