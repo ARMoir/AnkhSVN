@@ -149,12 +149,10 @@ namespace Ankh.Scc
 
                     if (rgsiGlyphs != null)
                     {
-                        VsStateIcon icon = (VsStateIcon)glyph;
-
-                        if (icon == VsStateIcon.STATEICON_BLANK || icon == VsStateIcon.STATEICON_NOSTATEICON)
-                            rgsiGlyphs[i] = icon;
-                        else
-                            rgsiGlyphs[i] = (VsStateIcon)((int)icon + _glyphOffset);
+                        rgsiGlyphs[i] = SccGlyphDisplayLogic.GetStateIcon(
+                            glyph,
+                            _glyphOffset,
+                            VSVersion.VS2012OrLater);
                     }
 
                     if (rgdwSccStatus != null)
@@ -193,9 +191,12 @@ namespace Ankh.Scc
             if (hier == null)
                 return;
 
-            int glyph = (int)GetPathGlyph(sf) + _glyphOffset;
+            VsStateIcon glyph = SccGlyphDisplayLogic.GetStateIcon(
+                GetPathGlyph(sf),
+                _glyphOffset,
+                VSVersion.VS2012OrLater);
 
-            hier.SetProperty(VSItemId.Root, (int)__VSHPROPID.VSHPROPID_StateIconIndex, glyph);
+            hier.SetProperty(VSItemId.Root, (int)__VSHPROPID.VSHPROPID_StateIconIndex, (int)glyph);
         }
 
         public void ClearSolutionGlyph()
