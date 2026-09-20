@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Ankh.Commands;
 
 namespace Ankh.UI.VSSelectionControls
 {
@@ -111,9 +112,12 @@ namespace Ankh.UI.VSSelectionControls
             if (_stateImageList != null)
                 SetStateList();
 
-            if (!_inVSTheming && SmartListView.IsXPPlus)
+            if (SmartListView.IsXPPlus)
             {
-                NativeMethods.SetWindowTheme(Handle, "Explorer", null);
+                if (_useDarkNativeTheme)
+                    NativeMethods.SetWindowTheme(Handle, "DarkMode_Explorer", null);
+                else if (!_inVSTheming)
+                    NativeMethods.SetWindowTheme(Handle, "Explorer", null);
 
                 uint flags = (uint)NativeMethods.SendMessage(Handle, TVM_GETEXTENDEDSTYLE, IntPtr.Zero, IntPtr.Zero);
 
@@ -211,9 +215,27 @@ namespace Ankh.UI.VSSelectionControls
         }
 
         bool _inVSTheming;
+        bool _useDarkNativeTheme;
+
         void ISupportsVSTheming.OnThemeChange(IAnkhServiceProvider sender, CancelEventArgs e)
         {
-            _inVSTheming = true;
+            _inVSTheming = !e.Cancel;
+
+            IAnkhCommandStates states = sender.GetService<IAnkhCommandStates>();
+            _useDarkNativeTheme = SmartTreeViewThemeLogic.ShouldUseDarkNativeTheme(
+                _inVSTheming,
+                states != null && states.ThemeDark,
+                SystemInformation.HighContrast);
+
+            // TreeView handles are recreated while repositories and image lists
+            // are initialized. Preserve the current VS colors across those
+            // recreations instead of falling back to the Windows light theme.
+            if (_useDarkNativeTheme && Parent != null)
+            {
+                BackColor = Parent.BackColor;
+                ForeColor = Parent.ForeColor;
+            }
+
             RecreateHandle();
         }
 

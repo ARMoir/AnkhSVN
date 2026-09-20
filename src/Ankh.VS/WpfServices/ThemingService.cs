@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Microsoft.VisualStudio;
@@ -21,6 +22,11 @@ namespace Ankh.WpfPackage.Services
     [GlobalService(typeof(IWinFormsThemingService), MinVersion = VSInstance.VS2012)]
     sealed partial class ThemingService : AnkhService, IWinFormsThemingService
     {
+        readonly ConditionalWeakTable<ComboBox, DarkComboBoxPainter> _comboPainters =
+            new ConditionalWeakTable<ComboBox, DarkComboBoxPainter>();
+        readonly ConditionalWeakTable<NumericUpDown, DarkNumericUpDownPainter> _numericPainters =
+            new ConditionalWeakTable<NumericUpDown, DarkNumericUpDownPainter>();
+
         public ThemingService(IAnkhServiceProvider context)
             : base(context)
         {
@@ -614,6 +620,11 @@ namespace Ankh.WpfPackage.Services
                 combo.DrawMode = DrawMode.Normal;
                 combo.FlatStyle = FlatStyle.Standard;
             }
+
+            DarkComboBoxPainter painter = _comboPainters.GetValue(
+                combo,
+                delegate(ComboBox value) { return new DarkComboBoxPainter(value); });
+            painter.SetDarkMode(UseDarkNativeTheme);
         }
 
         void ThemeComboDrawItem(object sender, DrawItemEventArgs e)
@@ -655,6 +666,48 @@ namespace Ankh.WpfPackage.Services
 
             if ((e.State & DrawItemState.Focus) != 0 && !editPortion)
                 e.DrawFocusRectangle();
+        }
+
+        void ThemeOne(NumericUpDown numeric, bool forDialog)
+        {
+            ApplyNativeControlTheme(
+                numeric.Handle,
+                WinFormsNativeThemeLogic.DarkComboTheme,
+                forDialog);
+
+            if (numeric.Font != DialogFont)
+                numeric.Font = DialogFont;
+
+            if (numeric.Parent != null)
+            {
+                if (numeric.BackColor != numeric.Parent.BackColor)
+                    numeric.BackColor = numeric.Parent.BackColor;
+
+                if (numeric.ForeColor != numeric.Parent.ForeColor)
+                    numeric.ForeColor = numeric.Parent.ForeColor;
+            }
+
+            if (numeric.BorderStyle == BorderStyle.Fixed3D)
+                numeric.BorderStyle = BorderStyle.FixedSingle;
+
+            foreach (Control child in numeric.Controls)
+            {
+                child.BackColor = numeric.BackColor;
+                child.ForeColor = numeric.ForeColor;
+
+                if (child.IsHandleCreated)
+                {
+                    ApplyNativeControlTheme(
+                        child.Handle,
+                        WinFormsNativeThemeLogic.DarkComboTheme,
+                        forDialog);
+                }
+            }
+
+            DarkNumericUpDownPainter painter = _numericPainters.GetValue(
+                numeric,
+                delegate(NumericUpDown value) { return new DarkNumericUpDownPainter(value); });
+            painter.SetDarkMode(UseDarkNativeTheme);
         }
 
         void ThemeOne(SplitContainer panel)
@@ -742,6 +795,7 @@ namespace Ankh.WpfPackage.Services
                 || MaybeTheme<UserControl>(ThemeOne, control, forDialog)
                 || MaybeTheme<PropertyGrid>(ThemeOne, control, forDialog)
                 || MaybeTheme<ComboBox>(ThemeOne, control, forDialog)
+                || MaybeTheme<NumericUpDown>(ThemeOne, control, forDialog)
                 || MaybeTheme<SplitContainer>(ThemeOne, control, forDialog)
                 || MaybeTheme<IHasSplitterColor>(ThemeOne, control, forDialog)
                 || MaybeTheme<Button>(ThemeOne, control, forDialog)
