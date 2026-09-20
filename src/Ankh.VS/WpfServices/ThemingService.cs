@@ -668,7 +668,7 @@ namespace Ankh.WpfPackage.Services
                 e.DrawFocusRectangle();
         }
 
-        void ThemeOne(NumericUpDown numeric, bool forDialog)
+        void ThemeNumericUpDown(NumericUpDown numeric, bool forDialog)
         {
             ApplyNativeControlTheme(
                 numeric.Handle,
@@ -795,7 +795,7 @@ namespace Ankh.WpfPackage.Services
                 || MaybeTheme<UserControl>(ThemeOne, control, forDialog)
                 || MaybeTheme<PropertyGrid>(ThemeOne, control, forDialog)
                 || MaybeTheme<ComboBox>(ThemeOne, control, forDialog)
-                || MaybeTheme<NumericUpDown>(ThemeOne, control, forDialog)
+                || MaybeTheme<NumericUpDown>(ThemeNumericUpDown, control, forDialog)
                 || MaybeTheme<SplitContainer>(ThemeOne, control, forDialog)
                 || MaybeTheme<IHasSplitterColor>(ThemeOne, control, forDialog)
                 || MaybeTheme<Button>(ThemeOne, control, forDialog)
