@@ -3,30 +3,30 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 10:59:44 PM |
-| Coverage date: | 9/20/2026 - 10:59:24 PM - 9/20/2026 - 10:59:35 PM |
+| Generated on: | 9/20/2026 - 11:17:08 PM |
+| Coverage date: | 9/20/2026 - 11:16:46 PM - 9/20/2026 - 11:16:56 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 605 |
 | Files: | 671 |
-| **Line coverage:** | 8.3% (3840 of 45959) |
-| Covered lines: | 3840 |
-| Uncovered lines: | 42119 |
-| Coverable lines: | 45959 |
-| Total lines: | 130483 |
-| **Branch coverage:** | 10.8% (2385 of 22027) |
-| Covered branches: | 2385 |
-| Total branches: | 22027 |
+| **Line coverage:** | 8.3% (3850 of 45970) |
+| Covered lines: | 3850 |
+| Uncovered lines: | 42120 |
+| Coverable lines: | 45970 |
+| Total lines: | 130505 |
+| **Branch coverage:** | 10.8% (2393 of 22039) |
+| Covered branches: | 2393 |
+| Total branches: | 22039 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
 
 ## Coverage
-<details><summary>Ankh - 10.3%</summary>
+<details><summary>Ankh - 10.4%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh**|**10.3%**|**19.6%**|
+|**Ankh**|**10.4%**|**19.7%**|
 |Ankh.AnkhModule|0%||
 |Ankh.Commands.AddItemCommand|5.7%|14.7%|
 |Ankh.Commands.AddToSccCommands|3.1%|1%|
@@ -94,7 +94,7 @@
 |Ankh.Services.AnkhDiff|10.8%|27.6%|
 |Ankh.Services.AnkhErrorHandler|0%|0%|
 |Ankh.Services.AnkhErrorMessage|0%|0%|
-|Ankh.Services.AnkhHelpService|40.9%|56.9%|
+|Ankh.Services.AnkhHelpService|46.8%|58.1%|
 |Ankh.Services.AnkhScheduler|0%|0%|
 |Ankh.Services.DiffToolTemplateLogic|100%|100%|
 |Ankh.Services.IssueTracker.AnkhIssueService|0%|0%|
