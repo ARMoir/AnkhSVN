@@ -42,6 +42,7 @@ jobs:
       run: cmd.exe /C scripts\gh-version-setup ${{ github.run_number }}
 
     - name: Build 2022
+      id: build_2022
       working-directory: ${{ env.GITHUB_WORKSPACE }}
       run: >
         msbuild /m /v:m /restore /t:rebuild
@@ -119,12 +120,6 @@ jobs:
         $trxFiles = Get-ChildItem "${{ github.workspace }}\TestResults" -Recurse -Filter "*.trx" -ErrorAction SilentlyContinue
 
         New-Item -ItemType Directory -Force -Path $badgeDir | Out-Null
-
-        if (-not (Test-Path $coveragePath) -or -not $trxFiles) {
-          Write-Host "Coverage or TRX results are unavailable; leaving the published badges unchanged."
-          "ready=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          exit 0
-        }
 
         $total = 0
         $passed = 0
@@ -204,6 +199,24 @@ jobs:
           Set-Content -Path $path -Value $svg -Encoding utf8
         }
 
+        $buildOutcome = "${{ steps.build_2022.outcome }}"
+        if ($buildOutcome -eq "success") {
+          $buildMessage = "passing"
+          $buildColor = "#4c1"
+        }
+        else {
+          $buildMessage = "failing"
+          $buildColor = "#e05d44"
+        }
+
+        Write-Badge (Join-Path $badgeDir "build.svg") "build" $buildMessage $buildColor
+
+        if (-not (Test-Path $coveragePath) -or -not $trxFiles) {
+          Write-Host "Coverage or TRX results are unavailable; publishing only the build badge."
+          "ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          exit 0
+        }
+
         if ($failed -gt 0) {
           $testMessage = "$passed passed, $failed failed"
           $testColor = "#e05d44"
@@ -233,7 +246,7 @@ jobs:
         "ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
     - name: Publish README badges
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.readme_badges.outputs.ready == 'true'
+      if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.readme_badges.outputs.ready == 'true'
       shell: pwsh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -260,10 +273,16 @@ jobs:
         New-Item -ItemType Directory -Force -Path "badges" | Out-Null
         Copy-Item "${{ github.workspace }}\ReadmeBadges\*.svg" "badges\" -Force
 
-        New-Item -ItemType Directory -Force -Path "CoverageReport" | Out-Null
-        Copy-Item "${{ github.workspace }}\CoverageReport\SummaryGithub.md" "CoverageReport\SummaryGithub.md" -Force
+        $summarySource = "${{ github.workspace }}\CoverageReport\SummaryGithub.md"
+        if (Test-Path $summarySource) {
+          New-Item -ItemType Directory -Force -Path "CoverageReport" | Out-Null
+          Copy-Item $summarySource "CoverageReport\SummaryGithub.md" -Force
+        }
 
-        git add badges/*.svg CoverageReport/SummaryGithub.md
+        git add badges/*.svg
+        if (Test-Path "CoverageReport\SummaryGithub.md") {
+          git add CoverageReport/SummaryGithub.md
+        }
         git diff --cached --quiet
         if ($LASTEXITCODE -eq 0) {
           Write-Host "README badges and coverage summary are already current."

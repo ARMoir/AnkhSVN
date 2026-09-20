@@ -1,6 +1,6 @@
 # AnkhSVN - Subversion Support for Visual Studio
 
-[![Build & tests](../../actions/workflows/MSBuild.yml/badge.svg?branch=main)](../../actions/workflows/MSBuild.yml)
+![Build](badges/build.svg)
 ![Tests](badges/tests.svg)
 ![Line coverage](badges/coverage.svg)
 ![Branch coverage](badges/branches.svg)
