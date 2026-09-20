@@ -1,11 +1,11 @@
 # AnkhSVN - Subversion Support for Visual Studio
 
 [![Build & tests](../../actions/workflows/MSBuild.yml/badge.svg?branch=main)](../../actions/workflows/MSBuild.yml)
-![Tests](../../raw/badges/tests.svg)
-![Line coverage](../../raw/badges/coverage.svg)
-![Branch coverage](../../raw/badges/branches.svg)
+![Tests](badges/tests.svg)
+![Line coverage](badges/coverage.svg)
+![Branch coverage](badges/branches.svg)
 
-[View detailed coverage report](../../blob/badges/CoverageReport/SummaryGithub.md)
+[View detailed coverage report](CoverageReport/SummaryGithub.md)
 
 AnkhSVN integrates Apache Subversion working-copy and repository operations directly into Visual Studio.
 

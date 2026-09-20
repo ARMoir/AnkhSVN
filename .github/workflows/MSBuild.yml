@@ -3,6 +3,9 @@ name: MSBuild
 on:
   push:
     branches: [ main, stable/* ]
+    paths-ignore:
+      - 'badges/**'
+      - 'CoverageReport/SummaryGithub.md'
   pull_request:
     branches: [ main, stable/* ]
   workflow_dispatch:
@@ -248,29 +251,19 @@ jobs:
           Remove-Item -Recurse -Force $publishDir
         }
 
-        git clone --quiet $remote $publishDir
+        git clone --quiet --branch main --single-branch $remote $publishDir
         Set-Location $publishDir
 
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-        $badgeRef = git ls-remote --heads origin badges
-        if ($badgeRef) {
-          git fetch --quiet origin badges
-          git checkout -B badges origin/badges
-        }
-        else {
-          git checkout --orphan badges
-          git rm -rf . | Out-Null
-        }
-
-        Get-ChildItem -Path . -Filter "*.svg" -File -ErrorAction SilentlyContinue | Remove-Item -Force
-        Copy-Item "${{ github.workspace }}\ReadmeBadges\*.svg" .
+        New-Item -ItemType Directory -Force -Path "badges" | Out-Null
+        Copy-Item "${{ github.workspace }}\ReadmeBadges\*.svg" "badges\" -Force
 
         New-Item -ItemType Directory -Force -Path "CoverageReport" | Out-Null
         Copy-Item "${{ github.workspace }}\CoverageReport\SummaryGithub.md" "CoverageReport\SummaryGithub.md" -Force
 
-        git add *.svg CoverageReport/SummaryGithub.md
+        git add badges/*.svg CoverageReport/SummaryGithub.md
         git diff --cached --quiet
         if ($LASTEXITCODE -eq 0) {
           Write-Host "README badges and coverage summary are already current."
@@ -278,7 +271,7 @@ jobs:
         }
 
         git commit -m "Update README metrics for run #${{ github.run_number }}"
-        git push origin HEAD:badges
+        git push origin HEAD:main
 
     - name: Upload coverage report
       if: always()
