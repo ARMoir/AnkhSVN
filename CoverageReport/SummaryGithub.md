@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 6:34:09 PM |
-| Coverage date: | 9/20/2026 - 6:33:51 PM - 9/20/2026 - 6:34:01 PM |
+| Generated on: | 9/20/2026 - 7:29:01 PM |
+| Coverage date: | 9/20/2026 - 7:28:41 PM - 9/20/2026 - 7:28:51 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 597 |
 | Files: | 665 |
-| **Line coverage:** | 8.1% (3667 of 45252) |
-| Covered lines: | 3667 |
-| Uncovered lines: | 41585 |
-| Coverable lines: | 45252 |
-| Total lines: | 129044 |
-| **Branch coverage:** | 10.4% (2267 of 21736) |
-| Covered branches: | 2267 |
-| Total branches: | 21736 |
+| **Line coverage:** | 8.2% (3740 of 45285) |
+| Covered lines: | 3740 |
+| Uncovered lines: | 41545 |
+| Coverable lines: | 45285 |
+| Total lines: | 129111 |
+| **Branch coverage:** | 10.6% (2327 of 21754) |
+| Covered branches: | 2327 |
+| Total branches: | 21754 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -267,11 +267,11 @@
 |Ankh.Scc.ThePendingChangeCollection|0%||
 
 </details>
-<details><summary>Ankh.Services - 13.8%</summary>
+<details><summary>Ankh.Services - 13.9%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Services**|**13.8%**|**12.8%**|
+|**Ankh.Services**|**13.9%**|**13.2%**|
 |Ankh.AnkhInstanceConditionalAttribute|46.6%|50%|
 |Ankh.AnkhRuntime|31.9%|24.3%|
 |Ankh.AnkhService|10.8%|6.4%|
@@ -314,7 +314,7 @@
 |Ankh.Scc.BatchStartedEventArgs|0%|0%|
 |Ankh.Scc.DocumentLock|0%|0%|
 |Ankh.Scc.Engine.SccDirectory`1|88.8%|75%|
-|Ankh.Scc.Engine.SccItem|17.4%|8%|
+|Ankh.Scc.Engine.SccItem|25.3%|16%|
 |Ankh.Scc.Engine.SccItem`1|57.1%|50%|
 |Ankh.Scc.PendingChange|15.4%|29.5%|
 |Ankh.Scc.PendingChangeCollection|28.5%|0%|
@@ -355,11 +355,11 @@
 |Ankh.Selection.SelectionItemMap|0%|0%|
 |Ankh.Selection.SelectionItemPropertyLogic|100%|100%|
 |Ankh.Services.AnkhContext|40.9%|42.8%|
-|Ankh.Services.VSErr|0%|0%|
+|Ankh.Services.VSErr|7.6%|0%|
 |Ankh.Services.XCastInt32|0%||
 |Ankh.Services.XCastUInt32|0%||
 |Ankh.SvnClientAction|0%|0%|
-|Ankh.SvnItem|39.1%|26.1%|
+|Ankh.SvnItem|39.9%|28.7%|
 |Ankh.SvnPoolClient|0%|0%|
 |Ankh.SvnPoolRemoteSession|0%|0%|
 |Ankh.UI.AnkhCommandHook|0%|0%|
@@ -616,11 +616,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 7.2%</summary>
+<details><summary>Ankh.VS - 8.6%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**7.2%**|**5.8%**|
+|**Ankh.VS**|**8.6%**|**7.5%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -658,7 +658,7 @@
 |Ankh.VS.Selection.Disposer|0%||
 |Ankh.VS.Selection.SelectionContext|0%|0%|
 |Ankh.VS.Selection.SelectionItem|0%|0%|
-|Ankh.VS.Selection.SelectionUtils|0%|0%|
+|Ankh.VS.Selection.SelectionUtils|32.2%|33.5%|
 |Ankh.VS.Services.AnkhVSColor|0%|0%|
 |Ankh.VS.Services.DiffMergeInstance|0%|0%|
 |Ankh.VS.Services.GlobalCommandHook|0%|0%|
