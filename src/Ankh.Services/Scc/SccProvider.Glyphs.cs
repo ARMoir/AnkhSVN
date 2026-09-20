@@ -149,7 +149,9 @@ namespace Ankh.Scc
 
                     if (rgsiGlyphs != null)
                     {
-                        VsStateIcon icon = (VsStateIcon)glyph;
+                        AnkhGlyph displayGlyph =
+                            SccGlyphDisplayLogic.GetDisplayGlyph(glyph);
+                        VsStateIcon icon = (VsStateIcon)displayGlyph;
 
                         if (icon == VsStateIcon.STATEICON_BLANK || icon == VsStateIcon.STATEICON_NOSTATEICON)
                             rgsiGlyphs[i] = icon;
@@ -307,3 +309,4 @@ namespace Ankh.Scc
         }
     }
 }
+
