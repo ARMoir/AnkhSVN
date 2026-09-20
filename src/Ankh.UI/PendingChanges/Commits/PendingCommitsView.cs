@@ -272,6 +272,16 @@ namespace Ankh.UI.PendingChanges.Commits
                 !PendingChange.IsIgnoreOnCommitChangeList(pci.PendingChange.ChangeList);
         }
 
+        internal static bool ShouldOpenPendingChangeOnDoubleClick(
+            ListViewHitTestLocations location)
+        {
+            // Checkbox state is owned by the ListView itself. A double-click on
+            // the row should only open the item; it must never alter whether the
+            // pending change is selected for commit.
+            return location != ListViewHitTestLocations.None
+                && location != ListViewHitTestLocations.StateImage;
+        }
+
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
             base.OnMouseDoubleClick(e);
@@ -280,14 +290,11 @@ namespace Ankh.UI.PendingChanges.Commits
             {
                 ListViewHitTestInfo info = HitTest(e.X, e.Y);
 
-                if (info == null || info.Location == ListViewHitTestLocations.None)
+                if (info == null
+                    || !ShouldOpenPendingChangeOnDoubleClick(info.Location))
+                {
                     return;
-
-                if (info.Item != null)
-                    info.Item.Checked = !info.Item.Checked;
-
-                if (info.Location == ListViewHitTestLocations.StateImage)
-                    return; // Just check the item
+                }
 
                 if (CommandService != null)
                     CommandService.ExecCommand(Config.PCDoubleClickShowsChanges
