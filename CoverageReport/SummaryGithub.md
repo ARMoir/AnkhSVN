@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 10:22:03 PM |
-| Coverage date: | 9/20/2026 - 10:21:43 PM - 9/20/2026 - 10:21:54 PM |
+| Generated on: | 9/20/2026 - 10:32:09 PM |
+| Coverage date: | 9/20/2026 - 10:31:48 PM - 9/20/2026 - 10:31:59 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 600 |
-| Files: | 668 |
-| **Line coverage:** | 8.3% (3808 of 45643) |
-| Covered lines: | 3808 |
-| Uncovered lines: | 41835 |
-| Coverable lines: | 45643 |
-| Total lines: | 129855 |
-| **Branch coverage:** | 10.8% (2364 of 21885) |
-| Covered branches: | 2364 |
-| Total branches: | 21885 |
+| Classes: | 603 |
+| Files: | 670 |
+| **Line coverage:** | 8.3% (3809 of 45861) |
+| Covered lines: | 3809 |
+| Uncovered lines: | 42052 |
+| Coverable lines: | 45861 |
+| Total lines: | 130270 |
+| **Branch coverage:** | 10.7% (2366 of 21979) |
+| Covered branches: | 2366 |
+| Total branches: | 21979 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -594,6 +594,7 @@
 |Ankh.UI.VSSelectionControls.SmartListViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.SmartSplitContainer|31.5%|18.1%|
 |Ankh.UI.VSSelectionControls.SmartTreeView|0%|0%|
+|Ankh.UI.VSSelectionControls.SmartTreeViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.TreeViewWithSelection`1|0%|0%|
 |Ankh.UI.WizardFramework.Wizard|42%|3.2%|
 |Ankh.UI.WizardFramework.WizardMessage|0%||
@@ -617,11 +618,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 9.7%</summary>
+<details><summary>Ankh.VS - 9.2%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.7%**|**8.7%**|
+|**Ankh.VS**|**9.2%**|**8.5%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -678,6 +679,8 @@
 |Ankh.VS.WebBrowser.BrowserUser|0%||
 |Ankh.VS.WpfServices.ServiceMethodResolver|0%|0%|
 |Ankh.VS.WpfServices.WpfEditorInfoService|0%|0%|
+|Ankh.WpfPackage.Services.DarkComboBoxPainter|0%|0%|
+|Ankh.WpfPackage.Services.DarkNumericUpDownPainter|0%|0%|
 |Ankh.WpfPackage.Services.ThemingService|0%|0%|
 |Ankh.WpfPackage.Services.ThreadedWaitService|0%|0%|
 |Ankh.WpfPackage.Services.WinFormsNativeThemeLogic|100%|100%|
