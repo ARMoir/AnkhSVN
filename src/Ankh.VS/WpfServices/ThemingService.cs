@@ -14,6 +14,7 @@ using Ankh.UI;
 using Ankh.VS;
 using Ankh.ExtensionPoints.UI;
 using Ankh.Services;
+using Ankh.Commands;
 
 namespace Ankh.WpfPackage.Services
 {
@@ -182,6 +183,69 @@ namespace Ankh.WpfPackage.Services
             return false;
         }
 
+        bool UseDarkNativeTheme
+        {
+            get
+            {
+                IAnkhCommandStates states = GetService<IAnkhCommandStates>();
+
+                return WinFormsNativeThemeLogic.ShouldUseDarkTheme(
+                    states != null && states.ThemeDark,
+                    SystemInformation.HighContrast);
+            }
+        }
+
+        void ApplyNativeControlTheme(IntPtr handle, string darkTheme, bool forDialog)
+        {
+            if (handle == IntPtr.Zero)
+                return;
+
+            if (UseDarkNativeTheme)
+            {
+                VSThemeWindow(handle, forDialog);
+                NativeMethods.SetWindowTheme(handle, darkTheme, null);
+            }
+            else
+            {
+                // Remove a dark native sub-theme after a VS theme switch, then
+                // let the shell apply its current light/blue/high-contrast theme.
+                NativeMethods.SetWindowTheme(handle, null, null);
+                VSThemeWindow(handle, forDialog);
+            }
+        }
+
+        void ApplyNativeCaptionTheme(Form form)
+        {
+            if (form == null || !form.IsHandleCreated)
+                return;
+
+            int enabled = UseDarkNativeTheme ? 1 : 0;
+
+            try
+            {
+                int hr = NativeMethods.DwmSetWindowAttribute(
+                    form.Handle,
+                    NativeMethods.DWMWA_USE_IMMERSIVE_DARK_MODE,
+                    ref enabled,
+                    Marshal.SizeOf(typeof(int)));
+
+                if (hr != 0)
+                {
+                    NativeMethods.DwmSetWindowAttribute(
+                        form.Handle,
+                        NativeMethods.DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1,
+                        ref enabled,
+                        Marshal.SizeOf(typeof(int)));
+                }
+            }
+            catch (DllNotFoundException)
+            {
+            }
+            catch (EntryPointNotFoundException)
+            {
+            }
+        }
+
         IAnkhVSColor _colorSvc;
         public IAnkhVSColor ColorSvc
         {
@@ -248,7 +312,10 @@ namespace Ankh.WpfPackage.Services
 
         void ThemeOne(ListView listView, bool forDialog)
         {
-            VSThemeWindow(listView.Handle, forDialog);
+            ApplyNativeControlTheme(
+                listView.Handle,
+                WinFormsNativeThemeLogic.DarkExplorerTheme,
+                forDialog);
 
             if (listView.Font != DialogFont)
                 listView.Font = DialogFont;
@@ -294,15 +361,19 @@ namespace Ankh.WpfPackage.Services
 
             if (header != IntPtr.Zero)
             {
-                VSThemeWindow(header, forDialog);
-
-                // TODO: Force colors?
+                ApplyNativeControlTheme(
+                    header,
+                    WinFormsNativeThemeLogic.DarkItemsViewTheme,
+                    forDialog);
             }
         }
 
         void ThemeOne(TreeView treeView, bool forDialog)
         {
-            VSThemeWindow(treeView.Handle, forDialog);
+            ApplyNativeControlTheme(
+                treeView.Handle,
+                WinFormsNativeThemeLogic.DarkExplorerTheme,
+                forDialog);
 
             if (treeView.Font != DialogFont)
                 treeView.Font = DialogFont;
@@ -365,6 +436,8 @@ namespace Ankh.WpfPackage.Services
                 if (form.ForeColor != color)
                     form.ForeColor = color;
             }
+
+            ApplyNativeCaptionTheme(form as Form);
         }
 
         private void ThemeOne(ScrollableControl one)
@@ -479,8 +552,13 @@ namespace Ankh.WpfPackage.Services
             }
         }
 
-        void ThemeOne(ComboBox combo)
+        void ThemeOne(ComboBox combo, bool forDialog)
         {
+            ApplyNativeControlTheme(
+                combo.Handle,
+                WinFormsNativeThemeLogic.DarkComboTheme,
+                forDialog);
+
             if (combo.Font != DialogFont)
                 combo.Font = DialogFont;
 
@@ -546,10 +624,22 @@ namespace Ankh.WpfPackage.Services
 
         static class NativeMethods
         {
-            public const Int32 LVM_GETHEADER = 0x1000 + 31; // LVM_FIRST + 31
+            public const Int32 LVM_GETHEADER = 0x1000 + 31; // LVM_FIRST + 31;
+            public const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
+            public const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
 
             [DllImport("user32.dll")]
             public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+            public static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+
+            [DllImport("dwmapi.dll")]
+            public static extern int DwmSetWindowAttribute(
+                IntPtr hwnd,
+                int dwAttribute,
+                ref int pvAttribute,
+                int cbAttribute);
         }
 
         void VSThemeWindow(Control control, bool forDialog)
