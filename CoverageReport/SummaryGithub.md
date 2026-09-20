@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 8:11:12 PM |
-| Coverage date: | 9/20/2026 - 8:10:51 PM - 9/20/2026 - 8:11:02 PM |
+| Generated on: | 9/20/2026 - 8:41:55 PM |
+| Coverage date: | 9/20/2026 - 8:41:34 PM - 9/20/2026 - 8:41:45 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 598 |
-| Files: | 666 |
-| **Line coverage:** | 8.3% (3805 of 45446) |
-| Covered lines: | 3805 |
-| Uncovered lines: | 41641 |
-| Coverable lines: | 45446 |
-| Total lines: | 129476 |
-| **Branch coverage:** | 10.8% (2360 of 21823) |
-| Covered branches: | 2360 |
-| Total branches: | 21823 |
+| Classes: | 599 |
+| Files: | 667 |
+| **Line coverage:** | 8.3% (3806 of 45493) |
+| Covered lines: | 3806 |
+| Uncovered lines: | 41687 |
+| Coverable lines: | 45493 |
+| Total lines: | 129594 |
+| **Branch coverage:** | 10.8% (2362 of 21837) |
+| Covered branches: | 2362 |
+| Total branches: | 21837 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -679,6 +679,7 @@
 |Ankh.VS.WpfServices.WpfEditorInfoService|0%|0%|
 |Ankh.WpfPackage.Services.ThemingService|0%|0%|
 |Ankh.WpfPackage.Services.ThreadedWaitService|0%|0%|
+|Ankh.WpfPackage.Services.WinFormsNativeThemeLogic|100%|100%|
 
 </details>
 <details><summary>TestUtils - 0%</summary>
