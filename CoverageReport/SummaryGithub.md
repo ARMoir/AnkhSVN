@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/20/2026 - 8:41:55 PM |
-| Coverage date: | 9/20/2026 - 8:41:34 PM - 9/20/2026 - 8:41:45 PM |
+| Generated on: | 9/20/2026 - 9:04:56 PM |
+| Coverage date: | 9/20/2026 - 9:04:37 PM - 9/20/2026 - 9:04:47 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
-| Classes: | 599 |
-| Files: | 667 |
-| **Line coverage:** | 8.3% (3806 of 45493) |
-| Covered lines: | 3806 |
-| Uncovered lines: | 41687 |
-| Coverable lines: | 45493 |
-| Total lines: | 129594 |
-| **Branch coverage:** | 10.8% (2362 of 21837) |
-| Covered branches: | 2362 |
-| Total branches: | 21837 |
+| Classes: | 600 |
+| Files: | 668 |
+| **Line coverage:** | 8.3% (3807 of 45623) |
+| Covered lines: | 3807 |
+| Uncovered lines: | 41816 |
+| Coverable lines: | 45623 |
+| Total lines: | 129817 |
+| **Branch coverage:** | 10.8% (2364 of 21879) |
+| Covered branches: | 2364 |
+| Total branches: | 21879 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -589,8 +589,9 @@
 |Ankh.UI.VSSelectionControls.ListViewWithSelection`1|4.5%|1.4%|
 |Ankh.UI.VSSelectionControls.SmartColumn|24%|5.5%|
 |Ankh.UI.VSSelectionControls.SmartGroup|0%|0%|
-|Ankh.UI.VSSelectionControls.SmartListView|11.2%|4%|
+|Ankh.UI.VSSelectionControls.SmartListView|9.3%|3.7%|
 |Ankh.UI.VSSelectionControls.SmartListViewItem|0%|0%|
+|Ankh.UI.VSSelectionControls.SmartListViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.SmartSplitContainer|31.5%|18.1%|
 |Ankh.UI.VSSelectionControls.SmartTreeView|0%|0%|
 |Ankh.UI.VSSelectionControls.TreeViewWithSelection`1|0%|0%|
@@ -616,11 +617,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 9.8%</summary>
+<details><summary>Ankh.VS - 9.7%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.8%**|**8.8%**|
+|**Ankh.VS**|**9.7%**|**8.8%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
