@@ -109,7 +109,7 @@ The reporter confirmed that a fix in the external FallenWorlds/AnkhSVN 3.0.1 for
 - **#56 — New file indicator missing from Solution Explorer**  
   https://github.com/AmpScm/AnkhSVN/issues/56
 
-The thread asks whether a related setting is enabled, but no resolution or reporter confirmation follows.
+Fixed on main by replacing the legacy VS11-era hard-coded `+16` custom-glyph offset with the `IVsSccGlyphs.GetCustomGlyphList` base index supplied by Visual Studio. Regression coverage verifies that `ShouldBeAdded` and the other custom Ankh glyphs map relative to the shell-provided base index. A live Visual Studio smoke test is still useful before closing the upstream issue.
 
 - **#37 — Conflict folder/files not detected**  
   https://github.com/AmpScm/AnkhSVN/issues/37
