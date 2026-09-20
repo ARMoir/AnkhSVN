@@ -21,8 +21,20 @@ namespace Ankh.Scc
         public static VsStateIcon GetStateIcon(
             AnkhGlyph glyph,
             int glyphOffset,
-            bool preferVisualStudioNativeGlyphs)
+            bool preferVisualStudioNativeGlyphs,
+            int glyphMonikerBaseIndex)
         {
+            // IVsSccGlyphs2 appends our ImageMoniker list after Visual Studio's
+            // built-in SCC glyphs. Once VS has requested that list, prefer it
+            // for all visible Ankh states so each status gets the catalog icon
+            // selected by SccGlyphMonikerLogic.
+            if (glyphMonikerBaseIndex >= 0
+                && glyph != AnkhGlyph.None
+                && glyph != AnkhGlyph.Blank)
+            {
+                return (VsStateIcon)(glyphMonikerBaseIndex + (int)glyph);
+            }
+
             if (preferVisualStudioNativeGlyphs)
             {
                 VsStateIcon nativeIcon;

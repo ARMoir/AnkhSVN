@@ -21,6 +21,53 @@ namespace AnkhSvn_UnitTestProject.Scc
     [TestFixture]
     public class SccGlyphDisplayLogicTests
     {
+        [TestCase(AnkhGlyph.MustLock, 13)]
+        [TestCase(AnkhGlyph.Modified, 14)]
+        [TestCase(AnkhGlyph.Deleted, 15)]
+        [TestCase(AnkhGlyph.FileDirty, 16)]
+        [TestCase(AnkhGlyph.Normal, 18)]
+        [TestCase(AnkhGlyph.FileMissing, 19)]
+        [TestCase(AnkhGlyph.CopiedOrMoved, 20)]
+        [TestCase(AnkhGlyph.LockedNormal, 21)]
+        [TestCase(AnkhGlyph.LockedModified, 22)]
+        [TestCase(AnkhGlyph.Ignored, 23)]
+        [TestCase(AnkhGlyph.Added, 24)]
+        [TestCase(AnkhGlyph.ShouldBeAdded, 25)]
+        [TestCase(AnkhGlyph.InConflict, 26)]
+        [TestCase(AnkhGlyph.ChildChanged, 27)]
+        public void GetStateIcon_UsesMonikerListWhenAvailable(
+            AnkhGlyph glyph,
+            int expected)
+        {
+            Assert.That(
+                (int)SccGlyphDisplayLogic.GetStateIcon(
+                    glyph,
+                    16,
+                    true,
+                    12),
+                Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetStateIcon_MonikerListPreservesNoIconAndBlank()
+        {
+            Assert.That(
+                SccGlyphDisplayLogic.GetStateIcon(
+                    AnkhGlyph.None,
+                    16,
+                    true,
+                    12),
+                Is.EqualTo(VsStateIcon.STATEICON_NOSTATEICON));
+
+            Assert.That(
+                SccGlyphDisplayLogic.GetStateIcon(
+                    AnkhGlyph.Blank,
+                    16,
+                    true,
+                    12),
+                Is.EqualTo(VsStateIcon.STATEICON_BLANK));
+        }
+
         [TestCase(AnkhGlyph.None, VsStateIcon.STATEICON_NOSTATEICON)]
         [TestCase(AnkhGlyph.MustLock, VsStateIcon.STATEICON_CHECKEDIN)]
         [TestCase(AnkhGlyph.Modified, VsStateIcon.STATEICON_CHECKEDOUT)]
@@ -33,12 +80,16 @@ namespace AnkhSvn_UnitTestProject.Scc
         [TestCase(AnkhGlyph.LockedNormal, VsStateIcon.STATEICON_CHECKEDOUTSHAREDOTHER)]
         [TestCase(AnkhGlyph.LockedModified, VsStateIcon.STATEICON_CHECKEDOUTEXCLUSIVEOTHER)]
         [TestCase(AnkhGlyph.Ignored, VsStateIcon.STATEICON_EXCLUDEDFROMSCC)]
-        public void GetStateIcon_UsesVisualStudioNativeGlyphsForAlignedStates(
+        public void GetStateIcon_UsesVisualStudioNativeFallbackForAlignedStates(
             AnkhGlyph glyph,
             VsStateIcon expected)
         {
             Assert.That(
-                SccGlyphDisplayLogic.GetStateIcon(glyph, 16, true),
+                SccGlyphDisplayLogic.GetStateIcon(
+                    glyph,
+                    16,
+                    true,
+                    -1),
                 Is.EqualTo(expected));
         }
 
@@ -46,12 +97,16 @@ namespace AnkhSvn_UnitTestProject.Scc
         [TestCase(AnkhGlyph.ShouldBeAdded, VsStateIcon.STATEICON_CHECKEDOUT)]
         [TestCase(AnkhGlyph.ChildChanged, VsStateIcon.STATEICON_CHECKEDOUT)]
         [TestCase(AnkhGlyph.InConflict, VsStateIcon.STATEICON_ORPHANED)]
-        public void GetStateIcon_UsesClosestVisualStudioNativeGlyphForExtendedStates(
+        public void GetStateIcon_UsesClosestNativeFallbackForExtendedStates(
             AnkhGlyph glyph,
             VsStateIcon expected)
         {
             Assert.That(
-                SccGlyphDisplayLogic.GetStateIcon(glyph, 16, true),
+                SccGlyphDisplayLogic.GetStateIcon(
+                    glyph,
+                    16,
+                    true,
+                    -1),
                 Is.EqualTo(expected));
         }
 
@@ -59,30 +114,36 @@ namespace AnkhSvn_UnitTestProject.Scc
         [TestCase(AnkhGlyph.Normal, 22)]
         [TestCase(AnkhGlyph.Added, 28)]
         [TestCase(AnkhGlyph.InConflict, 30)]
-        public void GetStateIcon_PreservesCustomGlyphFallback(
+        public void GetStateIcon_PreservesLegacyCustomGlyphFallback(
             AnkhGlyph glyph,
             int expected)
         {
             Assert.That(
-                (int)SccGlyphDisplayLogic.GetStateIcon(glyph, 16, false),
+                (int)SccGlyphDisplayLogic.GetStateIcon(
+                    glyph,
+                    16,
+                    false,
+                    -1),
                 Is.EqualTo(expected));
         }
 
         [Test]
-        public void GetStateIcon_CustomFallbackLeavesBlankStatesUnshifted()
+        public void GetStateIcon_LegacyFallbackLeavesBlankStatesUnshifted()
         {
             Assert.That(
                 SccGlyphDisplayLogic.GetStateIcon(
                     AnkhGlyph.None,
                     16,
-                    false),
+                    false,
+                    -1),
                 Is.EqualTo(VsStateIcon.STATEICON_NOSTATEICON));
 
             Assert.That(
                 SccGlyphDisplayLogic.GetStateIcon(
                     AnkhGlyph.Blank,
                     16,
-                    false),
+                    false,
+                    -1),
                 Is.EqualTo(VsStateIcon.STATEICON_BLANK));
         }
     }
