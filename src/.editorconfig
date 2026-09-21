@@ -1,0 +1,29 @@
+﻿# Top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+spelling_languages = en-us
+
+[*.cs]
+
+# VSTHRD010: Invoke single-threaded types on Main thread
+dotnet_diagnostic.VSTHRD010.severity = none
+
+# IDE0052: Remove unread private members
+dotnet_diagnostic.IDE0052.severity = none
+
+
+[*.csproj]
+indent_size = 2
+
+[*.props]
+indent_size = 2
+
+[*.targets]
+indent_size = 2

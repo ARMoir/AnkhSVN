@@ -1,0 +1,286 @@
+// Copyright 2008-2009 The AnkhSVN Project
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Collections;
+using Ankh.VS;
+using System.IO;
+using SharpSvn;
+using Ankh.Scc;
+using Ankh.UI.SccManagement;
+using System.Text.RegularExpressions;
+
+namespace Ankh.UI.RepositoryOpen
+{
+    public partial class CheckoutProject : VSDialogForm
+    {
+        Regex r = new Regex(@"\(\d+\)$");
+
+        public CheckoutProject()
+        {
+            InitializeComponent();
+            version.Revision = SvnRevision.Head;
+        }
+
+        protected override void OnContextChanged(EventArgs e)
+        {
+            base.OnContextChanged(e);
+            version.Context = Context;
+        }
+
+        public SvnOrigin SvnOrigin
+        {
+            get { return version.SvnOrigin; }
+            set { version.SvnOrigin = value; }
+        }
+
+        public SvnRevision Revision
+        {
+            get { return version.Revision; }
+            set { version.Revision = value; }
+        }
+
+        public string SelectedPath
+        {
+            get { return directory.Text; }
+            set { directory.Text = value; }
+        }
+
+        Uri _projectUri;
+        public Uri ProjectUri
+        {
+            get { return _projectUri; }
+            set
+            {
+                _projectUri = value;
+                projectUrl.Text = (value != null) ? value.ToString() : "";
+
+                if (Context != null && value != null)
+                {
+                    IFileIconMapper mapper = Context.GetService<IFileIconMapper>();
+
+                    string txt = Path.GetExtension(SvnTools.GetFileName(value));
+
+                    int ico = mapper.GetIconForExtension(txt);
+
+                    projectIcon.Image = CreateIcon(mapper.ImageList, ico);
+                }
+            }
+        }
+
+        Image CreateIcon(ImageList imgList, int index)
+        {
+            Bitmap bmp = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            using (Graphics g = Graphics.FromImage(bmp))
+            using( SolidBrush sb = new SolidBrush(BackColor))
+            {
+                g.FillRectangle(sb, 0, 0, 16, 16);
+                imgList.Draw(g, 0, 0, 16, 16, index);
+            }
+
+            return bmp;
+        }
+
+        Uri _rootUri;
+        public Uri RepositoryRootUri
+        {
+            get { return _rootUri; }
+            set { _rootUri = value; }
+        }
+
+        Uri _projectTop;
+        public Uri ProjectTop
+        {
+            get { return (Uri)checkOutFrom.SelectedItem; }
+            set 
+            { 
+                _projectTop = value;
+                if (value != null)
+                {
+                    int l = value.ToString().Length;
+                    foreach (Uri uri in new ArrayList(checkOutFrom.Items))
+                    {
+                        if (uri.ToString().Length > l)
+                            checkOutFrom.Items.Remove(uri);
+                    }
+
+                    if (checkOutFrom.SelectedIndex < 0)
+                        checkOutFrom.SelectedIndex = 0;
+                }
+            }
+        }
+
+
+        Uri _checkOutUri;
+        public Uri CheckOutUri
+        {
+            get { return _checkOutUri; }
+            set
+            {
+                _checkOutUri = value;
+                checkOutFrom.Text = (value != null) ? value.ToString() : "";
+            }
+        }
+
+        private void browseDirectory_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
+            {
+                fbd.ShowNewFolderButton = true;
+                fbd.SelectedPath = SelectedPath;
+                fbd.Description = "Select the location where you wish to save this project";
+
+                if (fbd.ShowDialog(this) == DialogResult.OK)
+                    SelectedPath = fbd.SelectedPath;
+            }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (checkOutFrom != null && RepositoryRootUri != null && ProjectUri != null)
+            {
+                checkOutFrom.Items.Clear();
+
+                CheckoutProjectLoadPlan plan = CheckoutProjectLogic.BuildLoadPlan(
+                    RepositoryRootUri,
+                    ProjectUri,
+                    ProjectTop);
+
+                RepositoryRootUri = plan.RepositoryRootUri;
+
+                foreach (Uri uri in plan.Candidates)
+                    checkOutFrom.Items.Add(uri);
+
+                RepositoryLayoutInfo li;
+                Uri guessedWorkingRoot = null;
+                if (RepositoryUrlUtils.TryGuessLayout(Context, ProjectUri, out li))
+                    guessedWorkingRoot = li.WorkingRoot;
+
+                int selectedIndex = CheckoutProjectLogic.SelectDefaultIndex(
+                    plan.Candidates,
+                    guessedWorkingRoot);
+
+                if (selectedIndex >= 0)
+                    checkOutFrom.SelectedIndex = selectedIndex;
+
+                version.Context = Context;
+            }
+        }
+
+        public string GuessBranchOrTagName()
+        {
+            RepositoryLayoutInfo li;
+            if (RepositoryUrlUtils.TryGuessLayout(Context, ProjectUri, out li))
+            {
+                return li.SelectedBranchName;
+            }
+
+            return "";
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            string path = directory.Text;
+
+            if (!SvnItem.IsValidPath(path) || File.Exists(path))
+            {
+                MessageBox.Show(this, "Path is not valid", "Open Project from Subversion", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            directory.Text = path = SvnTools.GetNormalizedFullPath(path);
+
+            if (Directory.Exists(path))
+            {
+                DirectoryInfo di = new DirectoryInfo(path);
+                if (EnumTools.GetFirst(di.GetFileSystemInfos()) != null)
+                {
+                    if (MessageBox.Show(this, string.Format("{0} already contains files or directories.\nWould you like to continue?", path)
+                        , "Open Project from Subversion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) != DialogResult.Yes)
+                    {
+                        return;
+                    }
+                }
+            }
+            else
+                Directory.CreateDirectory(path);
+
+            DialogResult = DialogResult.OK;
+        }
+
+        private void appendBranch_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateLocalDirectoryWithBranchOrTag();
+        }
+
+        private void UpdateLocalDirectoryWithBranchOrTag()
+        {
+            string suffix = GuessBranchOrTagName();
+            if (suffix != "")
+            {
+                suffix = "-" + suffix;
+                string path = StripDisambiguator(directory.Text);
+
+                if (appendBranch.Checked)
+                {
+                    // add it, if it's not there already
+                    if (!path.Contains(suffix))
+                    {
+                        path += suffix;
+                    }
+                }
+                else
+                {
+                    // remove it, if it's there
+                    if (path.EndsWith(suffix))
+                    {
+                        path = path.Substring(0, path.Length - suffix.Length);
+                    }
+                }
+
+                directory.Text = AddDisambiguator(path);
+            }
+        }
+
+        private string StripDisambiguator(string p)
+        {
+            return r.Replace(p, "");
+        }
+
+        private string AddDisambiguator(string path)
+        {
+            string newPath;
+            int n = 0;
+            
+            do
+            {
+                newPath = path;
+                if (n > 0)
+                    newPath += string.Format("({0})", n);
+                n++;
+            }
+            while (File.Exists(newPath) || Directory.Exists(newPath));
+            
+            return newPath;
+        }
+    }
+}
