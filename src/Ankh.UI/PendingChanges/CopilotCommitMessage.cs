@@ -61,7 +61,7 @@ namespace Ankh.UI.PendingChanges
             if (string.IsNullOrWhiteSpace(response))
                 return string.Empty;
 
-            string text = response.Trim();
+            string text = StripOuterMarkdownFence(response.Trim());
 
             const string startTag = "<commit-message>";
             const string endTag = "</commit-message>";
@@ -83,10 +83,18 @@ namespace Ankh.UI.PendingChanges
 
                 text = text.Substring(contentStart, envelopeEnd - contentStart).Trim();
             }
-            else if (ContainsReasoningLeak(text))
+            else
             {
-                throw new InvalidOperationException(
-                    "Visual Studio Copilot returned planning/reasoning text instead of an isolated commit message.");
+                string extractedCommitMessage;
+                if (TryExtractCommitMessageAfterPreamble(text, out extractedCommitMessage))
+                {
+                    text = extractedCommitMessage;
+                }
+                else if (ContainsReasoningLeak(text) || ContainsMarkdownPreamble(text))
+                {
+                    throw new InvalidOperationException(
+                        "Visual Studio Copilot returned planning/reasoning text instead of an isolated commit message.");
+                }
             }
 
             // VS 2022's generic Copilot chat responder can occasionally answer
@@ -100,20 +108,32 @@ namespace Ankh.UI.PendingChanges
                     "Visual Studio Copilot requested interactive editor context instead of returning a commit message.");
             }
 
-            if (text.StartsWith("```", StringComparison.Ordinal))
-            {
-                int firstNewLine = text.IndexOf('\n');
-                int closingFence = text.LastIndexOf("```", StringComparison.Ordinal);
-                if (firstNewLine >= 0 && closingFence > firstNewLine)
-                    text = text.Substring(firstNewLine + 1, closingFence - firstNewLine - 1).Trim();
-            }
-
             const string label = "Commit message:";
             if (text.StartsWith(label, StringComparison.OrdinalIgnoreCase))
                 text = text.Substring(label.Length).Trim();
 
             text = text.Replace("\r\n", "\n").Replace('\r', '\n');
             return FormatCommitMessage(text);
+        }
+
+        static string StripOuterMarkdownFence(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text) ||
+                !text.StartsWith("```", StringComparison.Ordinal))
+            {
+                return text;
+            }
+
+            int firstNewLine = text.IndexOf('\n');
+            int closingFence = text.LastIndexOf("```", StringComparison.Ordinal);
+            if (firstNewLine >= 0 && closingFence > firstNewLine)
+            {
+                return text.Substring(
+                    firstNewLine + 1,
+                    closingFence - firstNewLine - 1).Trim();
+            }
+
+            return text;
         }
 
         static bool ContainsReasoningLeak(string text)
@@ -130,6 +150,159 @@ namespace Ankh.UI.PendingChanges
                    text.IndexOf(
                        "**Finalizing commit message**",
                        StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        static bool ContainsMarkdownPreamble(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            string normalized = text
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n');
+
+            string[] lines = normalized.Split(new[] { '\n' }, StringSplitOptions.None);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (IsMarkdownHeading(lines[i]))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static bool TryExtractCommitMessageAfterPreamble(
+            string text,
+            out string commitMessage)
+        {
+            commitMessage = null;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            string normalized = text
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n')
+                .Trim();
+
+            string[] lines = normalized.Split(new[] { '\n' }, StringSplitOptions.None);
+            int lastHeading = -1;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (IsMarkdownHeading(lines[i]))
+                    lastHeading = i;
+            }
+
+            if (lastHeading < 0)
+                return false;
+
+            // The requested commit format is subject, blank line, optional
+            // body. VS 2026 sometimes prepends visible planning and then emits
+            // that normal commit shape without the requested XML envelope.
+            // Locate the first plausible subject/body boundary after the final
+            // planning heading and discard everything before it.
+            for (int i = lastHeading + 1; i < lines.Length - 1; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                    continue;
+
+                int subjectIndex = i - 1;
+                while (subjectIndex > lastHeading &&
+                       string.IsNullOrWhiteSpace(lines[subjectIndex]))
+                {
+                    subjectIndex--;
+                }
+
+                int bodyIndex = i + 1;
+                while (bodyIndex < lines.Length &&
+                       string.IsNullOrWhiteSpace(lines[bodyIndex]))
+                {
+                    bodyIndex++;
+                }
+
+                if (subjectIndex <= lastHeading ||
+                    bodyIndex >= lines.Length ||
+                    !IsLikelyCommitSubject(lines[subjectIndex]) ||
+                    IsMarkdownHeading(lines[bodyIndex]))
+                {
+                    continue;
+                }
+
+                StringBuilder result = new StringBuilder();
+                result.AppendLine(lines[subjectIndex].Trim());
+                result.AppendLine();
+
+                for (int j = bodyIndex; j < lines.Length; j++)
+                {
+                    if (IsMarkdownHeading(lines[j]))
+                        return false;
+
+                    result.AppendLine(lines[j]);
+                }
+
+                commitMessage = result.ToString().Trim();
+                return commitMessage.Length > 0;
+            }
+
+            // Also support a subject-only response following a reasoning block.
+            for (int i = lines.Length - 1; i > lastHeading; i--)
+            {
+                if (string.IsNullOrWhiteSpace(lines[i]))
+                    continue;
+
+                if (IsLikelyCommitSubject(lines[i]))
+                {
+                    commitMessage = lines[i].Trim();
+                    return true;
+                }
+
+                break;
+            }
+
+            return false;
+        }
+
+        static bool IsMarkdownHeading(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            string trimmed = line.Trim();
+
+            if (trimmed.Length >= 4 &&
+                trimmed.StartsWith("**", StringComparison.Ordinal) &&
+                trimmed.EndsWith("**", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return trimmed.StartsWith("# ", StringComparison.Ordinal) ||
+                   trimmed.StartsWith("## ", StringComparison.Ordinal) ||
+                   trimmed.StartsWith("### ", StringComparison.Ordinal);
+        }
+
+        static bool IsLikelyCommitSubject(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            string trimmed = line.Trim();
+
+            if (trimmed.Length > 120 ||
+                IsMarkdownHeading(trimmed) ||
+                trimmed.StartsWith("I ", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("I'm ", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("I’m ", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("I'll ", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("I’ll ", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("The user ", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            char last = trimmed[trimmed.Length - 1];
+            return last != '.' && last != '?' && last != '!';
         }
 
         internal static string FormatCommitMessage(string text)

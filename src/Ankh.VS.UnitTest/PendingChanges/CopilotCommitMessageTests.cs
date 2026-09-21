@@ -27,7 +27,7 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
         {
             string prompt = CopilotCommitMessage.BuildPrompt("Modified: src/Test.cs");
 
-            Assert.That(prompt, Does.Contain("Return only the commit message"));
+            Assert.That(prompt, Does.Contain("Return the final commit message inside exactly one"));
             Assert.That(prompt, Does.Contain("complete and authoritative context"));
             Assert.That(prompt, Does.Contain("<commit-message>"));
             Assert.That(prompt, Does.Contain("Do not request editor selections"));
@@ -52,6 +52,48 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
                     "Add placeholder class files and resources" + Environment.NewLine +
                     Environment.NewLine +
                     "Update the Program.cs test message."));
+        }
+
+        [Test]
+        public void NormalizeResponse_StripsVisualStudio2026ReasoningPreamble()
+        {
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "**Refining purpose description**\n\n" +
+                "I need to remember that the focus should be on describing the purpose of the change, not just listing file names.\n" +
+                "I feel like I've captured that well in the message.\n" +
+                "So now, it seems like I'm ready to produce the final output.\n" +
+                "I want to ensure everything's clear and aligns with that instruction.\n" +
+                "I just need to double-check that I've followed all guidelines before wrapping things up!\n" +
+                "Add placeholder classes and sample files; tweak Program output\n\n" +
+                "Introduce three empty internal classes as placeholders and add sample text and bitmap files.\n" +
+                "Modify Program.cs test line to change output from \"testing this merge\" to \"testing this merge thin\".");
+
+            Assert.That(
+                actual,
+                Is.EqualTo(
+                    "Add placeholder classes and sample files; tweak Program output" + Environment.NewLine +
+                    Environment.NewLine +
+                    "Introduce three empty internal classes as placeholders and add sample text and bitmap files." + Environment.NewLine +
+                    "Modify Program.cs test line to change output from \"testing this merge\" to \"testing this merge thin\"."));
+        }
+
+        [Test]
+        public void NormalizeResponse_StripsFencedVisualStudio2026ReasoningPreamble()
+        {
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "```text\n" +
+                "**Refining purpose description**\n\n" +
+                "I need to verify the output before finishing.\n" +
+                "Update pending change handling\n\n" +
+                "Keep the generated commit message focused on the selected SVN changes.\n" +
+                "```");
+
+            Assert.That(
+                actual,
+                Is.EqualTo(
+                    "Update pending change handling" + Environment.NewLine +
+                    Environment.NewLine +
+                    "Keep the generated commit message focused on the selected SVN changes."));
         }
 
         [Test]

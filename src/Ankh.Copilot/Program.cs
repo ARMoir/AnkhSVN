@@ -330,7 +330,7 @@ namespace Ankh.Copilot
                 ? contentProperty.GetValue(response, null) as IEnumerable
                 : null;
 
-            StringBuilder text = new StringBuilder();
+            List<string> visibleTextParts = new List<string>();
 
             if (content != null)
             {
@@ -353,20 +353,26 @@ namespace Ankh.Copilot
                     if (string.IsNullOrWhiteSpace(value))
                         continue;
 
-                    if (text.Length > 0 &&
-                        text[text.Length - 1] != '\r' &&
-                        text[text.Length - 1] != '\n')
-                    {
-                        text.AppendLine();
-                    }
-
-                    text.Append(value.Trim());
+                    visibleTextParts.Add(value.Trim());
                 }
             }
 
-            string result = text.ToString().Trim();
-            if (result.Length > 0)
-                return result;
+            // Current VS 2026 Copilot builds can return user-visible planning
+            // as earlier content parts and the actual answer as the final text
+            // part. Prefer an explicitly enveloped part; otherwise prefer the
+            // last user-visible text part instead of concatenating every part.
+            for (int i = visibleTextParts.Count - 1; i >= 0; i--)
+            {
+                if (visibleTextParts[i].IndexOf(
+                        "<commit-message>",
+                        StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return visibleTextParts[i];
+                }
+            }
+
+            if (visibleTextParts.Count > 0)
+                return visibleTextParts[visibleTextParts.Count - 1];
 
             PropertyInfo statusProperty = response.GetType().GetProperty(
                 "Status",
