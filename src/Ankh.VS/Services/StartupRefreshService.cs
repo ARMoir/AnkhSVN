@@ -3,18 +3,23 @@ using Ankh.Commands;
 using Ankh.Scc;
 using Ankh.Services;
 using Ankh.UI;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Ankh.VS.Services
 {
     [GlobalService(typeof(StartupRefreshService))]
-    sealed class StartupRefreshService : AnkhService, IAnkhIdleProcessor
+    sealed class StartupRefreshService : AnkhService, IAnkhIdleProcessor, IVsSelectionEvents
     {
         bool _started;
         bool _themeRefreshed;
         bool _statusPending = true;
         AnkhServiceEvents _events;
         IAnkhPackage _package;
+        IVsMonitorSelection _selectionMonitor;
+        uint _selectionCookie;
+        bool _selectionEventsAdvised;
+        static readonly Guid SolutionExplorerGuid = new Guid(ToolWindowGuids.SolutionExplorer);
 
         public StartupRefreshService(IAnkhServiceProvider context) : base(context) { }
 
@@ -27,14 +32,83 @@ namespace Ankh.VS.Services
             _events.SccProviderActivated += OnStatusNeeded;
             _package = GetService<IAnkhPackage>();
             _package.RegisterIdleProcessor(this);
+            EnsureSelectionEvents();
         }
 
         void OnStarted(object sender, EventArgs e) { _started = true; }
         void OnStatusNeeded(object sender, EventArgs e) { _statusPending = true; }
 
+        void EnsureSelectionEvents()
+        {
+            if (_selectionEventsAdvised)
+                return;
+
+            if (_selectionMonitor == null)
+                _selectionMonitor = GetService<IVsMonitorSelection>(typeof(SVsShellMonitorSelection));
+
+            if (_selectionMonitor == null)
+                return;
+
+            uint cookie;
+            if (VSErr.Succeeded(_selectionMonitor.AdviseSelectionEvents(this, out cookie)))
+            {
+                _selectionCookie = cookie;
+                _selectionEventsAdvised = true;
+            }
+        }
+
+        internal static bool IsSolutionExplorerFrame(IVsWindowFrame frame)
+        {
+            if (frame == null)
+                return false;
+
+            Guid persistenceSlot;
+            return VSErr.Succeeded(frame.GetGuidProperty(
+                       (int)__VSFPROPID.VSFPROPID_GuidPersistenceSlot,
+                       out persistenceSlot))
+                   && persistenceSlot == SolutionExplorerGuid;
+        }
+
+        public int OnElementValueChanged(uint elementid, object varValueOld, object varValueNew)
+        {
+            if (elementid == (uint)VSConstants.VSSELELEMID.SEID_WindowFrame
+                && IsSolutionExplorerFrame(varValueNew as IVsWindowFrame))
+            {
+                // Defer the work to idle so merely activating Solution Explorer
+                // never blocks the shell, and repeated activation notifications
+                // before idle naturally coalesce into one refresh.
+                _statusPending = true;
+            }
+
+            return VSConstants.S_OK;
+        }
+
+        public int OnSelectionChanged(
+            IVsHierarchy pHierOld,
+            uint itemidOld,
+            IVsMultiItemSelect pMISOld,
+            ISelectionContainer pSCOld,
+            IVsHierarchy pHierNew,
+            uint itemidNew,
+            IVsMultiItemSelect pMISNew,
+            ISelectionContainer pSCNew)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
+        {
+            return VSConstants.S_OK;
+        }
+
         public void OnIdle(AnkhIdleArgs e)
         {
-            if (!_started || e.Priority || (_themeRefreshed && !_statusPending))
+            if (!_started || e.Priority)
+                return;
+
+            EnsureSelectionEvents();
+
+            if (_themeRefreshed && !_statusPending)
                 return;
 
             IAnkhCommandStates states = GetService<IAnkhCommandStates>();
@@ -90,6 +164,12 @@ namespace Ankh.VS.Services
                     _events.SolutionOpened -= OnStatusNeeded;
                     _events.SccProviderActivated -= OnStatusNeeded;
                 }
+                if (_selectionEventsAdvised && _selectionMonitor != null)
+                {
+                    _selectionMonitor.UnadviseSelectionEvents(_selectionCookie);
+                    _selectionEventsAdvised = false;
+                }
+                _selectionMonitor = null;
                 if (_package != null)
                     _package.UnregisterIdleProcessor(this);
             }
