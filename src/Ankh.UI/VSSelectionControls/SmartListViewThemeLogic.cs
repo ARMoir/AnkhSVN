@@ -23,5 +23,16 @@ namespace Ankh.UI.VSSelectionControls
         {
             return !themeCancelled && hasPalette && !highContrast;
         }
+
+        internal static bool ShouldUseDarkNativeTheme(
+            bool inVsTheming,
+            bool darkSurface,
+            bool highContrast)
+        {
+            // Native ListView inactive-selection colors otherwise come from
+            // the light Explorer theme and can render dark text on a dark
+            // Visual Studio surface after focus moves away from the list.
+            return inVsTheming && darkSurface && !highContrast;
+        }
     }
 }
