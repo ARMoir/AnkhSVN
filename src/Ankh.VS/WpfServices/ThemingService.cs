@@ -350,6 +350,8 @@ namespace Ankh.WpfPackage.Services
                 updateFore = true;
             }
 
+            RestoreNativeListColors(listView);
+
             if (!listView.VirtualMode)
             {
                 foreach (ListViewItem lvi in listView.Items)
@@ -406,6 +408,37 @@ namespace Ankh.WpfPackage.Services
 
             if (treeView.BorderStyle == BorderStyle.Fixed3D)
                 treeView.BorderStyle = BorderStyle.FixedSingle;
+
+            RestoreNativeTreeColors(treeView);
+        }
+
+        // VS ThemeWindow can replace native colors without updating the managed
+        // properties. Setting an unchanged WinForms property is a no-op, so send
+        // the colors explicitly even when the managed palette already matches.
+        internal static void RestoreNativeTreeColors(TreeView tree)
+        {
+            NativeMethods.SendMessage(tree.Handle, 0x1100 + 29, IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(tree.BackColor)); // TVM_SETBKCOLOR
+            NativeMethods.SendMessage(tree.Handle, 0x1100 + 30, IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(tree.ForeColor)); // TVM_SETTEXTCOLOR
+            tree.Invalidate();
+        }
+
+        internal static void RestoreNativeListColors(ListView list)
+        {
+            NativeMethods.SendMessage(list.Handle, 0x1000 + 1, IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(list.BackColor)); // LVM_SETBKCOLOR
+            NativeMethods.SendMessage(list.Handle, 0x1000 + 38, IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(list.BackColor)); // LVM_SETTEXTBKCOLOR
+            NativeMethods.SendMessage(list.Handle, 0x1000 + 36, IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(list.ForeColor)); // LVM_SETTEXTCOLOR
+            list.Invalidate();
+        }
+
+        void ThemeOne(GroupBox group)
+        {
+            group.BackColor = ThemePalette.SurfaceBackground;
+            group.ForeColor = ThemePalette.SurfaceForeground;
         }
 
         void ThemeOne(UserControl userControl)
@@ -776,6 +809,7 @@ namespace Ankh.WpfPackage.Services
             bool ok =
                 MaybeTheme<ToolStrip>(ThemeOne, control, forDialog)
                 || MaybeTheme<Label>(ThemeOne, control, forDialog)
+                || MaybeTheme<GroupBox>(ThemeOne, control, forDialog)
                 || MaybeTheme<TextBox>(ThemeOne, control, forDialog)
                 || MaybeTheme<ListView>(ThemeOne, control, forDialog)
                 || MaybeTheme<TreeView>(ThemeOne, control, forDialog)
@@ -791,7 +825,7 @@ namespace Ankh.WpfPackage.Services
                 || MaybeTheme<ScrollableControl>(ThemeOne, control, forDialog);
 
             // Controls without an Ankh-specific color adapter (for example
-            // CheckBox, RadioButton, GroupBox and TabControl) should still use
+            // CheckBox, RadioButton and TabControl) should still use
             // Visual Studio's native theming instead of retaining Windows
             // light-theme rendering inside a themed dialog.
             if (!ok && control.IsHandleCreated)

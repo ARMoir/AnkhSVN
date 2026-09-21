@@ -116,12 +116,6 @@ namespace Ankh.UI.VSSelectionControls
             {
                 if (_useDarkNativeTheme)
                 {
-                    if (Parent != null)
-                    {
-                        BackColor = Parent.BackColor;
-                        ForeColor = Parent.ForeColor;
-                    }
-
                     NativeMethods.SetWindowTheme(Handle, "DarkMode_Explorer", null);
                 }
                 else if (!_inVSTheming)
