@@ -365,8 +365,41 @@ jobs:
             throw "Issues #7/#47 regression: generated VSIX does not declare Ankh.UI as a Microsoft.VisualStudio.MefComponent. MEF paths: $assetPaths"
           }
 
+          # The Copilot SDK intentionally runs out-of-process so its dependency
+          # graph never loads into devenv.exe. Guard the helper and the pinned
+          # native runtime so the VS2022 package cannot ship a dead button.
+          $copilotHelper = $archive.Entries | Where-Object {
+            [System.IO.Path]::GetFileName($_.FullName) -eq "Ankh.Copilot.exe"
+          } | Select-Object -First 1
+          $copilotSdk = $archive.Entries | Where-Object {
+            [System.IO.Path]::GetFileName($_.FullName) -eq "GitHub.Copilot.SDK.dll"
+          } | Select-Object -First 1
+          $copilotRuntime = $archive.Entries | Where-Object {
+            [System.IO.Path]::GetFileName($_.FullName) -eq "copilot-runtime.exe"
+          } | Select-Object -First 1
+          $copilotNode = $archive.Entries | Where-Object {
+            [System.IO.Path]::GetFileName($_.FullName) -eq "runtime.node"
+          } | Select-Object -First 1
+
+          if (-not $copilotHelper) {
+            throw "Copilot packaging regression: Ankh.Copilot.exe is missing from the generated VSIX"
+          }
+          if (-not $copilotSdk) {
+            throw "Copilot packaging regression: GitHub.Copilot.SDK.dll is missing from the generated VSIX"
+          }
+          if (-not $copilotRuntime) {
+            throw "Copilot packaging regression: copilot-runtime.exe is missing from the generated VSIX"
+          }
+          if (-not $copilotNode) {
+            throw "Copilot packaging regression: runtime.node is missing from the generated VSIX"
+          }
+
           Write-Host "Verified VSIX contains $($uiAssembly.FullName)"
           Write-Host "Verified Ankh.UI MEF asset path: $($mefAsset.GetAttribute('Path'))"
+          Write-Host "Verified Copilot helper: $($copilotHelper.FullName)"
+          Write-Host "Verified Copilot SDK: $($copilotSdk.FullName)"
+          Write-Host "Verified Copilot runtime: $($copilotRuntime.FullName)"
+          Write-Host "Verified Copilot runtime node: $($copilotNode.FullName)"
         }
         finally {
           $archive.Dispose()

@@ -67,7 +67,7 @@
     <ProjectReference Include="..\Ankh.ExtensionPoints\Ankh.ExtensionPoints.csproj" />
     <ProjectReference Include="..\Ankh.Ids\Ankh.Ids.csproj" />
     <ProjectReference Include="..\Ankh.ImageCatalog\Ankh.ImageCatalog.csproj" />
-    <ProjectReference Include="..\Ankh.Copilot\Ankh.Copilot.csproj">
+    <ProjectReference Include="..\Ankh.Copilot\Ankh.Copilot.csproj" ReferenceOutputAssembly="false">
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
     <ProjectReference Include="..\Ankh.Scc\Ankh.Scc.csproj" />
