@@ -102,6 +102,8 @@ namespace Ankh.UI.VSSelectionControls
         }
 
         private const int TV_FIRST = 0x1100;
+        private const int TVM_SETBKCOLOR = TV_FIRST + 29;
+        private const int TVM_SETTEXTCOLOR = TV_FIRST + 30;
         private const int TVM_SETEXTENDEDSTYLE = TV_FIRST + 44;
         private const int TVM_GETEXTENDEDSTYLE = TV_FIRST + 45;
 
@@ -127,6 +129,33 @@ namespace Ankh.UI.VSSelectionControls
 
                 NativeMethods.SendMessage(Handle, TVM_SETEXTENDEDSTYLE, (IntPtr)flags, (IntPtr)flags);
             }
+
+            // SetWindowTheme() can reset the native TreeView colors even though
+            // the managed BackColor/ForeColor still contain the VS palette.
+            // Reapply them to every newly-created handle so repository browser
+            // trees cannot fall back to a white Windows background.
+            RestoreNativeColors(this);
+        }
+
+        internal static void RestoreNativeColors(TreeView treeView)
+        {
+            if (treeView == null)
+                throw new ArgumentNullException("treeView");
+
+            if (!treeView.IsHandleCreated)
+                return;
+
+            NativeMethods.SendMessage(
+                treeView.Handle,
+                TVM_SETBKCOLOR,
+                IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(treeView.BackColor));
+            NativeMethods.SendMessage(
+                treeView.Handle,
+                TVM_SETTEXTCOLOR,
+                IntPtr.Zero,
+                (IntPtr)ColorTranslator.ToWin32(treeView.ForeColor));
+            treeView.Invalidate();
         }
 
         protected override void OnHandleDestroyed(EventArgs e)

@@ -89,11 +89,12 @@ namespace Ankh.UI.RepositoryExplorer
                     IWinFormsThemingService themer = Context.GetService<IWinFormsThemingService>();
                     if (themer != null)
                     {
-                        // RepositoryTreeView can recreate its native handle
-                        // while roots and image lists are initialized. Reapply
-                        // the dialog theme after that initialization completes.
-                        themer.ThemeRecursive(reposBrowser, true);
-                        themer.ThemeRecursive(urlBox, true);
+                        // The repository browser and its native controls can
+                        // create/recreate handles while roots and image lists are
+                        // initialized. Reapply the whole dialog recursively after
+                        // initialization so every nested control gets the same
+                        // semantic Visual Studio palette.
+                        themer.ThemeRecursive(this, true);
                     }
                 }
             }
