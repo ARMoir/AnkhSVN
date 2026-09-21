@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 12:15:20 AM |
-| Coverage date: | 9/21/2026 - 12:14:59 AM - 9/21/2026 - 12:15:09 AM |
+| Generated on: | 9/21/2026 - 12:35:02 AM |
+| Coverage date: | 9/21/2026 - 12:34:43 AM - 9/21/2026 - 12:34:53 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 606 |
 | Files: | 673 |
-| **Line coverage:** | 8.3% (3866 of 46130) |
-| Covered lines: | 3866 |
-| Uncovered lines: | 42264 |
-| Coverable lines: | 46130 |
-| Total lines: | 130774 |
-| **Branch coverage:** | 10.8% (2397 of 22047) |
-| Covered branches: | 2397 |
-| Total branches: | 22047 |
+| **Line coverage:** | 8.3% (3871 of 46142) |
+| Covered lines: | 3871 |
+| Uncovered lines: | 42271 |
+| Coverable lines: | 46142 |
+| Total lines: | 130800 |
+| **Branch coverage:** | 10.8% (2399 of 22043) |
+| Covered branches: | 2399 |
+| Total branches: | 22043 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -267,11 +267,11 @@
 |Ankh.Scc.ThePendingChangeCollection|0%||
 
 </details>
-<details><summary>Ankh.Services - 14%</summary>
+<details><summary>Ankh.Services - 14.2%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.Services**|**14%**|**13.2%**|
+|**Ankh.Services**|**14.2%**|**13.3%**|
 |Ankh.AnkhInstanceConditionalAttribute|46.6%|50%|
 |Ankh.AnkhRuntime|31.9%|24.3%|
 |Ankh.AnkhService|11.4%|6.4%|
@@ -364,7 +364,7 @@
 |Ankh.SvnPoolRemoteSession|0%|0%|
 |Ankh.UI.AnkhCommandHook|0%|0%|
 |Ankh.UI.AnkhMessageBox|0%|0%|
-|Ankh.UI.AnkhThemePalette|30.7%|100%|
+|Ankh.UI.AnkhThemePalette|39.3%|100%|
 |Ankh.UI.AnkhToolWindowControl|0%|0%|
 |Ankh.UI.VSCommandHandler|0%|0%|
 |Ankh.UI.VSContainerForm|4.7%|0%|
@@ -577,7 +577,7 @@
 |Ankh.UI.SvnLog.LogItem|0%|0%|
 |Ankh.UI.SvnLog.LogRequest|0%|0%|
 |Ankh.UI.SvnLog.LogRevisionControl|0%|0%|
-|Ankh.UI.SvnLog.LogRevisionItem|4.7%|10%|
+|Ankh.UI.SvnLog.LogRevisionItem|1.8%|6.2%|
 |Ankh.UI.SvnLog.LogStrings|0%|0%|
 |Ankh.UI.SvnLog.LogToolWindowControl|0%|0%|
 |Ankh.UI.SvnLog.LogViewerDialog|0%|0%|
@@ -620,11 +620,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 9.6%</summary>
+<details><summary>Ankh.VS - 9.5%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.6%**|**9%**|
+|**Ankh.VS**|**9.5%**|**9%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -681,8 +681,8 @@
 |Ankh.VS.WebBrowser.BrowserUser|0%||
 |Ankh.VS.WpfServices.ServiceMethodResolver|0%|0%|
 |Ankh.VS.WpfServices.WpfEditorInfoService|0%|0%|
-|Ankh.WpfPackage.Services.DarkComboBoxPainter|0%|0%|
-|Ankh.WpfPackage.Services.DarkNumericUpDownPainter|0%|0%|
+|Ankh.WpfPackage.Services.PaletteComboBoxPainter|0%|0%|
+|Ankh.WpfPackage.Services.PaletteNumericUpDownPainter|0%|0%|
 |Ankh.WpfPackage.Services.ThemeReflectionLogic|73.1%|70.8%|
 |Ankh.WpfPackage.Services.ThemingService|0%|0%|
 |Ankh.WpfPackage.Services.ThreadedWaitService|0%|0%|
