@@ -41,7 +41,41 @@ namespace Ankh.VS.SolutionExplorer
         readonly Dictionary<string, string> _fileTypeMap;
         readonly int _imageDpi;
         IVsImageService2 _imageService;
-        bool _imageServiceResolved;
+        readonly Dictionary<string, ImageMoniker> _monikers = new Dictionary<string, ImageMoniker>();
+        AnkhServiceEvents _events;
+
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+            _events = GetService<AnkhServiceEvents>();
+            _events.ThemeChanged += OnThemeChanged;
+        }
+
+        void OnThemeChanged(object sender, EventArgs e)
+        {
+            _imageService = null;
+            // Keep indices stable: existing rows and tree nodes retain them.
+            foreach (var entry in _monikers)
+            {
+                try
+                {
+                    using (Bitmap bitmap = RenderMoniker(entry.Value))
+                    {
+                        if (bitmap != null)
+                            _imageList.Images[_monikerMap[entry.Key]] = bitmap;
+                    }
+                }
+                catch (COMException) { }
+                catch (ArgumentException) { }
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _events != null)
+                _events.ThemeChanged -= OnThemeChanged;
+            base.Dispose(disposing);
+        }
 
         public FileIconMapper(IAnkhServiceProvider context)
             : base(context)
@@ -166,9 +200,8 @@ namespace Ankh.VS.SolutionExplorer
         {
             get
             {
-                if (!_imageServiceResolved)
+                if (_imageService == null)
                 {
-                    _imageServiceResolved = true;
                     _imageService = GetService<IVsImageService2>(typeof(SVsImageService));
                 }
 
@@ -278,6 +311,7 @@ namespace Ankh.VS.SolutionExplorer
 
             value = _imageList.Images.Count - 1;
             _monikerMap[key] = value;
+            _monikers[key] = moniker;
             return value;
         }
 
