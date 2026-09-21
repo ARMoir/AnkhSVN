@@ -446,7 +446,7 @@ namespace Ankh.UI.PendingChanges
                     MessageBox.Show(
                         this,
                         "GitHub Copilot could not generate a commit message.\r\n\r\n" +
-                        "Make sure GitHub Copilot authentication is available (stored Copilot/gh credentials or a supported GitHub token), then try again.\r\n\r\n" +
+                        "Make sure GitHub Copilot is installed, enabled, and signed in inside Visual Studio, then try again.\r\n\r\n" +
                         ex.Message,
                         "GitHub Copilot",
                         MessageBoxButtons.OK,

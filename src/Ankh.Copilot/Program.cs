@@ -39,6 +39,13 @@ namespace Ankh.Copilot
     {
         const string CopilotNamespace = "Microsoft.VisualStudio.Copilot.";
 
+        const string CommitMessageGuidance =
+            "This is a headless, non-interactive commit-message generation request from AnkhSVN. " +
+            "The request already contains the complete SVN pending-change data needed for the task. " +
+            "Use only that supplied data. Do not ask for Visual Studio editor selections, active-file context, " +
+            "error-list context, chat references, files, or any additional workspace context. " +
+            "Do not explain limitations or offer choices. Return only the requested commit-message text.";
+
         static readonly string[] CopilotAssemblyNames =
         {
             "Microsoft.VisualStudio.Copilot",
@@ -241,6 +248,8 @@ namespace Ankh.Copilot
             Type requestType = GetRequiredCopilotType("CopilotRequest");
             object request = Activator.CreateInstance(requestType, new object[] { prompt });
 
+            ConfigureCommitMessageRequest(request);
+
             MethodInfo sendRequest = session.GetType().GetMethod(
                 "SendRequestAsync",
                 new[] { requestType, typeof(CancellationToken) });
@@ -261,6 +270,49 @@ namespace Ankh.Copilot
                 new[] { request, (object)CancellationToken.None });
 
             return await AwaitResultAsync(invocation);
+        }
+
+        static void ConfigureCommitMessageRequest(object request)
+        {
+            if (request == null)
+                return;
+
+            // Newer and current Copilot contracts expose Guidance, which is
+            // equivalent to adding app-specific system guidance. Older VS 2022
+            // builds may not have it, so this remains feature-detected.
+            PropertyInfo guidanceProperty = request.GetType().GetProperty(
+                "Guidance",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            if (guidanceProperty != null &&
+                guidanceProperty.CanWrite &&
+                guidanceProperty.PropertyType == typeof(string))
+            {
+                guidanceProperty.SetValue(request, CommitMessageGuidance, null);
+            }
+
+            // A null Intent asks Copilot to auto-detect intent. VS 2022 can
+            // interpret commit generation as an interactive code/chat request
+            // and then ask for editor selections or chat references. None means
+            // pass the request through without that intent-specific behavior.
+            PropertyInfo intentProperty = request.GetType().GetProperty(
+                "Intent",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            if (intentProperty == null || !intentProperty.CanWrite)
+                return;
+
+            Type intentType = Nullable.GetUnderlyingType(intentProperty.PropertyType)
+                ?? intentProperty.PropertyType;
+
+            if (!intentType.IsEnum ||
+                !Enum.GetNames(intentType).Contains("None"))
+            {
+                return;
+            }
+
+            object noIntent = Enum.Parse(intentType, "None", false);
+            intentProperty.SetValue(request, noIntent, null);
         }
 
         static string ExtractResponseText(object response)

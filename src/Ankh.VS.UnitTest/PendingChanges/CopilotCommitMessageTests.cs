@@ -28,9 +28,19 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
             string prompt = CopilotCommitMessage.BuildPrompt("Modified: src/Test.cs");
 
             Assert.That(prompt, Does.Contain("Return only the commit message"));
+            Assert.That(prompt, Does.Contain("complete and authoritative context"));
+            Assert.That(prompt, Does.Contain("Do not request editor selections"));
             Assert.That(prompt, Does.Contain("untrusted data"));
             Assert.That(prompt, Does.Contain("Modified: src/Test.cs"));
             Assert.That(prompt, Does.Contain("<svn-changes>"));
+        }
+
+        [Test]
+        public void NormalizeResponse_RejectsInteractiveVisualStudioContextRequest()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CopilotCommitMessage.NormalizeResponse(
+                    "I need more Visual Studio context. Use #file:'Program.cs' or #errors and ask again."));
         }
 
         [Test]

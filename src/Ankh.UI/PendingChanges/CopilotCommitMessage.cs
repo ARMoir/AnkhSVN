@@ -37,7 +37,10 @@ namespace Ankh.UI.PendingChanges
         internal static string BuildPrompt(string context)
         {
             return
-                "Write a concise Subversion commit message for the selected pending changes below.\n" +
+                "Generate a concise Subversion commit message from the complete SVN change data embedded below.\n" +
+                "The <svn-changes> block is the complete and authoritative context for this task.\n" +
+                "Do not request editor selections, active-file context, error-list context, file references, or any additional information.\n" +
+                "Do not offer choices or explain how to ask again. Generate the commit message now.\n" +
                 "Return only the commit message; do not add Markdown fences, headings, or commentary.\n" +
                 "Use an imperative subject line, ideally 72 characters or fewer.\n" +
                 "If there is a body, put a blank line after the subject.\n" +
@@ -57,6 +60,17 @@ namespace Ankh.UI.PendingChanges
                 return string.Empty;
 
             string text = response.Trim();
+
+            // VS 2022's generic Copilot chat responder can occasionally answer
+            // with instructions to add editor/file/error context instead of
+            // performing this headless request. Never put that chat guidance in
+            // the SVN commit box.
+            if (text.IndexOf("#file:", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                text.IndexOf("#errors", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                throw new InvalidOperationException(
+                    "Visual Studio Copilot requested interactive editor context instead of returning a commit message.");
+            }
 
             if (text.StartsWith("```", StringComparison.Ordinal))
             {
