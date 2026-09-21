@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 8:29:33 PM |
-| Coverage date: | 9/21/2026 - 8:29:12 PM - 9/21/2026 - 8:29:23 PM |
+| Generated on: | 9/21/2026 - 8:49:19 PM |
+| Coverage date: | 9/21/2026 - 8:48:42 PM - 9/21/2026 - 8:49:08 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 609 |
 | Files: | 677 |
-| **Line coverage:** | 8.9% (4161 of 46660) |
-| Covered lines: | 4161 |
+| **Line coverage:** | 8.9% (4168 of 46667) |
+| Covered lines: | 4168 |
 | Uncovered lines: | 42499 |
-| Coverable lines: | 46660 |
-| Total lines: | 131812 |
-| **Branch coverage:** | 11.4% (2561 of 22355) |
-| Covered branches: | 2561 |
-| Total branches: | 22355 |
+| Coverable lines: | 46667 |
+| Total lines: | 131826 |
+| **Branch coverage:** | 11.4% (2565 of 22359) |
+| Covered branches: | 2565 |
+| Total branches: | 22359 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -488,7 +488,7 @@
 |Ankh.UI.PendingChanges.ConfigureRecentChangesPageDialog|0%|0%|
 |Ankh.UI.PendingChanges.Conflicts.ConflictListItem|0%|0%|
 |Ankh.UI.PendingChanges.Conflicts.ConflictListView|0%|0%|
-|Ankh.UI.PendingChanges.CopilotCommitMessage|39.9%|45.8%|
+|Ankh.UI.PendingChanges.CopilotCommitMessage|41.5%|47.1%|
 |Ankh.UI.PendingChanges.LogMessageEditor|40%||
 |Ankh.UI.PendingChanges.PCResources|35.5%|100%|
 |Ankh.UI.PendingChanges.PendingActivationPage|0%|0%|
