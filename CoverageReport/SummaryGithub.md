@@ -3,19 +3,19 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 1:55:15 AM |
-| Coverage date: | 9/21/2026 - 1:54:54 AM - 9/21/2026 - 1:55:05 AM |
+| Generated on: | 9/21/2026 - 1:59:54 AM |
+| Coverage date: | 9/21/2026 - 1:59:34 AM - 9/21/2026 - 1:59:44 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 607 |
 | Files: | 675 |
-| **Line coverage:** | 8.7% (4038 of 46309) |
-| Covered lines: | 4038 |
-| Uncovered lines: | 42271 |
+| **Line coverage:** | 8.7% (4039 of 46309) |
+| Covered lines: | 4039 |
+| Uncovered lines: | 42270 |
 | Coverable lines: | 46309 |
 | Total lines: | 131129 |
-| **Branch coverage:** | 11.1% (2473 of 22133) |
-| Covered branches: | 2473 |
+| **Branch coverage:** | 11.1% (2475 of 22133) |
+| Covered branches: | 2475 |
 | Total branches: | 22133 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -667,7 +667,7 @@
 |Ankh.VS.Services.DiffMergeInstance|0%|0%|
 |Ankh.VS.Services.GlobalCommandHook|0%|0%|
 |Ankh.VS.Services.InternalDiff|0%|0%|
-|Ankh.VS.Services.StartupRefreshService|91.4%|83.3%|
+|Ankh.VS.Services.StartupRefreshService|92.6%|86.6%|
 |Ankh.VS.SolutionExplorer.FileIconMapper|65.2%|68.4%|
 |Ankh.VS.SolutionExplorer.FileIconMapperDpiLogic|60%|60%|
 |Ankh.VS.SolutionExplorer.SolutionExplorerStrings|0%|0%|
