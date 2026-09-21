@@ -60,6 +60,31 @@ namespace Ankh.UI
         public Color PressedBackground { get; private set; }
         public Color FocusBorder { get; private set; }
 
+        public Color SecondaryText
+        {
+            get { return Blend(SurfaceForeground, SurfaceBackground, 0.70); }
+        }
+
+        public static double ContrastRatio(Color foreground, Color background)
+        {
+            double first = RelativeLuminance(foreground);
+            double second = RelativeLuminance(background);
+            return (Math.Max(first, second) + 0.05) / (Math.Min(first, second) + 0.05);
+        }
+
+        static double RelativeLuminance(Color color)
+        {
+            return 0.2126 * LinearChannel(color.R)
+                + 0.7152 * LinearChannel(color.G)
+                + 0.0722 * LinearChannel(color.B);
+        }
+
+        static double LinearChannel(byte channel)
+        {
+            double value = channel / 255.0;
+            return value <= 0.04045 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4);
+        }
+
         public bool IsDarkSurface
         {
             get { return IsDark(SurfaceBackground); }
@@ -81,7 +106,7 @@ namespace Ankh.UI
         /// </summary>
         public static Color Blend(Color foreground, Color background, double foregroundWeight)
         {
-            if (foregroundWeight < 0.0 || foregroundWeight > 1.0)
+            if (double.IsNaN(foregroundWeight) || foregroundWeight < 0.0 || foregroundWeight > 1.0)
                 throw new ArgumentOutOfRangeException("foregroundWeight");
 
             double backgroundWeight = 1.0 - foregroundWeight;

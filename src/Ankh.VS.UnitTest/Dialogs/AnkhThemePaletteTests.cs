@@ -52,6 +52,7 @@ namespace AnkhSvn_UnitTestProject.Dialogs
 
         [TestCase(-0.01)]
         [TestCase(1.01)]
+        [TestCase(double.NaN)]
         public void BlendRejectsInvalidWeights(double weight)
         {
             Assert.Throws<ArgumentOutOfRangeException>(
@@ -59,6 +60,15 @@ namespace AnkhSvn_UnitTestProject.Dialogs
                 {
                     AnkhThemePalette.Blend(Color.White, Color.Black, weight);
                 });
+        }
+
+        [Test]
+        public void ContrastMeasuresActualColorPair()
+        {
+            Assert.That(AnkhThemePalette.ContrastRatio(Color.Black, Color.White), Is.EqualTo(21).Within(0.001));
+            Assert.That(AnkhThemePalette.ContrastRatio(Color.Gray, Color.Gray), Is.EqualTo(1));
+            Assert.That(AnkhThemePalette.ContrastRatio(Color.DarkBlue, Color.FromArgb(30, 30, 30)), Is.LessThan(4.5));
+            Assert.That(AnkhThemePalette.ContrastRatio(Color.DarkBlue, Color.FromArgb(245, 245, 245)), Is.GreaterThan(4.5));
         }
     }
 }

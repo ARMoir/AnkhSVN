@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Drawing;
+using System.Runtime.InteropServices;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using Ankh.UI;
@@ -43,7 +45,32 @@ namespace Ankh.WpfPackage.Services
                 (__VSSYSCOLOREX)__VSSYSCOLOREX3.VSCOLOR_COMBOBOX_BACKGROUND,
                 surfaceBackground);
 
-            Color inputForeground = surfaceForeground;
+            Color inputForeground = GetVsColor(
+                (__VSSYSCOLOREX)__VSSYSCOLOREX3.VSCOLOR_WINDOWTEXT,
+                surfaceForeground);
+
+            // CommonControls exposes the matching combo text token, which the
+            // legacy GetVSSysColorEx enumeration does not provide.
+            IVsUIShell5 shell = GetService<IVsUIShell5>(typeof(SVsUIShell));
+            if (shell != null)
+            {
+                try
+                {
+                    var key = CommonControlsColors.ComboBoxTextColorKey;
+                    var category = key.Category;
+                    uint rgb = shell.GetThemedColor(ref category, key.Name, 0);
+                    Color comboText = ColorTranslator.FromWin32(unchecked((int)rgb));
+                    key = CommonControlsColors.ComboBoxBackgroundColorKey;
+                    category = key.Category;
+                    rgb = shell.GetThemedColor(ref category, key.Name, 0);
+                    inputBackground = ColorTranslator.FromWin32(unchecked((int)rgb));
+                    inputForeground = comboText;
+                }
+                catch (COMException)
+                {
+                    // Older shells may not expose the CommonControls token.
+                }
+            }
 
             Color disabledText = GetVsColor(
                 (__VSSYSCOLOREX)__VSSYSCOLOREX3.VSCOLOR_GRAYTEXT,

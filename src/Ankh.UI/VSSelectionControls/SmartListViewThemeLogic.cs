@@ -16,12 +16,12 @@ namespace Ankh.UI.VSSelectionControls
 {
     internal static class SmartListViewThemeLogic
     {
-        internal static bool ShouldOwnerDrawDarkHeader(
+        internal static bool ShouldOwnerDrawHeader(
             bool themeCancelled,
-            bool darkSurface,
+            bool hasPalette,
             bool highContrast)
         {
-            return !themeCancelled && darkSurface && !highContrast;
+            return !themeCancelled && hasPalette && !highContrast;
         }
     }
 }

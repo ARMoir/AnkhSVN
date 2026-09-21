@@ -18,17 +18,17 @@ using System.Windows.Forms;
 
 namespace Ankh.WpfPackage.Services
 {
-    internal sealed class DarkComboBoxPainter : NativeWindow, IDisposable
+    internal sealed class PaletteComboBoxPainter : NativeWindow, IDisposable
     {
         const int WM_PAINT = 0x000F;
         const int WM_PRINTCLIENT = 0x0318;
 
         readonly ComboBox _combo;
-        bool _darkMode;
+        bool _usePalette;
         Color _borderColor;
         Color _disabledText;
 
-        internal DarkComboBoxPainter(ComboBox combo)
+        internal PaletteComboBoxPainter(ComboBox combo)
         {
             if (combo == null)
                 throw new ArgumentNullException("combo");
@@ -43,11 +43,11 @@ namespace Ankh.WpfPackage.Services
         }
 
         internal void SetTheme(
-            bool darkMode,
+            bool usePalette,
             Color borderColor,
             Color disabledText)
         {
-            _darkMode = darkMode;
+            _usePalette = usePalette;
             _borderColor = borderColor;
             _disabledText = disabledText;
 
@@ -59,7 +59,7 @@ namespace Ankh.WpfPackage.Services
         {
             base.WndProc(ref m);
 
-            if (_darkMode
+            if (_usePalette
                 && _combo.DropDownStyle != ComboBoxStyle.Simple
                 && (m.Msg == WM_PAINT || m.Msg == WM_PRINTCLIENT))
             {
@@ -148,18 +148,18 @@ namespace Ankh.WpfPackage.Services
         }
     }
 
-    internal sealed class DarkNumericUpDownPainter : NativeWindow, IDisposable
+    internal sealed class PaletteNumericUpDownPainter : NativeWindow, IDisposable
     {
         const int WM_PAINT = 0x000F;
         const int WM_PRINTCLIENT = 0x0318;
 
         readonly NumericUpDown _owner;
         Control _buttons;
-        bool _darkMode;
+        bool _usePalette;
         Color _borderColor;
         Color _disabledText;
 
-        internal DarkNumericUpDownPainter(NumericUpDown owner)
+        internal PaletteNumericUpDownPainter(NumericUpDown owner)
         {
             if (owner == null)
                 throw new ArgumentNullException("owner");
@@ -173,11 +173,11 @@ namespace Ankh.WpfPackage.Services
         }
 
         internal void SetTheme(
-            bool darkMode,
+            bool usePalette,
             Color borderColor,
             Color disabledText)
         {
-            _darkMode = darkMode;
+            _usePalette = usePalette;
             _borderColor = borderColor;
             _disabledText = disabledText;
             HookButtons();
@@ -219,7 +219,7 @@ namespace Ankh.WpfPackage.Services
         {
             base.WndProc(ref m);
 
-            if (_darkMode
+            if (_usePalette
                 && _buttons != null
                 && (m.Msg == WM_PAINT || m.Msg == WM_PRINTCLIENT))
             {

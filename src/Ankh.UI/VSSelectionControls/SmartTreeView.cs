@@ -245,7 +245,7 @@ namespace Ankh.UI.VSSelectionControls
                 BackColor = palette.SurfaceBackground;
                 ForeColor = palette.SurfaceForeground;
             }
-            else if (_useDarkNativeTheme && Parent != null)
+            else if (_inVSTheming && Parent != null)
             {
                 BackColor = Parent.BackColor;
                 ForeColor = Parent.ForeColor;

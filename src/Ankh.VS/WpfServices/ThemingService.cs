@@ -22,10 +22,10 @@ namespace Ankh.WpfPackage.Services
     [GlobalService(typeof(IWinFormsThemingService), MinVersion = VSInstance.VS2012)]
     sealed partial class ThemingService : AnkhService, IWinFormsThemingService
     {
-        readonly ConditionalWeakTable<ComboBox, DarkComboBoxPainter> _comboPainters =
-            new ConditionalWeakTable<ComboBox, DarkComboBoxPainter>();
-        readonly ConditionalWeakTable<NumericUpDown, DarkNumericUpDownPainter> _numericPainters =
-            new ConditionalWeakTable<NumericUpDown, DarkNumericUpDownPainter>();
+        readonly ConditionalWeakTable<ComboBox, PaletteComboBoxPainter> _comboPainters =
+            new ConditionalWeakTable<ComboBox, PaletteComboBoxPainter>();
+        readonly ConditionalWeakTable<NumericUpDown, PaletteNumericUpDownPainter> _numericPainters =
+            new ConditionalWeakTable<NumericUpDown, PaletteNumericUpDownPainter>();
 
         public ThemingService(IAnkhServiceProvider context)
             : base(context)
@@ -203,22 +203,12 @@ namespace Ankh.WpfPackage.Services
             return false;
         }
 
-        bool UseDarkNativeTheme
-        {
-            get
-            {
-                return WinFormsNativeThemeLogic.ShouldUseDarkTheme(
-                    ThemePalette.SurfaceBackground,
-                    SystemInformation.HighContrast);
-            }
-        }
-
-        void ApplyNativeControlTheme(IntPtr handle, string darkTheme, bool forDialog)
+        void ApplyNativeControlTheme(IntPtr handle, string darkTheme, bool forDialog, Color background)
         {
             if (handle == IntPtr.Zero)
                 return;
 
-            if (UseDarkNativeTheme)
+            if (WinFormsNativeThemeLogic.ShouldUseDarkTheme(background, SystemInformation.HighContrast))
             {
                 VSThemeWindow(handle, forDialog);
                 NativeMethods.SetWindowTheme(handle, darkTheme, null);
@@ -237,7 +227,8 @@ namespace Ankh.WpfPackage.Services
             if (form == null || !form.IsHandleCreated)
                 return;
 
-            int enabled = UseDarkNativeTheme ? 1 : 0;
+            int enabled = WinFormsNativeThemeLogic.ShouldUseDarkTheme(
+                form.BackColor, SystemInformation.HighContrast) ? 1 : 0;
 
             try
             {
@@ -334,7 +325,7 @@ namespace Ankh.WpfPackage.Services
             ApplyNativeControlTheme(
                 listView.Handle,
                 WinFormsNativeThemeLogic.DarkExplorerTheme,
-                forDialog);
+                forDialog, ThemePalette.SurfaceBackground);
 
             if (listView.Font != DialogFont)
                 listView.Font = DialogFont;
@@ -359,7 +350,7 @@ namespace Ankh.WpfPackage.Services
                 updateFore = true;
             }
 
-            if ((updateBack || updateFore) && !listView.VirtualMode)
+            if (!listView.VirtualMode)
             {
                 foreach (ListViewItem lvi in listView.Items)
                 {
@@ -368,6 +359,12 @@ namespace Ankh.WpfPackage.Services
 
                     if (updateBack && lvi.BackColor == oldBack)
                         lvi.BackColor = newBack;
+
+                    // A readable status accent on the previous background may
+                    // disappear after a theme switch. Inherit the VS text pair.
+                    if (SystemInformation.HighContrast
+                        || AnkhThemePalette.ContrastRatio(lvi.ForeColor, lvi.BackColor) < 4.5)
+                        lvi.ForeColor = Color.Empty;
                 }
             }
 
@@ -385,7 +382,7 @@ namespace Ankh.WpfPackage.Services
                 ApplyNativeControlTheme(
                     header,
                     WinFormsNativeThemeLogic.DarkItemsViewTheme,
-                    forDialog);
+                    forDialog, palette.SurfaceBackground);
             }
         }
 
@@ -394,7 +391,7 @@ namespace Ankh.WpfPackage.Services
             ApplyNativeControlTheme(
                 treeView.Handle,
                 WinFormsNativeThemeLogic.DarkExplorerTheme,
-                forDialog);
+                forDialog, ThemePalette.SurfaceBackground);
 
             if (treeView.Font != DialogFont)
                 treeView.Font = DialogFont;
@@ -493,17 +490,16 @@ namespace Ankh.WpfPackage.Services
                 button.Font = button.Parent.Font;
 
             AnkhThemePalette palette = ThemePalette;
-            bool darkButton = WinFormsNativeThemeLogic.ShouldUseDarkButtonRendering(
-                UseDarkNativeTheme);
+            bool paletteButton = !SystemInformation.HighContrast;
 
             Color foreColor = button.Enabled
-                ? palette.SurfaceForeground
+                ? palette.InputForeground
                 : palette.DisabledText;
 
             if (button.ForeColor != foreColor)
                 button.ForeColor = foreColor;
 
-            if (darkButton)
+            if (paletteButton)
             {
                 button.UseVisualStyleBackColor = false;
                 button.FlatStyle = FlatStyle.Flat;
@@ -586,7 +582,7 @@ namespace Ankh.WpfPackage.Services
             ApplyNativeControlTheme(
                 combo.Handle,
                 WinFormsNativeThemeLogic.DarkComboTheme,
-                forDialog);
+                forDialog, ThemePalette.InputBackground);
 
             if (combo.Font != DialogFont)
                 combo.Font = DialogFont;
@@ -601,7 +597,7 @@ namespace Ankh.WpfPackage.Services
 
             combo.DrawItem -= ThemeComboDrawItem;
 
-            if (UseDarkNativeTheme)
+            if (!SystemInformation.HighContrast)
             {
                 combo.FlatStyle = FlatStyle.Flat;
                 combo.DrawMode = DrawMode.OwnerDrawFixed;
@@ -613,11 +609,11 @@ namespace Ankh.WpfPackage.Services
                 combo.FlatStyle = FlatStyle.Standard;
             }
 
-            DarkComboBoxPainter painter = _comboPainters.GetValue(
+            PaletteComboBoxPainter painter = _comboPainters.GetValue(
                 combo,
-                delegate(ComboBox value) { return new DarkComboBoxPainter(value); });
+                delegate(ComboBox value) { return new PaletteComboBoxPainter(value); });
             painter.SetTheme(
-                UseDarkNativeTheme,
+                !SystemInformation.HighContrast,
                 palette.Border,
                 palette.DisabledText);
         }
@@ -673,7 +669,7 @@ namespace Ankh.WpfPackage.Services
             ApplyNativeControlTheme(
                 numeric.Handle,
                 WinFormsNativeThemeLogic.DarkComboTheme,
-                forDialog);
+                forDialog, ThemePalette.InputBackground);
 
             if (numeric.Font != DialogFont)
                 numeric.Font = DialogFont;
@@ -699,15 +695,15 @@ namespace Ankh.WpfPackage.Services
                     ApplyNativeControlTheme(
                         child.Handle,
                         WinFormsNativeThemeLogic.DarkComboTheme,
-                        forDialog);
+                        forDialog, child.BackColor);
                 }
             }
 
-            DarkNumericUpDownPainter painter = _numericPainters.GetValue(
+            PaletteNumericUpDownPainter painter = _numericPainters.GetValue(
                 numeric,
-                delegate(NumericUpDown value) { return new DarkNumericUpDownPainter(value); });
+                delegate(NumericUpDown value) { return new PaletteNumericUpDownPainter(value); });
             painter.SetTheme(
-                UseDarkNativeTheme,
+                !SystemInformation.HighContrast,
                 palette.Border,
                 palette.DisabledText);
         }

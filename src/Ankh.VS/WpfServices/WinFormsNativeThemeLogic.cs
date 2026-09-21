@@ -29,9 +29,5 @@ namespace Ankh.WpfPackage.Services
             return !highContrast && AnkhThemePalette.IsDark(background);
         }
 
-        internal static bool ShouldUseDarkButtonRendering(bool useDarkNativeTheme)
-        {
-            return useDarkNativeTheme;
-        }
     }
 }

@@ -497,7 +497,7 @@ namespace Ankh.UI.VSSelectionControls
         private bool _setHeaderStyle;
 
         bool _isThemed;
-        bool _ownerDrawDarkHeader;
+        bool _ownerDrawPaletteHeader;
         Color _headerBackColor;
         Color _headerForeColor;
         Color _headerBorderColor;
@@ -522,7 +522,7 @@ namespace Ankh.UI.VSSelectionControls
 
         protected override void OnDrawColumnHeader(DrawListViewColumnHeaderEventArgs e)
         {
-            if (!_ownerDrawDarkHeader)
+            if (!_ownerDrawPaletteHeader)
             {
                 e.DrawDefault = true;
                 return;
@@ -641,7 +641,7 @@ namespace Ankh.UI.VSSelectionControls
 
         protected override void OnDrawItem(DrawListViewItemEventArgs e)
         {
-            if (_ownerDrawDarkHeader)
+            if (_ownerDrawPaletteHeader)
                 e.DrawDefault = true;
 
             base.OnDrawItem(e);
@@ -649,7 +649,7 @@ namespace Ankh.UI.VSSelectionControls
 
         protected override void OnDrawSubItem(DrawListViewSubItemEventArgs e)
         {
-            if (_ownerDrawDarkHeader)
+            if (_ownerDrawPaletteHeader)
                 e.DrawDefault = true;
 
             base.OnDrawSubItem(e);
@@ -1406,15 +1406,11 @@ namespace Ankh.UI.VSSelectionControls
 
             IWinFormsThemingService themer = sender.GetService<IWinFormsThemingService>();
             AnkhThemePalette palette = themer != null ? themer.ThemePalette : null;
-            bool darkSurface = palette != null
-                ? palette.IsDarkSurface
-                : AnkhThemePalette.IsDark(BackColor);
-
             if (palette != null)
             {
                 BackColor = palette.SurfaceBackground;
                 ForeColor = palette.SurfaceForeground;
-                _headerBackColor = palette.HoverBackground;
+                _headerBackColor = AnkhThemePalette.Blend(palette.SurfaceForeground, palette.SurfaceBackground, 0.08);
                 _headerForeColor = palette.SurfaceForeground;
                 _headerBorderColor = palette.Border;
             }
@@ -1425,12 +1421,12 @@ namespace Ankh.UI.VSSelectionControls
                 _headerBorderColor = Color.Empty;
             }
 
-            _ownerDrawDarkHeader = SmartListViewThemeLogic.ShouldOwnerDrawDarkHeader(
+            _ownerDrawPaletteHeader = SmartListViewThemeLogic.ShouldOwnerDrawHeader(
                 e.Cancel,
-                darkSurface,
+                palette != null,
                 SystemInformation.HighContrast);
 
-            OwnerDraw = _ownerDrawDarkHeader;
+            OwnerDraw = _ownerDrawPaletteHeader;
             _isThemed = !e.Cancel;
 
             try
