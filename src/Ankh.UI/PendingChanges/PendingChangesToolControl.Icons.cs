@@ -22,7 +22,7 @@ namespace Ankh.UI.PendingChanges
             if (images == null)
                 return; // Keep the designer/fallback resources until VS is ready.
 
-            SetNavigationIcon(images, fileChangesButton, KnownMonikers.PendingChangeNode);
+            SetNavigationIcon(images, fileChangesButton, KnownMonikers.PendingChange);
             SetNavigationIcon(images, issuesButton, KnownMonikers.TaskList);
             SetNavigationIcon(images, recentChangesButton, KnownMonikers.ShowFullHistory);
             SetNavigationIcon(images, conflictsButton, KnownMonikers.Conflict);
