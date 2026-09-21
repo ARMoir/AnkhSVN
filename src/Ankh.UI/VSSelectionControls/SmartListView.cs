@@ -497,6 +497,7 @@ namespace Ankh.UI.VSSelectionControls
         private bool _setHeaderStyle;
 
         bool _isThemed;
+        bool _useDarkNativeTheme;
         bool _ownerDrawPaletteHeader;
         Color _headerBackColor;
         Color _headerForeColor;
@@ -510,7 +511,9 @@ namespace Ankh.UI.VSSelectionControls
 
             UpdateSortGlyphs();
 
-            if (!OwnerDraw && !_isThemed)
+            if (_useDarkNativeTheme)
+                NativeMethods.SetWindowTheme(Handle, "DarkMode_Explorer", null);
+            else if (!OwnerDraw && !_isThemed)
                 NativeMethods.SetWindowTheme(Handle, "Explorer", null);
 
             NativeMethods.SendMessage(
@@ -1428,6 +1431,12 @@ namespace Ankh.UI.VSSelectionControls
 
             OwnerDraw = _ownerDrawPaletteHeader;
             _isThemed = !e.Cancel;
+            _useDarkNativeTheme = SmartListViewThemeLogic.ShouldUseDarkNativeTheme(
+                _isThemed,
+                palette != null
+                    ? palette.IsDarkSurface
+                    : AnkhThemePalette.IsDark(BackColor),
+                SystemInformation.HighContrast);
 
             try
             {

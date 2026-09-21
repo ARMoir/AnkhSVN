@@ -37,5 +37,23 @@ namespace AnkhSvn_UnitTestProject.Dialogs
                     highContrast),
                 Is.EqualTo(expected));
         }
+
+        [TestCase(true, true, false, true)]
+        [TestCase(true, false, false, false)]
+        [TestCase(false, true, false, false)]
+        [TestCase(true, true, true, false)]
+        public void DarkNativeThemeOnlyForDarkVsSurfaces(
+            bool inVsTheming,
+            bool darkSurface,
+            bool highContrast,
+            bool expected)
+        {
+            Assert.That(
+                SmartListViewThemeLogic.ShouldUseDarkNativeTheme(
+                    inVsTheming,
+                    darkSurface,
+                    highContrast),
+                Is.EqualTo(expected));
+        }
     }
 }
