@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 2:35:05 AM |
-| Coverage date: | 9/21/2026 - 2:34:44 AM - 9/21/2026 - 2:34:55 AM |
+| Generated on: | 9/21/2026 - 5:44:01 PM |
+| Coverage date: | 9/21/2026 - 5:43:40 PM - 9/21/2026 - 5:43:51 PM |
 | Parser: | MultiReport (4x Cobertura) |
-| Assemblies: | 10 |
-| Classes: | 607 |
-| Files: | 675 |
-| **Line coverage:** | 8.7% (4057 of 46334) |
-| Covered lines: | 4057 |
-| Uncovered lines: | 42277 |
-| Coverable lines: | 46334 |
-| Total lines: | 131179 |
-| **Branch coverage:** | 11.2% (2481 of 22143) |
-| Covered branches: | 2481 |
-| Total branches: | 22143 |
+| Assemblies: | 11 |
+| Classes: | 610 |
+| Files: | 678 |
+| **Line coverage:** | 8.7% (4082 of 46614) |
+| Covered lines: | 4082 |
+| Uncovered lines: | 42532 |
+| Coverable lines: | 46614 |
+| Total lines: | 131723 |
+| **Branch coverage:** | 11.1% (2493 of 22265) |
+| Covered branches: | 2493 |
+| Total branches: | 22265 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -111,6 +111,14 @@
 |Ankh.Services.TempDirManager|0%|0%|
 |Ankh.Services.TempFileManager|0%|0%|
 |Ankh.Settings.SolutionSettings|13%|24.5%|
+
+</details>
+<details><summary>Ankh.Copilot - 0%</summary>
+
+|**Name**|**Line**|**Branch**|
+|:---|---:|---:|
+|**Ankh.Copilot**|**0%**|**0%**|
+|Ankh.Copilot.Program|0%|0%|
 
 </details>
 <details><summary>Ankh.Diff - 7.5%</summary>
@@ -385,11 +393,11 @@
 |Ankh.VSVersion|0%|0%|
 
 </details>
-<details><summary>Ankh.UI - 6.3%</summary>
+<details><summary>Ankh.UI - 6.4%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.UI**|**6.3%**|**7.2%**|
+|**Ankh.UI**|**6.4%**|**7.2%**|
 |Ankh.UI.AddRepositoryRootDialog|0%|0%|
 |Ankh.UI.AnkhUIModule|0%||
 |Ankh.UI.Annotate.AnnotateEditorControl|0%|0%|
@@ -474,6 +482,7 @@
 |Ankh.UI.PendingChanges.Commands.CommitPendingChanges|21.4%|15.3%|
 |Ankh.UI.PendingChanges.Commands.ConfigureRecentChangesPage|21%|12.5%|
 |Ankh.UI.PendingChanges.Commands.CreatePatch|15%|20%|
+|Ankh.UI.PendingChanges.Commands.GenerateCommitMessage|42.8%|33.3%|
 |Ankh.UI.PendingChanges.Commands.OpenIssue|13.4%|7.6%|
 |Ankh.UI.PendingChanges.Commands.PasteToEditorList|10.3%|12.5%|
 |Ankh.UI.PendingChanges.Commands.PendingChangeLocationCombo|29.7%|36.3%|
@@ -487,6 +496,7 @@
 |Ankh.UI.PendingChanges.ConfigureRecentChangesPageDialog|0%|0%|
 |Ankh.UI.PendingChanges.Conflicts.ConflictListItem|0%|0%|
 |Ankh.UI.PendingChanges.Conflicts.ConflictListView|0%|0%|
+|Ankh.UI.PendingChanges.CopilotCommitMessage|13%|12.8%|
 |Ankh.UI.PendingChanges.LogMessageEditor|40%||
 |Ankh.UI.PendingChanges.PCResources|35.5%|100%|
 |Ankh.UI.PendingChanges.PendingActivationPage|0%|0%|
