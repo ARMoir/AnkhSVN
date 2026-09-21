@@ -25,15 +25,14 @@ using SharpSvn;
 namespace Ankh.UI.PendingChanges
 {
     /// <summary>
-    /// Builds read-only SVN context and delegates generation to Ankh.Copilot.
-    /// The Copilot SDK stays out of devenv.exe to avoid dependency conflicts
-    /// with supported Visual Studio 2022 installations.
+    /// Builds read-only SVN context and delegates generation to the late-bound
+    /// Ankh.Copilot bridge. The bridge uses Visual Studio's own Copilot service
+    /// and therefore the Copilot account already signed in to Visual Studio.
     /// </summary>
     internal static class CopilotCommitMessage
     {
         const int MaxContextCharacters = 80000;
         const int MaxFileCharacters = 24000;
-        static readonly TimeSpan HelperTimeout = TimeSpan.FromSeconds(90);
 
         internal static string BuildPrompt(string context)
         {

@@ -365,9 +365,9 @@ jobs:
             throw "Issues #7/#47 regression: generated VSIX does not declare Ankh.UI as a Microsoft.VisualStudio.MefComponent. MEF paths: $assetPaths"
           }
 
-          # The Copilot bridge is intentionally late-loaded. It compiles against
-          # Visual Studio's Copilot contract but the VSIX must not ship Microsoft's
-          # Copilot implementation or a second Copilot CLI runtime.
+          # The Copilot bridge is intentionally late-loaded. It resolves the
+          # Copilot contract from the installed Visual Studio at runtime, and the
+          # VSIX must not ship Microsoft's implementation or a second Copilot CLI.
           $copilotBridge = $archive.Entries | Where-Object {
             [System.IO.Path]::GetFileName($_.FullName) -eq "Ankh.Copilot.dll"
           } | Select-Object -First 1

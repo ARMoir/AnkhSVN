@@ -13,31 +13,59 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.ServiceHub.Framework;
-using Microsoft.VisualStudio.Copilot;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.ServiceBroker;
 
 namespace Ankh.Copilot
 {
     /// <summary>
-    /// Uses Visual Studio's brokered Copilot service. This deliberately runs
-    /// inside devenv only when invoked so it shares Visual Studio's Copilot
-    /// authentication instead of starting a second Copilot CLI login.
+    /// Late-bound bridge to Visual Studio's own Copilot brokered service.
+    ///
+    /// AnkhSVN deliberately does not ship GitHub's standalone Copilot SDK/CLI.
+    /// Instead it resolves the Copilot contract from the running Visual Studio,
+    /// so the request uses the same Copilot sign-in and account policy as VS.
     /// </summary>
     public static class VisualStudioCopilot
     {
+        const string CopilotNamespace = "Microsoft.VisualStudio.Copilot.";
+
+        static readonly string[] CopilotAssemblyNames =
+        {
+            "Microsoft.VisualStudio.Copilot",
+            "Microsoft.VisualStudio.Copilot.Abstractions",
+            "Microsoft.VisualStudio.Copilot.Contracts"
+        };
+
         public static async Task<string> GenerateAsync(string prompt)
         {
             if (string.IsNullOrWhiteSpace(prompt))
                 throw new ArgumentException("A Copilot prompt is required.", "prompt");
 
-            CancellationToken cancellationToken = CancellationToken.None;
+            Type serviceType = GetRequiredCopilotType("ICopilotService");
+            Type descriptorsType = GetRequiredCopilotType("CopilotDescriptors");
+
+            PropertyInfo serviceDescriptorProperty = descriptorsType.GetProperty(
+                "CopilotService",
+                BindingFlags.Public | BindingFlags.Static);
+
+            if (serviceDescriptorProperty == null)
+                throw new MissingMemberException(descriptorsType.FullName, "CopilotService");
+
+            ServiceRpcDescriptor serviceDescriptor =
+                serviceDescriptorProperty.GetValue(null, null) as ServiceRpcDescriptor;
+
+            if (serviceDescriptor == null)
+                throw new InvalidOperationException("Visual Studio Copilot exposed an invalid service descriptor.");
 
             IBrokeredServiceContainer container =
                 await AsyncServiceProvider.GlobalProvider
@@ -50,70 +78,427 @@ namespace Ankh.Copilot
             if (serviceBroker == null)
                 throw new InvalidOperationException("Visual Studio's full-access service broker is unavailable.");
 
-            ICopilotService copilotService =
-                await serviceBroker.GetProxyAsync<ICopilotService>(
-                    CopilotDescriptors.CopilotService,
-                    cancellationToken);
+            object copilotService = await GetProxyAsync(
+                serviceBroker,
+                serviceDescriptor,
+                serviceType,
+                CancellationToken.None);
 
             if (copilotService == null)
             {
                 throw new InvalidOperationException(
-                    "Visual Studio Copilot is not available. Install/enable GitHub Copilot and sign in to Copilot in Visual Studio.");
+                    "Visual Studio Copilot is not available. " +
+                    "Make sure GitHub Copilot is installed, enabled, and signed in inside Visual Studio.");
             }
 
             try
             {
-                bool available = await copilotService.CheckAvailabilityAsync(cancellationToken);
-                if (!available)
-                {
-                    throw new InvalidOperationException(
-                        "Visual Studio Copilot is installed but is not currently available. Make sure Copilot is enabled and signed in.");
-                }
+                await VerifyAvailabilityAsync(serviceType, copilotService);
 
-                CopilotSessionOptions options =
-                    new CopilotSessionOptions(new CopilotClientId("AnkhSVN"));
-
-                ICopilotSession session =
-                    await copilotService.StartSessionAsync(options, cancellationToken);
-
+                object session = await StartSessionAsync(serviceType, copilotService);
                 if (session == null)
                     throw new InvalidOperationException("Visual Studio Copilot could not start a session.");
 
                 try
                 {
-                    CopilotRequest request = new CopilotRequest(prompt);
-                    CopilotResponse response =
-                        await session.SendRequestAsync(request, cancellationToken);
-
-                    if (response == null)
-                        throw new InvalidOperationException("Visual Studio Copilot returned no response.");
-
-                    StringBuilder text = new StringBuilder();
-                    foreach (CopilotContentTextPart part in response.Content.OfType<CopilotContentTextPart>())
-                        text.Append(part.Content);
-
-                    string result = text.ToString().Trim();
-                    if (result.Length == 0)
-                    {
-                        throw new InvalidOperationException(
-                            "Visual Studio Copilot returned a response without commit-message text.");
-                    }
-
-                    return result;
+                    object response = await SendRequestAsync(session, prompt);
+                    return ExtractResponseText(response);
                 }
                 finally
                 {
-                    IDisposable disposableSession = session as IDisposable;
-                    if (disposableSession != null)
-                        disposableSession.Dispose();
+                    DisposeObject(session);
                 }
             }
             finally
             {
-                IDisposable disposableService = copilotService as IDisposable;
-                if (disposableService != null)
-                    disposableService.Dispose();
+                DisposeObject(copilotService);
             }
+        }
+
+        static async Task<object> GetProxyAsync(
+            IServiceBroker serviceBroker,
+            ServiceRpcDescriptor serviceDescriptor,
+            Type serviceType,
+            CancellationToken cancellationToken)
+        {
+            MethodInfo getProxy = typeof(IServiceBroker)
+                .GetMethods()
+                .Where(m => m.Name == "GetProxyAsync" && m.IsGenericMethodDefinition)
+                .FirstOrDefault(m =>
+                {
+                    ParameterInfo[] parameters = m.GetParameters();
+                    return parameters.Length > 0 &&
+                        parameters[0].ParameterType == typeof(ServiceRpcDescriptor);
+                });
+
+            if (getProxy == null)
+                throw new MissingMethodException(typeof(IServiceBroker).FullName, "GetProxyAsync");
+
+            MethodInfo closedMethod = getProxy.MakeGenericMethod(serviceType);
+            ParameterInfo[] methodParameters = closedMethod.GetParameters();
+            object[] arguments = new object[methodParameters.Length];
+
+            arguments[0] = serviceDescriptor;
+
+            for (int i = 1; i < methodParameters.Length; i++)
+            {
+                Type parameterType = methodParameters[i].ParameterType;
+
+                if (parameterType == typeof(CancellationToken))
+                    arguments[i] = cancellationToken;
+                else if (parameterType.IsValueType)
+                    arguments[i] = Activator.CreateInstance(parameterType);
+                else
+                    arguments[i] = null;
+            }
+
+            object invocation = closedMethod.Invoke(serviceBroker, arguments);
+            return await AwaitResultAsync(invocation);
+        }
+
+        static async Task VerifyAvailabilityAsync(Type serviceType, object copilotService)
+        {
+            MethodInfo checkAvailability = serviceType.GetMethod(
+                "CheckAvailabilityAsync",
+                new[] { typeof(CancellationToken) });
+
+            if (checkAvailability == null)
+                return;
+
+            object invocation = checkAvailability.Invoke(
+                copilotService,
+                new object[] { CancellationToken.None });
+
+            object result = await AwaitResultAsync(invocation);
+            if (result is bool && !(bool)result)
+            {
+                throw new InvalidOperationException(
+                    "Visual Studio Copilot is installed but is not currently available. " +
+                    "Make sure Copilot is enabled and signed in.");
+            }
+        }
+
+        static async Task<object> StartSessionAsync(Type serviceType, object copilotService)
+        {
+            Type clientIdType = GetRequiredCopilotType("CopilotClientId");
+            object clientId = Activator.CreateInstance(
+                clientIdType,
+                new object[] { "AnkhSVN.CommitMessage" });
+
+            Type sessionOptionsType = FindCopilotType("CopilotSessionOptions");
+            if (sessionOptionsType != null)
+            {
+                MethodInfo startSession = serviceType.GetMethod(
+                    "StartSessionAsync",
+                    new[] { sessionOptionsType, typeof(CancellationToken) });
+
+                if (startSession != null)
+                {
+                    object options = Activator.CreateInstance(
+                        sessionOptionsType,
+                        new[] { clientId });
+
+                    object invocation = startSession.Invoke(
+                        copilotService,
+                        new[] { options, (object)CancellationToken.None });
+
+                    return await AwaitResultAsync(invocation);
+                }
+            }
+
+            // Older VS 2022 Copilot builds exposed GetCopilotSessionAsync instead.
+            Type serviceOptionsType = FindCopilotType("CopilotServiceSessionOptions");
+            if (serviceOptionsType != null)
+            {
+                MethodInfo getSession = serviceType.GetMethod(
+                    "GetCopilotSessionAsync",
+                    new[] { serviceOptionsType, typeof(CancellationToken) });
+
+                if (getSession != null)
+                {
+                    object options = Activator.CreateInstance(
+                        serviceOptionsType,
+                        new[] { clientId });
+
+                    PropertyInfo provideUi = serviceOptionsType.GetProperty("ProvideUI");
+                    if (provideUi != null && provideUi.CanWrite)
+                        provideUi.SetValue(options, false, null);
+
+                    object invocation = getSession.Invoke(
+                        copilotService,
+                        new[] { options, (object)CancellationToken.None });
+
+                    return await AwaitResultAsync(invocation);
+                }
+            }
+
+            throw new MissingMethodException(
+                "The installed Visual Studio Copilot contract does not expose a compatible session API.");
+        }
+
+        static async Task<object> SendRequestAsync(object session, string prompt)
+        {
+            Type requestType = GetRequiredCopilotType("CopilotRequest");
+            object request = Activator.CreateInstance(requestType, new object[] { prompt });
+
+            MethodInfo sendRequest = session.GetType().GetMethod(
+                "SendRequestAsync",
+                new[] { requestType, typeof(CancellationToken) });
+
+            if (sendRequest == null)
+            {
+                Type sessionType = GetRequiredCopilotType("ICopilotSession");
+                sendRequest = sessionType.GetMethod(
+                    "SendRequestAsync",
+                    new[] { requestType, typeof(CancellationToken) });
+            }
+
+            if (sendRequest == null)
+                throw new MissingMethodException(session.GetType().FullName, "SendRequestAsync");
+
+            object invocation = sendRequest.Invoke(
+                session,
+                new[] { request, (object)CancellationToken.None });
+
+            return await AwaitResultAsync(invocation);
+        }
+
+        static string ExtractResponseText(object response)
+        {
+            if (response == null)
+                throw new InvalidOperationException("Visual Studio Copilot returned no response.");
+
+            PropertyInfo contentProperty = response.GetType().GetProperty(
+                "Content",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            IEnumerable content = contentProperty != null
+                ? contentProperty.GetValue(response, null) as IEnumerable
+                : null;
+
+            StringBuilder text = new StringBuilder();
+
+            if (content != null)
+            {
+                foreach (object part in content)
+                {
+                    if (part == null)
+                        continue;
+
+                    PropertyInfo partContent = part.GetType().GetProperty(
+                        "Content",
+                        BindingFlags.Public | BindingFlags.Instance);
+
+                    if (partContent == null || partContent.PropertyType != typeof(string))
+                        continue;
+
+                    string value = partContent.GetValue(part, null) as string;
+                    if (!string.IsNullOrEmpty(value))
+                        text.Append(value);
+                }
+            }
+
+            string result = text.ToString().Trim();
+            if (result.Length > 0)
+                return result;
+
+            PropertyInfo statusProperty = response.GetType().GetProperty(
+                "Status",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            object status = statusProperty != null
+                ? statusProperty.GetValue(response, null)
+                : null;
+
+            throw new InvalidOperationException(
+                "Visual Studio Copilot returned a response without commit-message text" +
+                (status != null ? " (status: " + status + ")." : "."));
+        }
+
+        static async Task<object> AwaitResultAsync(object awaitable)
+        {
+            if (awaitable == null)
+                return null;
+
+            Task task = awaitable as Task;
+            if (task != null)
+            {
+                await task;
+                return GetTaskResult(task);
+            }
+
+            Type awaitableType = awaitable.GetType();
+
+            // IServiceBroker returns ValueTask<T>. Keep this late-bound as well
+            // so the bridge remains compatible with net472 and VS SDK versions.
+            MethodInfo asTask = awaitableType.GetMethod(
+                "AsTask",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                Type.EmptyTypes,
+                null);
+
+            if (asTask != null)
+            {
+                Task converted = asTask.Invoke(awaitable, null) as Task;
+                if (converted == null)
+                    throw new InvalidOperationException("Visual Studio returned an invalid asynchronous result.");
+
+                await converted;
+                return GetTaskResult(converted);
+            }
+
+            return awaitable;
+        }
+
+        static object GetTaskResult(Task task)
+        {
+            PropertyInfo resultProperty = task.GetType().GetProperty(
+                "Result",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            return resultProperty != null
+                ? resultProperty.GetValue(task, null)
+                : null;
+        }
+
+        static Type GetRequiredCopilotType(string typeName)
+        {
+            Type type = FindCopilotType(typeName);
+            if (type != null)
+                return type;
+
+            throw new InvalidOperationException(
+                "Visual Studio's Copilot contract type '" + typeName + "' could not be found. " +
+                "Install or enable GitHub Copilot in this Visual Studio installation.");
+        }
+
+        static Type FindCopilotType(string typeName)
+        {
+            string fullName = CopilotNamespace + typeName;
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type type = SafeGetType(assembly, fullName);
+                if (type != null)
+                    return type;
+            }
+
+            foreach (string assemblyName in CopilotAssemblyNames)
+            {
+                try
+                {
+                    Assembly assembly = Assembly.Load(new AssemblyName(assemblyName));
+                    Type type = SafeGetType(assembly, fullName);
+                    if (type != null)
+                        return type;
+                }
+                catch (Exception ex) when (
+                    ex is FileNotFoundException ||
+                    ex is FileLoadException ||
+                    ex is BadImageFormatException)
+                {
+                }
+            }
+
+            foreach (string directory in GetCopilotSearchDirectories())
+            {
+                if (!Directory.Exists(directory))
+                    continue;
+
+                IEnumerable<string> files;
+                try
+                {
+                    files = Directory.EnumerateFiles(
+                        directory,
+                        "Microsoft.VisualStudio.Copilot*.dll",
+                        SearchOption.AllDirectories);
+                }
+                catch (Exception ex) when (
+                    ex is IOException ||
+                    ex is UnauthorizedAccessException)
+                {
+                    continue;
+                }
+
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        Assembly assembly = Assembly.LoadFrom(file);
+                        Type type = SafeGetType(assembly, fullName);
+                        if (type != null)
+                            return type;
+                    }
+                    catch (Exception ex) when (
+                        ex is FileNotFoundException ||
+                        ex is FileLoadException ||
+                        ex is BadImageFormatException)
+                    {
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        static Type SafeGetType(Assembly assembly, string fullName)
+        {
+            try
+            {
+                return assembly.GetType(fullName, false, false);
+            }
+            catch (Exception ex) when (
+                ex is FileNotFoundException ||
+                ex is FileLoadException ||
+                ex is TypeLoadException)
+            {
+                return null;
+            }
+        }
+
+        static IEnumerable<string> GetCopilotSearchDirectories()
+        {
+            HashSet<string> directories = new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase);
+
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            AddCopilotDirectory(directories, baseDirectory);
+
+            string installDirectory = Environment.GetEnvironmentVariable("VSINSTALLDIR");
+            if (!string.IsNullOrEmpty(installDirectory))
+            {
+                AddCopilotDirectory(
+                    directories,
+                    Path.Combine(installDirectory, "Common7", "IDE"));
+            }
+
+            return directories;
+        }
+
+        static void AddCopilotDirectory(HashSet<string> directories, string ideDirectory)
+        {
+            if (string.IsNullOrEmpty(ideDirectory))
+                return;
+
+            directories.Add(Path.Combine(
+                ideDirectory,
+                "Extensions",
+                "Microsoft",
+                "Copilot"));
+
+            directories.Add(Path.Combine(
+                ideDirectory,
+                "CommonExtensions",
+                "Microsoft",
+                "Copilot"));
+        }
+
+        static void DisposeObject(object value)
+        {
+            IDisposable disposable = value as IDisposable;
+            if (disposable != null)
+                disposable.Dispose();
         }
     }
 }

@@ -6,12 +6,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <!-- Compile against the VS Copilot contract, but never ship Microsoft's
-         implementation in the VSIX. The installed Visual Studio supplies it. -->
-    <PackageReference Include="Microsoft.VisualStudio.Copilot">
-      <PrivateAssets>all</PrivateAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
+    <!-- The Copilot contract ships with Visual Studio, not NuGet. Compile only
+         against the public VS SDK and resolve Copilot's contract at runtime. -->
     <PackageReference Include="Microsoft.VisualStudio.SDK" />
   </ItemGroup>
 </Project>
