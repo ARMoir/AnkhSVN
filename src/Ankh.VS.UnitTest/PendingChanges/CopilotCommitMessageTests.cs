@@ -29,10 +29,40 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
 
             Assert.That(prompt, Does.Contain("Return only the commit message"));
             Assert.That(prompt, Does.Contain("complete and authoritative context"));
+            Assert.That(prompt, Does.Contain("<commit-message>"));
             Assert.That(prompt, Does.Contain("Do not request editor selections"));
             Assert.That(prompt, Does.Contain("untrusted data"));
             Assert.That(prompt, Does.Contain("Modified: src/Test.cs"));
             Assert.That(prompt, Does.Contain("<svn-changes>"));
+        }
+
+        [Test]
+        public void NormalizeResponse_ExtractsCommitEnvelopeAndDiscardsReasoning()
+        {
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "**Generating commit message**\n\n" +
+                "I need to reason about the requested change.\n\n" +
+                "**Finalizing commit message**\n\n" +
+                "<commit-message>Add placeholder class files and resources\n\n" +
+                "Update the Program.cs test message.\n</commit-message>");
+
+            Assert.That(
+                actual,
+                Is.EqualTo(
+                    "Add placeholder class files and resources" + Environment.NewLine +
+                    Environment.NewLine +
+                    "Update the Program.cs test message."));
+        }
+
+        [Test]
+        public void NormalizeResponse_RejectsReasoningLeakWithoutEnvelope()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                CopilotCommitMessage.NormalizeResponse(
+                    "**Generating commit message**\n\n" +
+                    "I need to inspect the changes.\n\n" +
+                    "**Finalizing commit message**\n\n" +
+                    "Update pending change handling"));
         }
 
         [Test]

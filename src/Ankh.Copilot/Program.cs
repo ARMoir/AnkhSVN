@@ -44,7 +44,9 @@ namespace Ankh.Copilot
             "The request already contains the complete SVN pending-change data needed for the task. " +
             "Use only that supplied data. Do not ask for Visual Studio editor selections, active-file context, " +
             "error-list context, chat references, files, or any additional workspace context. " +
-            "Do not explain limitations or offer choices. Return only the requested commit-message text.";
+            "Do not explain limitations or offer choices. " +
+            "Place the final commit message, and only the final commit message, between " +
+            "<commit-message> and </commit-message> tags. Any planning or reasoning outside those tags is ignored.";
 
         static readonly string[] CopilotAssemblyNames =
         {

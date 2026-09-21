@@ -41,7 +41,9 @@ namespace Ankh.UI.PendingChanges
                 "The <svn-changes> block is the complete and authoritative context for this task.\n" +
                 "Do not request editor selections, active-file context, error-list context, file references, or any additional information.\n" +
                 "Do not offer choices or explain how to ask again. Generate the commit message now.\n" +
-                "Return only the commit message; do not add Markdown fences, headings, or commentary.\n" +
+                "Return the final commit message inside exactly one <commit-message>...</commit-message> block.\n" +
+                "Put only the commit message inside that block; any planning, reasoning, headings, or commentary must stay outside it.\n" +
+                "Do not add Markdown fences around the block.\n" +
                 "Use an imperative subject line, ideally 72 characters or fewer.\n" +
                 "If there is a body, put a blank line after the subject.\n" +
                 "Put each complete body sentence on its own line.\n" +
@@ -60,6 +62,32 @@ namespace Ankh.UI.PendingChanges
                 return string.Empty;
 
             string text = response.Trim();
+
+            const string startTag = "<commit-message>";
+            const string endTag = "</commit-message>";
+
+            int envelopeStart = text.IndexOf(startTag, StringComparison.OrdinalIgnoreCase);
+            if (envelopeStart >= 0)
+            {
+                int contentStart = envelopeStart + startTag.Length;
+                int envelopeEnd = text.IndexOf(
+                    endTag,
+                    contentStart,
+                    StringComparison.OrdinalIgnoreCase);
+
+                if (envelopeEnd < 0)
+                {
+                    throw new InvalidOperationException(
+                        "Visual Studio Copilot returned an incomplete commit-message response.");
+                }
+
+                text = text.Substring(contentStart, envelopeEnd - contentStart).Trim();
+            }
+            else if (ContainsReasoningLeak(text))
+            {
+                throw new InvalidOperationException(
+                    "Visual Studio Copilot returned planning/reasoning text instead of an isolated commit message.");
+            }
 
             // VS 2022's generic Copilot chat responder can occasionally answer
             // with instructions to add editor/file/error context instead of
@@ -86,6 +114,22 @@ namespace Ankh.UI.PendingChanges
 
             text = text.Replace("\r\n", "\n").Replace('\r', '\n');
             return FormatCommitMessage(text);
+        }
+
+        static bool ContainsReasoningLeak(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            return text.IndexOf(
+                       "**Generating commit message**",
+                       StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   text.IndexOf(
+                       "**Crafting commit message**",
+                       StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   text.IndexOf(
+                       "**Finalizing commit message**",
+                       StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         internal static string FormatCommitMessage(string text)
