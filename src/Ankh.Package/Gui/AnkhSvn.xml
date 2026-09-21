@@ -958,6 +958,9 @@
               text="Show &amp;All Files" iconFile="Scc/ShowAll.png"/>
           <Button id="Cmd_PendingChangesViewLogMessage" priority="0x300" name="ViewLogMessage"
               text="Show &amp;Message" iconFile="Scc/Comments.png"/>
+          <Button id="Cmd_PcGenerateCommitMessage" priority="0x400" name="GenerateCommitMessage"
+              text="&amp;Copilot" toolTip="Generate a commit message with GitHub Copilot"
+              iconFile="Scc/Comments.png" iconAndText="true" defaultDisabled="true"/>
         </Group>
         <Group id="Grp_PendingChangesItems" priority="0x300">
           <Menu id="Menu_ItemConflict" priority="0x100" name="Conflicts" type="MenuController">
