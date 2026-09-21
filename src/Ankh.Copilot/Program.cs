@@ -48,15 +48,18 @@ namespace Ankh.Copilot
                 return 2;
             }
 
-            await using (CopilotClient client = new CopilotClient())
+            CopilotClient client = new CopilotClient();
+            try
             {
                 await client.StartAsync();
 
-                await using (CopilotSession session = await client.CreateSessionAsync(
+                CopilotSession session = await client.CreateSessionAsync(
                     new SessionConfig
                     {
                         AvailableTools = new List<string>()
-                    }))
+                    });
+
+                try
                 {
                     AssistantMessageEvent response = await session.SendAndWaitAsync(
                         new MessageOptions { Prompt = prompt },
@@ -75,6 +78,14 @@ namespace Ankh.Copilot
                     Console.Out.Write(message);
                     return 0;
                 }
+                finally
+                {
+                    await session.DisposeAsync();
+                }
+            }
+            finally
+            {
+                await client.DisposeAsync();
             }
         }
     }
