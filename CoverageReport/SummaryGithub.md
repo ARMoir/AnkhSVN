@@ -3,19 +3,19 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 12:35:02 AM |
-| Coverage date: | 9/21/2026 - 12:34:43 AM - 9/21/2026 - 12:34:53 AM |
+| Generated on: | 9/21/2026 - 12:56:31 AM |
+| Coverage date: | 9/21/2026 - 12:56:09 AM - 9/21/2026 - 12:56:20 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 606 |
 | Files: | 673 |
-| **Line coverage:** | 8.3% (3871 of 46142) |
-| Covered lines: | 3871 |
-| Uncovered lines: | 42271 |
-| Coverable lines: | 46142 |
-| Total lines: | 130800 |
-| **Branch coverage:** | 10.8% (2399 of 22043) |
-| Covered branches: | 2399 |
+| **Line coverage:** | 8.4% (3909 of 46159) |
+| Covered lines: | 3909 |
+| Uncovered lines: | 42250 |
+| Coverable lines: | 46159 |
+| Total lines: | 130828 |
+| **Branch coverage:** | 10.9% (2409 of 22043) |
+| Covered branches: | 2409 |
 | Total branches: | 22043 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -385,11 +385,11 @@
 |Ankh.VSVersion|0%|0%|
 
 </details>
-<details><summary>Ankh.UI - 6.1%</summary>
+<details><summary>Ankh.UI - 6.2%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.UI**|**6.1%**|**6.9%**|
+|**Ankh.UI**|**6.2%**|**7.1%**|
 |Ankh.UI.AddRepositoryRootDialog|0%|0%|
 |Ankh.UI.AnkhUIModule|0%||
 |Ankh.UI.Annotate.AnnotateEditorControl|0%|0%|
@@ -595,7 +595,7 @@
 |Ankh.UI.VSSelectionControls.SmartListViewItem|0%|0%|
 |Ankh.UI.VSSelectionControls.SmartListViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.SmartSplitContainer|31.5%|18.1%|
-|Ankh.UI.VSSelectionControls.SmartTreeView|0%|0%|
+|Ankh.UI.VSSelectionControls.SmartTreeView|23.5%|17.2%|
 |Ankh.UI.VSSelectionControls.SmartTreeViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.TreeViewWithSelection`1|0%|0%|
 |Ankh.UI.WizardFramework.Wizard|42%|3.2%|
@@ -620,11 +620,11 @@
 |Ankh.UI.WorkingCopyExplorer.WorkingCopyExplorerControl|0%|0%|
 
 </details>
-<details><summary>Ankh.VS - 9.5%</summary>
+<details><summary>Ankh.VS - 9.7%</summary>
 
 |**Name**|**Line**|**Branch**|
 |:---|---:|---:|
-|**Ankh.VS**|**9.5%**|**9%**|
+|**Ankh.VS**|**9.7%**|**9%**|
 |Ankh.VS.AnkhVSModule|0%||
 |Ankh.VS.Dialogs.AnkhDialogOwner|0%|0%|
 |Ankh.VS.Dialogs.ContextCommandHandler|0%|0%|
@@ -684,7 +684,7 @@
 |Ankh.WpfPackage.Services.PaletteComboBoxPainter|0%|0%|
 |Ankh.WpfPackage.Services.PaletteNumericUpDownPainter|0%|0%|
 |Ankh.WpfPackage.Services.ThemeReflectionLogic|73.1%|70.8%|
-|Ankh.WpfPackage.Services.ThemingService|0%|0%|
+|Ankh.WpfPackage.Services.ThemingService|2.4%|0%|
 |Ankh.WpfPackage.Services.ThreadedWaitService|0%|0%|
 |Ankh.WpfPackage.Services.WinFormsNativeThemeLogic|100%|100%|
 
