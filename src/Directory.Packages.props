@@ -7,8 +7,8 @@
   </PropertyGroup>  
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="GitHub.Copilot.SDK" Version="1.0.14" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="Microsoft.VisualStudio.Copilot" Version="0.2.28-beta" />
     <PackageVersion Include="Microsoft.VisualStudio.SDK" Version="17.5.33428.388" />
     <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="17.5.4072" />
     <PackageVersion Include="Moq" Version="4.20.69" />

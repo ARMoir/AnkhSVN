@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Ankh.Copilot</AssemblyName>
     <RootNamespace>Ankh.Copilot</RootNamespace>
-    <PlatformTarget>x64</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GitHub.Copilot.SDK" />
+    <!-- Compile against the VS Copilot contract, but never ship Microsoft's
+         implementation in the VSIX. The installed Visual Studio supplies it. -->
+    <PackageReference Include="Microsoft.VisualStudio.Copilot">
+      <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" />
   </ItemGroup>
 </Project>

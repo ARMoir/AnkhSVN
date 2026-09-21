@@ -13,79 +13,106 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-using GitHub.Copilot;
+using Microsoft.ServiceHub.Framework;
+using Microsoft.VisualStudio.Copilot;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.ServiceBroker;
 
 namespace Ankh.Copilot
 {
-    static class Program
+    /// <summary>
+    /// Uses Visual Studio's brokered Copilot service. This deliberately runs
+    /// inside devenv only when invoked so it shares Visual Studio's Copilot
+    /// authentication instead of starting a second Copilot CLI login.
+    /// </summary>
+    public static class VisualStudioCopilot
     {
-        static int Main(string[] args)
+        public static async Task<string> GenerateAsync(string prompt)
         {
-            Console.InputEncoding = Encoding.UTF8;
-            Console.OutputEncoding = Encoding.UTF8;
-
-            try
-            {
-                return MainAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                return 1;
-            }
-        }
-
-        static async Task<int> MainAsync()
-        {
-            string prompt = await Console.In.ReadToEndAsync();
             if (string.IsNullOrWhiteSpace(prompt))
+                throw new ArgumentException("A Copilot prompt is required.", "prompt");
+
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            IBrokeredServiceContainer container =
+                await AsyncServiceProvider.GlobalProvider
+                    .GetServiceAsync<SVsBrokeredServiceContainer, IBrokeredServiceContainer>();
+
+            if (container == null)
+                throw new InvalidOperationException("Visual Studio's brokered service container is unavailable.");
+
+            IServiceBroker serviceBroker = container.GetFullAccessServiceBroker();
+            if (serviceBroker == null)
+                throw new InvalidOperationException("Visual Studio's full-access service broker is unavailable.");
+
+            ICopilotService copilotService =
+                await serviceBroker.GetProxyAsync<ICopilotService>(
+                    CopilotDescriptors.CopilotService,
+                    cancellationToken);
+
+            if (copilotService == null)
             {
-                Console.Error.WriteLine("No commit-message prompt was supplied.");
-                return 2;
+                throw new InvalidOperationException(
+                    "Visual Studio Copilot is not available. Install/enable GitHub Copilot and sign in to Copilot in Visual Studio.");
             }
 
-            CopilotClient client = new CopilotClient();
             try
             {
-                await client.StartAsync();
+                bool available = await copilotService.CheckAvailabilityAsync(cancellationToken);
+                if (!available)
+                {
+                    throw new InvalidOperationException(
+                        "Visual Studio Copilot is installed but is not currently available. Make sure Copilot is enabled and signed in.");
+                }
 
-                CopilotSession session = await client.CreateSessionAsync(
-                    new SessionConfig
-                    {
-                        AvailableTools = new List<string>()
-                    });
+                CopilotSessionOptions options =
+                    new CopilotSessionOptions(new CopilotClientId("AnkhSVN"));
+
+                ICopilotSession session =
+                    await copilotService.StartSessionAsync(options, cancellationToken);
+
+                if (session == null)
+                    throw new InvalidOperationException("Visual Studio Copilot could not start a session.");
 
                 try
                 {
-                    AssistantMessageEvent response = await session.SendAndWaitAsync(
-                        new MessageOptions { Prompt = prompt },
-                        TimeSpan.FromSeconds(75));
+                    CopilotRequest request = new CopilotRequest(prompt);
+                    CopilotResponse response =
+                        await session.SendRequestAsync(request, cancellationToken);
 
-                    string message = response != null && response.Data != null
-                        ? response.Data.Content
-                        : null;
+                    if (response == null)
+                        throw new InvalidOperationException("Visual Studio Copilot returned no response.");
 
-                    if (string.IsNullOrWhiteSpace(message))
+                    StringBuilder text = new StringBuilder();
+                    foreach (CopilotContentTextPart part in response.Content.OfType<CopilotContentTextPart>())
+                        text.Append(part.Content);
+
+                    string result = text.ToString().Trim();
+                    if (result.Length == 0)
                     {
-                        Console.Error.WriteLine("GitHub Copilot returned no commit message.");
-                        return 3;
+                        throw new InvalidOperationException(
+                            "Visual Studio Copilot returned a response without commit-message text.");
                     }
 
-                    Console.Out.Write(message);
-                    return 0;
+                    return result;
                 }
                 finally
                 {
-                    await session.DisposeAsync();
+                    IDisposable disposableSession = session as IDisposable;
+                    if (disposableSession != null)
+                        disposableSession.Dispose();
                 }
             }
             finally
             {
-                await client.DisposeAsync();
+                IDisposable disposableService = copilotService as IDisposable;
+                if (disposableService != null)
+                    disposableService.Dispose();
             }
         }
     }

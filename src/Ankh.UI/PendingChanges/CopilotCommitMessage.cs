@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using Ankh.Scc;
 using SharpSvn;
@@ -238,87 +238,56 @@ namespace Ankh.UI.PendingChanges
         internal static async Task<string> GenerateAsync(string context)
         {
             string assemblyDirectory = Path.GetDirectoryName(typeof(CopilotCommitMessage).Assembly.Location);
-            string helperPath = Path.Combine(assemblyDirectory, "Ankh.Copilot.exe");
+            string helperPath = Path.Combine(assemblyDirectory, "Ankh.Copilot.dll");
 
             if (!File.Exists(helperPath))
-                throw new FileNotFoundException("The AnkhSVN GitHub Copilot helper is not installed.", helperPath);
-
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = helperPath;
-            startInfo.WorkingDirectory = assemblyDirectory;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardInput = true;
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.StandardOutputEncoding = Encoding.UTF8;
-            startInfo.StandardErrorEncoding = Encoding.UTF8;
-
-            using (Process process = new Process())
             {
-                process.StartInfo = startInfo;
-                process.EnableRaisingEvents = true;
+                throw new FileNotFoundException(
+                    "The AnkhSVN Visual Studio Copilot bridge is not installed.",
+                    helperPath);
+            }
 
-                if (!process.Start())
-                    throw new InvalidOperationException("Unable to start the AnkhSVN GitHub Copilot helper.");
+            try
+            {
+                Assembly helperAssembly = Assembly.LoadFrom(helperPath);
+                Type helperType = helperAssembly.GetType(
+                    "Ankh.Copilot.VisualStudioCopilot",
+                    true,
+                    false);
 
-                Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
-                Task<string> standardError = process.StandardError.ReadToEndAsync();
-                Task<int> exit = WaitForExitAsync(process);
+                MethodInfo generate = helperType.GetMethod(
+                    "GenerateAsync",
+                    BindingFlags.Public | BindingFlags.Static);
 
-                await process.StandardInput.WriteAsync(BuildPrompt(context));
-                process.StandardInput.Close();
+                if (generate == null)
+                    throw new MissingMethodException(helperType.FullName, "GenerateAsync");
 
-                Task completed = await Task.WhenAny(exit, Task.Delay(HelperTimeout));
-                if (completed != exit)
-                {
-                    try
-                    {
-                        process.Kill();
-                    }
-                    catch
-                    {
-                    }
+                Task<string> task = generate.Invoke(
+                    null,
+                    new object[] { BuildPrompt(context) }) as Task<string>;
 
-                    throw new TimeoutException("GitHub Copilot did not respond within 90 seconds.");
-                }
+                if (task == null)
+                    throw new InvalidOperationException("The Visual Studio Copilot bridge returned an invalid task.");
 
-                int exitCode = await exit;
-                string output = await standardOutput;
-                string error = await standardError;
+                string result = await task;
+                return NormalizeResponse(result);
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null)
+                    throw new InvalidOperationException(ex.InnerException.Message, ex.InnerException);
 
-                if (exitCode != 0)
-                {
-                    if (string.IsNullOrWhiteSpace(error))
-                        error = "The GitHub Copilot helper exited with code " + exitCode + ".";
-
-                    throw new InvalidOperationException(error.Trim());
-                }
-
-                return NormalizeResponse(output);
+                throw;
+            }
+            catch (FileNotFoundException ex)
+            {
+                throw new InvalidOperationException(
+                    "Visual Studio's Copilot integration is not available in this Visual Studio installation. " +
+                    "AnkhSVN itself remains supported; AI commit-message generation requires a Visual Studio 2022 version with GitHub Copilot installed. " +
+                    ex.Message,
+                    ex);
             }
         }
 
-        static Task<int> WaitForExitAsync(Process process)
-        {
-            TaskCompletionSource<int> completion = new TaskCompletionSource<int>();
-
-            EventHandler handler = null;
-            handler = delegate
-            {
-                process.Exited -= handler;
-                completion.TrySetResult(process.ExitCode);
-            };
-
-            process.Exited += handler;
-
-            if (process.HasExited)
-            {
-                process.Exited -= handler;
-                completion.TrySetResult(process.ExitCode);
-            }
-
-            return completion.Task;
-        }
     }
 }
