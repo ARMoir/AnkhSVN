@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 5:44:01 PM |
-| Coverage date: | 9/21/2026 - 5:43:40 PM - 9/21/2026 - 5:43:51 PM |
+| Generated on: | 9/21/2026 - 5:52:10 PM |
+| Coverage date: | 9/21/2026 - 5:51:49 PM - 9/21/2026 - 5:52:00 PM |
 | Parser: | MultiReport (4x Cobertura) |
-| Assemblies: | 11 |
-| Classes: | 610 |
-| Files: | 678 |
-| **Line coverage:** | 8.7% (4082 of 46614) |
+| Assemblies: | 10 |
+| Classes: | 609 |
+| Files: | 677 |
+| **Line coverage:** | 8.7% (4082 of 46569) |
 | Covered lines: | 4082 |
-| Uncovered lines: | 42532 |
-| Coverable lines: | 46614 |
-| Total lines: | 131723 |
-| **Branch coverage:** | 11.1% (2493 of 22265) |
+| Uncovered lines: | 42487 |
+| Coverable lines: | 46569 |
+| Total lines: | 131631 |
+| **Branch coverage:** | 11.2% (2493 of 22257) |
 | Covered branches: | 2493 |
-| Total branches: | 22265 |
+| Total branches: | 22257 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -111,14 +111,6 @@
 |Ankh.Services.TempDirManager|0%|0%|
 |Ankh.Services.TempFileManager|0%|0%|
 |Ankh.Settings.SolutionSettings|13%|24.5%|
-
-</details>
-<details><summary>Ankh.Copilot - 0%</summary>
-
-|**Name**|**Line**|**Branch**|
-|:---|---:|---:|
-|**Ankh.Copilot**|**0%**|**0%**|
-|Ankh.Copilot.Program|0%|0%|
 
 </details>
 <details><summary>Ankh.Diff - 7.5%</summary>
