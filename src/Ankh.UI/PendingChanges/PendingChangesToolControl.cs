@@ -61,6 +61,10 @@ namespace Ankh.UI.PendingChanges
             issuesButton.Image = VSVersion.VS2012OrLater ? PCResources.Issues : PCResources.IssuesOld;
             recentChangesButton.Image = VSVersion.VS2012OrLater ? PCResources.RecentChanges : PCResources.RecentChangesOld;
             conflictsButton.Image = VSVersion.VS2012OrLater ? PCResources.Conflicts : PCResources.ConflictsOld;
+
+            pendingChangesTabs.BackColorChanged += delegate { RefreshNavigationIcons(); };
+            pendingChangesTabs.DpiChangedAfterParent += delegate { RefreshNavigationIcons(); };
+            Disposed += delegate { DisposeNavigationIcons(); };
         }
 
         protected override void OnLoad(EventArgs e)
@@ -125,11 +129,13 @@ namespace Ankh.UI.PendingChanges
                 p.OnThemeChanged(e);
             }
 
+            RefreshNavigationIcons();
             pendingChangesTabs.Invalidate();
         }
 
         void OnSccShellActivate(object sender, EventArgs e)
         {
+            RefreshNavigationIcons();
             IAnkhCommandStates states = Context.GetService<IAnkhCommandStates>();
 
             if (states != null && states.SccProviderActive)
