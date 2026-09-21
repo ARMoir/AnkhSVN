@@ -55,5 +55,38 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
                     Environment.NewLine +
                     "Keep the list synchronized."));
         }
+
+        [Test]
+        public void NormalizeResponse_PutsEachBodySentenceOnItsOwnLine()
+        {
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "Add placeholder classes and resources\n" +
+                "Add three empty internal classes and new resource files. " +
+                "Update Program.cs test line from old to new.");
+
+            Assert.That(
+                actual,
+                Is.EqualTo(
+                    "Add placeholder classes and resources" + Environment.NewLine +
+                    Environment.NewLine +
+                    "Add three empty internal classes and new resource files." + Environment.NewLine +
+                    "Update Program.cs test line from old to new."));
+        }
+
+        [Test]
+        public void NormalizeResponse_RecognizesDoubleSpaceSubjectBodySeparator()
+        {
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "Add placeholder classes and resources  " +
+                "Add three empty internal classes. Update Program.cs test string.");
+
+            Assert.That(
+                actual,
+                Is.EqualTo(
+                    "Add placeholder classes and resources" + Environment.NewLine +
+                    Environment.NewLine +
+                    "Add three empty internal classes." + Environment.NewLine +
+                    "Update Program.cs test string."));
+        }
     }
 }

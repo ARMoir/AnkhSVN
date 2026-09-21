@@ -285,6 +285,9 @@ namespace Ankh.Copilot
                     if (part == null)
                         continue;
 
+                    if (!IsUserVisibleContentPart(part))
+                        continue;
+
                     PropertyInfo partContent = part.GetType().GetProperty(
                         "Content",
                         BindingFlags.Public | BindingFlags.Instance);
@@ -293,8 +296,17 @@ namespace Ankh.Copilot
                         continue;
 
                     string value = partContent.GetValue(part, null) as string;
-                    if (!string.IsNullOrEmpty(value))
-                        text.Append(value);
+                    if (string.IsNullOrWhiteSpace(value))
+                        continue;
+
+                    if (text.Length > 0 &&
+                        text[text.Length - 1] != '\r' &&
+                        text[text.Length - 1] != '\n')
+                    {
+                        text.AppendLine();
+                    }
+
+                    text.Append(value.Trim());
                 }
             }
 
@@ -313,6 +325,29 @@ namespace Ankh.Copilot
             throw new InvalidOperationException(
                 "Visual Studio Copilot returned a response without commit-message text" +
                 (status != null ? " (status: " + status + ")." : "."));
+        }
+
+        static bool IsUserVisibleContentPart(object part)
+        {
+            PropertyInfo visibilityProperty = part.GetType().GetProperty(
+                "Visibility",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            if (visibilityProperty == null)
+                return true;
+
+            object visibility = visibilityProperty.GetValue(part, null);
+            if (visibility == null)
+                return true;
+
+            // CopilotContentVisibility.Model is internal/model-only material
+            // such as reasoning or planning. User and All are safe to surface.
+            // Unknown future values are left visible for compatibility; only
+            // the explicitly model-only value is suppressed.
+            return !string.Equals(
+                visibility.ToString(),
+                "Model",
+                StringComparison.OrdinalIgnoreCase);
         }
 
         static async Task<object> AwaitResultAsync(object awaitable)

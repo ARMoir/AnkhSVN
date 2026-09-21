@@ -40,6 +40,8 @@ namespace Ankh.UI.PendingChanges
                 "Write a concise Subversion commit message for the selected pending changes below.\n" +
                 "Return only the commit message; do not add Markdown fences, headings, or commentary.\n" +
                 "Use an imperative subject line, ideally 72 characters or fewer.\n" +
+                "If there is a body, put a blank line after the subject.\n" +
+                "Put each complete body sentence on its own line.\n" +
                 "Add a short body only when it clarifies intent or important behavior.\n" +
                 "Describe the purpose of the change rather than merely listing file names.\n" +
                 "Do not invent issue numbers, behavior, or implementation details that are not supported by the change data.\n" +
@@ -69,7 +71,194 @@ namespace Ankh.UI.PendingChanges
                 text = text.Substring(label.Length).Trim();
 
             text = text.Replace("\r\n", "\n").Replace('\r', '\n');
-            return text.Replace("\n", Environment.NewLine).Trim();
+            return FormatCommitMessage(text);
+        }
+
+        internal static string FormatCommitMessage(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            string normalized = text
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n')
+                .Trim();
+
+            // Some Copilot responders return "subject  body" as a single
+            // content part. Treat a double-space boundary as the subject/body
+            // separator when no explicit line break was supplied.
+            if (normalized.IndexOf('\n') < 0)
+            {
+                int separator = normalized.IndexOf("  ", StringComparison.Ordinal);
+                if (separator > 0)
+                {
+                    string subjectPart = normalized.Substring(0, separator).Trim();
+                    string bodyPart = normalized.Substring(separator).Trim();
+
+                    if (subjectPart.Length > 0 && bodyPart.Length > 0)
+                        normalized = subjectPart + "\n" + bodyPart;
+                }
+            }
+
+            string[] rawLines = normalized.Split(new[] { '\n' }, StringSplitOptions.None);
+            int subjectIndex = 0;
+
+            while (subjectIndex < rawLines.Length &&
+                   string.IsNullOrWhiteSpace(rawLines[subjectIndex]))
+            {
+                subjectIndex++;
+            }
+
+            if (subjectIndex >= rawLines.Length)
+                return string.Empty;
+
+            string subject = rawLines[subjectIndex].Trim();
+            int bodyIndex = subjectIndex + 1;
+
+            while (bodyIndex < rawLines.Length &&
+                   string.IsNullOrWhiteSpace(rawLines[bodyIndex]))
+            {
+                bodyIndex++;
+            }
+
+            if (bodyIndex >= rawLines.Length)
+                return subject;
+
+            List<string> output = new List<string>();
+            output.Add(subject);
+            output.Add(string.Empty);
+
+            StringBuilder paragraph = new StringBuilder();
+
+            for (int i = bodyIndex; i < rawLines.Length; i++)
+            {
+                string line = rawLines[i].Trim();
+
+                if (line.Length == 0)
+                {
+                    FlushBodyParagraph(output, paragraph);
+
+                    if (output.Count > 0 &&
+                        output[output.Count - 1].Length > 0)
+                    {
+                        output.Add(string.Empty);
+                    }
+
+                    continue;
+                }
+
+                if (IsListItem(line))
+                {
+                    FlushBodyParagraph(output, paragraph);
+                    output.Add(line);
+                    continue;
+                }
+
+                if (paragraph.Length > 0)
+                    paragraph.Append(' ');
+
+                paragraph.Append(line);
+            }
+
+            FlushBodyParagraph(output, paragraph);
+
+            while (output.Count > 0 &&
+                   output[output.Count - 1].Length == 0)
+            {
+                output.RemoveAt(output.Count - 1);
+            }
+
+            return string.Join(Environment.NewLine, output);
+        }
+
+        static void FlushBodyParagraph(List<string> output, StringBuilder paragraph)
+        {
+            if (paragraph.Length == 0)
+                return;
+
+            foreach (string sentence in SplitSentences(paragraph.ToString()))
+                output.Add(sentence);
+
+            paragraph.Clear();
+        }
+
+        static IEnumerable<string> SplitSentences(string paragraph)
+        {
+            List<string> sentences = new List<string>();
+            int start = 0;
+
+            for (int i = 0; i < paragraph.Length; i++)
+            {
+                char c = paragraph[i];
+                if (c != '.' && c != '!' && c != '?')
+                    continue;
+
+                int next = i + 1;
+                if (next >= paragraph.Length || !char.IsWhiteSpace(paragraph[next]))
+                    continue;
+
+                while (next < paragraph.Length && char.IsWhiteSpace(paragraph[next]))
+                    next++;
+
+                if (next >= paragraph.Length)
+                {
+                    string finalSentence = paragraph.Substring(start, i - start + 1).Trim();
+                    if (finalSentence.Length > 0)
+                        sentences.Add(finalSentence);
+
+                    start = paragraph.Length;
+                    break;
+                }
+
+                char nextCharacter = paragraph[next];
+                if (!char.IsUpper(nextCharacter) &&
+                    !char.IsDigit(nextCharacter) &&
+                    nextCharacter != '"' &&
+                    nextCharacter != '\'' &&
+                    nextCharacter != '(' &&
+                    nextCharacter != '[')
+                {
+                    continue;
+                }
+
+                string sentence = paragraph.Substring(start, i - start + 1).Trim();
+                if (sentence.Length > 0)
+                    sentences.Add(sentence);
+
+                start = next;
+                i = next - 1;
+            }
+
+            if (start < paragraph.Length)
+            {
+                string remainder = paragraph.Substring(start).Trim();
+                if (remainder.Length > 0)
+                    sentences.Add(remainder);
+            }
+
+            return sentences;
+        }
+
+        static bool IsListItem(string line)
+        {
+            if (line.StartsWith("- ", StringComparison.Ordinal) ||
+                line.StartsWith("* ", StringComparison.Ordinal) ||
+                line.StartsWith("• ", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            int dot = line.IndexOf('.');
+            if (dot <= 0 || dot > 3)
+                return false;
+
+            for (int i = 0; i < dot; i++)
+            {
+                if (!char.IsDigit(line[i]))
+                    return false;
+            }
+
+            return dot + 1 < line.Length && char.IsWhiteSpace(line[dot + 1]);
         }
 
         internal static string BuildChangeContext(IEnumerable<PendingChange> changes, string projectRoot)
