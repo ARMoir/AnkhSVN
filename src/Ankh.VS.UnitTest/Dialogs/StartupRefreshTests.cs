@@ -146,6 +146,40 @@ namespace AnkhSvn_UnitTestProject.Dialogs
             }
         }
 
+
+        [Test]
+        public void SolutionExplorerFrameDetectionRejectsNullFailuresAndOtherWindows()
+        {
+            Assert.That(StartupRefreshService.IsSolutionExplorerFrame(null), Is.False);
+
+            Guid failedGuid = Guid.Empty;
+            var failedFrame = new Mock<IVsWindowFrame>();
+            failedFrame
+                .Setup(x => x.GetGuidProperty(
+                    (int)__VSFPROPID.VSFPROPID_GuidPersistenceSlot,
+                    out failedGuid))
+                .Returns(-1);
+            Assert.That(StartupRefreshService.IsSolutionExplorerFrame(failedFrame.Object), Is.False);
+
+            Guid otherGuid = Guid.NewGuid();
+            var otherFrame = new Mock<IVsWindowFrame>();
+            otherFrame
+                .Setup(x => x.GetGuidProperty(
+                    (int)__VSFPROPID.VSFPROPID_GuidPersistenceSlot,
+                    out otherGuid))
+                .Returns(0);
+            Assert.That(StartupRefreshService.IsSolutionExplorerFrame(otherFrame.Object), Is.False);
+
+            Guid solutionExplorerGuid = new Guid(ToolWindowGuids.SolutionExplorer);
+            var solutionExplorerFrame = new Mock<IVsWindowFrame>();
+            solutionExplorerFrame
+                .Setup(x => x.GetGuidProperty(
+                    (int)__VSFPROPID.VSFPROPID_GuidPersistenceSlot,
+                    out solutionExplorerGuid))
+                .Returns(0);
+            Assert.That(StartupRefreshService.IsSolutionExplorerFrame(solutionExplorerFrame.Object), Is.True);
+        }
+
         [Test]
         public void ImageServiceLookupRetriesAfterEarlyStartupMiss()
         {
