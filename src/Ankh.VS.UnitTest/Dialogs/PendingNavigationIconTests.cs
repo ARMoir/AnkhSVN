@@ -39,6 +39,30 @@ namespace AnkhSvn_UnitTestProject.Dialogs
             }
         }
 
+
+        [Test]
+        public void PendingChangeMonikerUsesNavigationRenderPipeline()
+        {
+            var service = new Mock<IVsImageService2>();
+            var image = new Mock<IVsUIObject>();
+            using (var source = new Bitmap(32, 32))
+            {
+                object data = source;
+                image.Setup(x => x.get_Data(out data)).Returns(0);
+                ImageMoniker requested = new ImageMoniker();
+                service.Setup(x => x.GetImage(It.IsAny<ImageMoniker>(), It.IsAny<ImageAttributes>()))
+                    .Callback<ImageMoniker, ImageAttributes>((moniker, attributes) => requested = moniker)
+                    .Returns(image.Object);
+
+                using (var result = PendingChangesToolControl.RenderNavigationIcon(
+                    service.Object, KnownMonikers.PendingChange, Color.White, 96))
+                {
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(requested, Is.EqualTo(KnownMonikers.PendingChange));
+                }
+            }
+        }
+
         [Test]
         public void UnavailableImageAllowsExistingIconToRemain()
         {
