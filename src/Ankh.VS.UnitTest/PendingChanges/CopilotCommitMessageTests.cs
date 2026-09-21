@@ -97,14 +97,15 @@ namespace AnkhSvn_UnitTestProject.PendingChanges
         }
 
         [Test]
-        public void NormalizeResponse_RejectsReasoningLeakWithoutEnvelope()
+        public void NormalizeResponse_ExtractsSubjectAfterReasoningWithoutEnvelope()
         {
-            Assert.Throws<InvalidOperationException>(() =>
-                CopilotCommitMessage.NormalizeResponse(
-                    "**Generating commit message**\n\n" +
-                    "I need to inspect the changes.\n\n" +
-                    "**Finalizing commit message**\n\n" +
-                    "Update pending change handling"));
+            string actual = CopilotCommitMessage.NormalizeResponse(
+                "**Generating commit message**\n\n" +
+                "I need to inspect the changes.\n\n" +
+                "**Finalizing commit message**\n\n" +
+                "Update pending change handling");
+
+            Assert.That(actual, Is.EqualTo("Update pending change handling"));
         }
 
         [Test]

@@ -55,6 +55,18 @@ namespace Ankh.Copilot
             "Microsoft.VisualStudio.Copilot.Contracts"
         };
 
+        // GitHub uses small utility models for background features such as
+        // commit-message generation. Prefer those families when the running
+        // Visual Studio Copilot responder reports them as available, rather
+        // than inheriting the user's interactive Chat/reasoning model.
+        static readonly string[] CommitMessageModelFamilies =
+        {
+            "gpt-4o-mini",
+            "gpt-4o",
+            "gpt-4.1",
+            "gpt-5.4-nano"
+        };
+
         public static async Task<string> GenerateAsync(string prompt)
         {
             if (string.IsNullOrWhiteSpace(prompt))
@@ -250,7 +262,7 @@ namespace Ankh.Copilot
             Type requestType = GetRequiredCopilotType("CopilotRequest");
             object request = Activator.CreateInstance(requestType, new object[] { prompt });
 
-            ConfigureCommitMessageRequest(request);
+            await ConfigureCommitMessageRequestAsync(session, request);
 
             MethodInfo sendRequest = session.GetType().GetMethod(
                 "SendRequestAsync",
@@ -274,7 +286,7 @@ namespace Ankh.Copilot
             return await AwaitResultAsync(invocation);
         }
 
-        static void ConfigureCommitMessageRequest(object request)
+        static async Task ConfigureCommitMessageRequestAsync(object session, object request)
         {
             if (request == null)
                 return;
@@ -315,6 +327,110 @@ namespace Ankh.Copilot
 
             object noIntent = Enum.Parse(intentType, "None", false);
             intentProperty.SetValue(request, noIntent, null);
+
+            await TryUseCommitMessageUtilityModelAsync(session, request);
+        }
+
+        static async Task TryUseCommitMessageUtilityModelAsync(
+            object session,
+            object request)
+        {
+            if (session == null || request == null)
+                return;
+
+            PropertyInfo modelProperty = request.GetType().GetProperty(
+                "Model",
+                BindingFlags.Public | BindingFlags.Instance);
+
+            if (modelProperty == null || !modelProperty.CanWrite)
+                return;
+
+            IEnumerable models = null;
+
+            try
+            {
+                MethodInfo getModels = session.GetType().GetMethod(
+                    "GetDefaultModelsAsync",
+                    new[] { typeof(CancellationToken) });
+
+                if (getModels == null)
+                {
+                    Type sessionType = FindCopilotType("ICopilotSession");
+                    if (sessionType != null)
+                    {
+                        getModels = sessionType.GetMethod(
+                            "GetDefaultModelsAsync",
+                            new[] { typeof(CancellationToken) });
+                    }
+                }
+
+                if (getModels == null)
+                    return;
+
+                object invocation = getModels.Invoke(
+                    session,
+                    new object[] { CancellationToken.None });
+
+                object result = await AwaitResultAsync(invocation);
+                models = result as IEnumerable;
+            }
+            catch
+            {
+                // Model discovery is an optional optimization. If a particular
+                // VS Copilot build cannot enumerate models, keep its default
+                // model and rely on the response filtering fallback.
+                return;
+            }
+
+            string family = SelectCommitMessageModelFamily(models);
+            if (string.IsNullOrEmpty(family))
+                return;
+
+            Type modelRequestType = Nullable.GetUnderlyingType(
+                modelProperty.PropertyType) ?? modelProperty.PropertyType;
+
+            ConstructorInfo constructor = modelRequestType.GetConstructor(
+                new[] { typeof(string) });
+
+            if (constructor == null)
+                return;
+
+            object modelRequest = constructor.Invoke(new object[] { family });
+            modelProperty.SetValue(request, modelRequest, null);
+        }
+
+        static string SelectCommitMessageModelFamily(IEnumerable models)
+        {
+            if (models == null)
+                return null;
+
+            HashSet<string> availableFamilies = new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (object model in models)
+            {
+                if (model == null)
+                    continue;
+
+                PropertyInfo familyProperty = model.GetType().GetProperty(
+                    "Family",
+                    BindingFlags.Public | BindingFlags.Instance);
+
+                string family = familyProperty != null
+                    ? familyProperty.GetValue(model, null) as string
+                    : null;
+
+                if (!string.IsNullOrWhiteSpace(family))
+                    availableFamilies.Add(family.Trim());
+            }
+
+            foreach (string preferredFamily in CommitMessageModelFamilies)
+            {
+                if (availableFamilies.Contains(preferredFamily))
+                    return preferredFamily;
+            }
+
+            return null;
         }
 
         static string ExtractResponseText(object response)
