@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Drawing;
+
+using Ankh.UI;
+
 namespace Ankh.WpfPackage.Services
 {
     internal static class WinFormsNativeThemeLogic
@@ -20,9 +24,9 @@ namespace Ankh.WpfPackage.Services
         internal const string DarkComboTheme = "DarkMode_CFD";
         internal const string DarkItemsViewTheme = "DarkMode_ItemsView";
 
-        internal static bool ShouldUseDarkTheme(bool themeDark, bool highContrast)
+        internal static bool ShouldUseDarkTheme(Color background, bool highContrast)
         {
-            return themeDark && !highContrast;
+            return !highContrast && AnkhThemePalette.IsDark(background);
         }
 
         internal static bool ShouldUseDarkButtonRendering(bool useDarkNativeTheme)

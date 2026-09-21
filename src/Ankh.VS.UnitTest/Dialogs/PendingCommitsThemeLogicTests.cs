@@ -20,19 +20,19 @@ namespace AnkhSvn_UnitTestProject.Dialogs
     [TestFixture]
     public class PendingCommitsThemeLogicTests
     {
-        [TestCase(true, false, true)]
+        [TestCase(false, false, true)]
+        [TestCase(true, false, false)]
         [TestCase(false, true, false)]
         [TestCase(true, true, false)]
-        [TestCase(false, false, false)]
-        public void LightHeaderOptOutNeverWinsOverDarkTheme(
-            bool themeLight,
-            bool themeDark,
+        public void HeaderOptOutUsesSurfaceLuminanceAndHonorsHighContrast(
+            bool darkSurface,
+            bool highContrast,
             bool expected)
         {
             Assert.That(
                 PendingCommitsThemeLogic.ShouldCancelVsHeaderTheming(
-                    themeLight,
-                    themeDark),
+                    darkSurface,
+                    highContrast),
                 Is.EqualTo(expected));
         }
     }

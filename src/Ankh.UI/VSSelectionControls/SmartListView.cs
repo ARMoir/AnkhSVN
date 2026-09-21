@@ -498,6 +498,9 @@ namespace Ankh.UI.VSSelectionControls
 
         bool _isThemed;
         bool _ownerDrawDarkHeader;
+        Color _headerBackColor;
+        Color _headerForeColor;
+        Color _headerBorderColor;
 
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -525,9 +528,15 @@ namespace Ankh.UI.VSSelectionControls
                 return;
             }
 
-            Color headerBack = ControlPaint.Light(BackColor, 0.08f);
-            Color headerFore = ForeColor;
-            Color border = ControlPaint.Light(BackColor, 0.20f);
+            Color headerBack = _headerBackColor.IsEmpty
+                ? BackColor
+                : _headerBackColor;
+            Color headerFore = _headerForeColor.IsEmpty
+                ? ForeColor
+                : _headerForeColor;
+            Color border = _headerBorderColor.IsEmpty
+                ? AnkhThemePalette.Blend(ForeColor, BackColor, 0.25)
+                : _headerBorderColor;
 
             using (SolidBrush background = new SolidBrush(headerBack))
                 e.Graphics.FillRectangle(background, e.Bounds);
@@ -1395,10 +1404,30 @@ namespace Ankh.UI.VSSelectionControls
         {
             ShowSelectAllCheckBox = false; // Not supported by VS theming. Disable to avoid problems and unnecessary work :(
 
-            IAnkhCommandStates states = sender.GetService<IAnkhCommandStates>();
+            IWinFormsThemingService themer = sender.GetService<IWinFormsThemingService>();
+            AnkhThemePalette palette = themer != null ? themer.ThemePalette : null;
+            bool darkSurface = palette != null
+                ? palette.IsDarkSurface
+                : AnkhThemePalette.IsDark(BackColor);
+
+            if (palette != null)
+            {
+                BackColor = palette.SurfaceBackground;
+                ForeColor = palette.SurfaceForeground;
+                _headerBackColor = palette.HoverBackground;
+                _headerForeColor = palette.SurfaceForeground;
+                _headerBorderColor = palette.Border;
+            }
+            else
+            {
+                _headerBackColor = Color.Empty;
+                _headerForeColor = Color.Empty;
+                _headerBorderColor = Color.Empty;
+            }
+
             _ownerDrawDarkHeader = SmartListViewThemeLogic.ShouldOwnerDrawDarkHeader(
                 e.Cancel,
-                states != null && states.ThemeDark,
+                darkSurface,
                 SystemInformation.HighContrast);
 
             OwnerDraw = _ownerDrawDarkHeader;

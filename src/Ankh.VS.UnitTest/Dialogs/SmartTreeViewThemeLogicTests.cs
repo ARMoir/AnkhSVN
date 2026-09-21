@@ -24,16 +24,16 @@ namespace AnkhSvn_UnitTestProject.Dialogs
         [TestCase(false, true, false, false)]
         [TestCase(true, false, false, false)]
         [TestCase(true, true, true, false)]
-        public void DarkNativeTreeThemeRequiresActiveVsDarkTheme(
+        public void DarkNativeTreeThemeRequiresActiveDarkSurface(
             bool inVsTheming,
-            bool themeDark,
+            bool darkSurface,
             bool highContrast,
             bool expected)
         {
             Assert.That(
                 SmartTreeViewThemeLogic.ShouldUseDarkNativeTheme(
                     inVsTheming,
-                    themeDark,
+                    darkSurface,
                     highContrast),
                 Is.EqualTo(expected));
         }

@@ -18,10 +18,10 @@ namespace Ankh.UI.VSSelectionControls
     {
         internal static bool ShouldOwnerDrawDarkHeader(
             bool themeCancelled,
-            bool themeDark,
+            bool darkSurface,
             bool highContrast)
         {
-            return !themeCancelled && themeDark && !highContrast;
+            return !themeCancelled && darkSurface && !highContrast;
         }
     }
 }

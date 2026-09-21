@@ -17,14 +17,12 @@ namespace Ankh.UI.PendingChanges.Commits
     internal static class PendingCommitsThemeLogic
     {
         internal static bool ShouldCancelVsHeaderTheming(
-            bool themeLight,
-            bool themeDark)
+            bool darkSurface,
+            bool highContrast)
         {
-            // Older Ankh theme detection can report both flags before VS has
-            // supplied a concrete theme id. Prefer dark rendering in that
-            // ambiguous state so a visibly dark VS shell never gets a light
-            // native header.
-            return themeLight && !themeDark;
+            // The select-all header needs custom handling on ordinary light
+            // surfaces. High contrast is left entirely to Visual Studio/Windows.
+            return !darkSurface && !highContrast;
         }
     }
 }

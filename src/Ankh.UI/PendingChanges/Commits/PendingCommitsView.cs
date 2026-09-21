@@ -320,19 +320,19 @@ namespace Ankh.UI.PendingChanges.Commits
 
         public override void OnThemeChange(IAnkhServiceProvider sender, CancelEventArgs e)
         {
-            IAnkhCommandStates states;
+            IWinFormsThemingService themer = sender.GetService<IWinFormsThemingService>();
 
             if (VSVersion.VS2012OrLater
-                && null != (states = sender.GetService<IAnkhCommandStates>())
+                && themer != null
                 && PendingCommitsThemeLogic.ShouldCancelVsHeaderTheming(
-                    states.ThemeLight,
-                    states.ThemeDark))
+                    themer.ThemePalette.IsDarkSurface,
+                    SystemInformation.HighContrast))
             {
                 e.Cancel = true; // Don't ask VS to theme the header
                 base.OnThemeChange(sender, e); /* Recreate handle while keeping state lists valid */
 
-                ForeColor = Parent.ForeColor;
-                BackColor = Parent.BackColor;
+                ForeColor = themer.ThemePalette.SurfaceForeground;
+                BackColor = themer.ThemePalette.SurfaceBackground;
 
                 // Re-enable after undoing theming
                 ShowSelectAllCheckBox = true;

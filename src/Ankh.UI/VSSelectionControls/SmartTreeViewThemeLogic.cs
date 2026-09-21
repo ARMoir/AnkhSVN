@@ -18,10 +18,10 @@ namespace Ankh.UI.VSSelectionControls
     {
         internal static bool ShouldUseDarkNativeTheme(
             bool inVsTheming,
-            bool themeDark,
+            bool darkSurface,
             bool highContrast)
         {
-            return inVsTheming && themeDark && !highContrast;
+            return inVsTheming && darkSurface && !highContrast;
         }
     }
 }

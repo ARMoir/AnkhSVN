@@ -25,6 +25,8 @@ namespace Ankh.WpfPackage.Services
 
         readonly ComboBox _combo;
         bool _darkMode;
+        Color _borderColor;
+        Color _disabledText;
 
         internal DarkComboBoxPainter(ComboBox combo)
         {
@@ -40,9 +42,15 @@ namespace Ankh.WpfPackage.Services
                 AssignHandle(_combo.Handle);
         }
 
-        internal void SetDarkMode(bool darkMode)
+        internal void SetTheme(
+            bool darkMode,
+            Color borderColor,
+            Color disabledText)
         {
             _darkMode = darkMode;
+            _borderColor = borderColor;
+            _disabledText = disabledText;
+
             if (_combo.IsHandleCreated)
                 _combo.Invalidate();
         }
@@ -76,10 +84,12 @@ namespace Ankh.WpfPackage.Services
                 client.Height);
 
             Color backColor = _combo.BackColor;
-            Color borderColor = ControlPaint.Light(backColor, 0.22f);
-            Color arrowColor = _combo.Enabled
+            Color borderColor = _borderColor.IsEmpty
                 ? _combo.ForeColor
-                : ControlPaint.Dark(_combo.ForeColor, 0.25f);
+                : _borderColor;
+            Color arrowColor = _combo.Enabled || _disabledText.IsEmpty
+                ? _combo.ForeColor
+                : _disabledText;
 
             using (Graphics graphics = Graphics.FromHwnd(_combo.Handle))
             using (SolidBrush background = new SolidBrush(backColor))
@@ -146,6 +156,8 @@ namespace Ankh.WpfPackage.Services
         readonly NumericUpDown _owner;
         Control _buttons;
         bool _darkMode;
+        Color _borderColor;
+        Color _disabledText;
 
         internal DarkNumericUpDownPainter(NumericUpDown owner)
         {
@@ -160,9 +172,14 @@ namespace Ankh.WpfPackage.Services
             HookButtons();
         }
 
-        internal void SetDarkMode(bool darkMode)
+        internal void SetTheme(
+            bool darkMode,
+            Color borderColor,
+            Color disabledText)
         {
             _darkMode = darkMode;
+            _borderColor = borderColor;
+            _disabledText = disabledText;
             HookButtons();
 
             if (_buttons != null && _buttons.IsHandleCreated)
@@ -217,10 +234,12 @@ namespace Ankh.WpfPackage.Services
                 return;
 
             Color backColor = _owner.BackColor;
-            Color borderColor = ControlPaint.Light(backColor, 0.22f);
-            Color glyphColor = _owner.Enabled
+            Color borderColor = _borderColor.IsEmpty
                 ? _owner.ForeColor
-                : ControlPaint.Dark(_owner.ForeColor, 0.25f);
+                : _borderColor;
+            Color glyphColor = _owner.Enabled || _disabledText.IsEmpty
+                ? _owner.ForeColor
+                : _disabledText;
 
             int splitY = bounds.Top + bounds.Height / 2;
 

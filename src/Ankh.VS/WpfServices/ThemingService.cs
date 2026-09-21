@@ -130,17 +130,33 @@ namespace Ankh.WpfPackage.Services
 
         public void ThemeRecursive(System.Windows.Forms.Control control, bool forDialog)
         {
+            bool ownsPalette = _activeThemePalette == null;
+            if (ownsPalette)
+                _activeThemePalette = CreateThemePalette();
+
+            try
+            {
+                ThemeRecursiveCore(control, forDialog);
+            }
+            finally
+            {
+                if (ownsPalette)
+                    _activeThemePalette = null;
+            }
+        }
+
+        void ThemeRecursiveCore(System.Windows.Forms.Control control, bool forDialog)
+        {
             bool recurse = true;
             bool autoTheme = true;
             ISupportsVSTheming themeControl = control as ISupportsVSTheming;
             if (themeControl != null)
             {
                 CancelEventArgs ca = new CancelEventArgs(false);
-                if (themeControl != null)
-                    themeControl.OnThemeChange(this, ca);
+                themeControl.OnThemeChange(this, ca);
 
                 if (ca.Cancel)
-                    recurse = autoTheme = false; // No recurse!
+                    recurse = autoTheme = false;
             }
 
             IThemedControl themed = control as IThemedControl;
@@ -156,15 +172,13 @@ namespace Ankh.WpfPackage.Services
             }
 
             if (autoTheme && control.IsHandleCreated)
-            {
                 VSThemeWindow(control, forDialog);
-            }
 
             if (recurse)
+            {
                 foreach (Control c in control.Controls)
-                {
-                    ThemeRecursive(c, forDialog);
-                }
+                    ThemeRecursiveCore(c, forDialog);
+            }
         }
 
         bool MaybeTheme<T>(Action<T> how, Control control, bool forDialog) where T : class
@@ -193,10 +207,8 @@ namespace Ankh.WpfPackage.Services
         {
             get
             {
-                IAnkhCommandStates states = GetService<IAnkhCommandStates>();
-
                 return WinFormsNativeThemeLogic.ShouldUseDarkTheme(
-                    states != null && states.ThemeDark,
+                    ThemePalette.SurfaceBackground,
                     SystemInformation.HighContrast);
             }
         }
@@ -299,18 +311,19 @@ namespace Ankh.WpfPackage.Services
             if (textBox.Font != DialogFont)
                 textBox.Font = DialogFont;
 
-            Color backColor;
-            if (!textBox.ReadOnly
-                || !ColorSvc.TryGetColor((__VSSYSCOLOREX)__VSSYSCOLOREX3.VSCOLOR_COMBOBOX_BACKGROUND, out backColor))
-            {
-                backColor = textBox.Parent.BackColor;
-            }
+            AnkhThemePalette palette = ThemePalette;
+            Color backColor = textBox.ReadOnly
+                ? palette.SurfaceBackground
+                : palette.InputBackground;
+            Color foreColor = textBox.ReadOnly
+                ? palette.SurfaceForeground
+                : palette.InputForeground;
 
             if (textBox.BackColor != backColor)
                 textBox.BackColor = backColor;
 
-            if (textBox.ForeColor != textBox.Parent.ForeColor)
-                textBox.ForeColor = textBox.Parent.ForeColor;
+            if (textBox.ForeColor != foreColor)
+                textBox.ForeColor = foreColor;
 
             if (textBox.BorderStyle == BorderStyle.Fixed3D)
                 textBox.BorderStyle = BorderStyle.FixedSingle;
@@ -326,11 +339,13 @@ namespace Ankh.WpfPackage.Services
             if (listView.Font != DialogFont)
                 listView.Font = DialogFont;
 
+            AnkhThemePalette palette = ThemePalette;
             Color oldBack = listView.BackColor;
             Color oldFore = listView.ForeColor;
-            Color newBack = listView.Parent.BackColor;
-            Color newFore = listView.Parent.ForeColor;
-            bool updateBack= false, updateFore = false;
+            Color newBack = palette.SurfaceBackground;
+            Color newFore = palette.SurfaceForeground;
+            bool updateBack = false;
+            bool updateFore = false;
 
             if (oldBack != newBack)
             {
@@ -344,12 +359,9 @@ namespace Ankh.WpfPackage.Services
                 updateFore = true;
             }
 
-            // In some cases we can iterate over third party components here,
-            // so make sure we don't fail because we try to iterate a virtual
-            // listview
             if ((updateBack || updateFore) && !listView.VirtualMode)
             {
-                foreach(ListViewItem lvi in listView.Items)
+                foreach (ListViewItem lvi in listView.Items)
                 {
                     if (updateFore && lvi.ForeColor == oldFore)
                         lvi.ForeColor = newFore;
@@ -359,11 +371,14 @@ namespace Ankh.WpfPackage.Services
                 }
             }
 
-
             if (listView.BorderStyle == BorderStyle.Fixed3D)
                 listView.BorderStyle = BorderStyle.FixedSingle;
 
-            IntPtr header = NativeMethods.SendMessage(listView.Handle, NativeMethods.LVM_GETHEADER, IntPtr.Zero, IntPtr.Zero);
+            IntPtr header = NativeMethods.SendMessage(
+                listView.Handle,
+                NativeMethods.LVM_GETHEADER,
+                IntPtr.Zero,
+                IntPtr.Zero);
 
             if (header != IntPtr.Zero)
             {
@@ -384,11 +399,13 @@ namespace Ankh.WpfPackage.Services
             if (treeView.Font != DialogFont)
                 treeView.Font = DialogFont;
 
-            if (treeView.BackColor != treeView.Parent.BackColor)
-                treeView.BackColor = treeView.Parent.BackColor;
+            AnkhThemePalette palette = ThemePalette;
 
-            if (treeView.ForeColor != treeView.Parent.ForeColor)
-                treeView.ForeColor = treeView.Parent.ForeColor;
+            if (treeView.BackColor != palette.SurfaceBackground)
+                treeView.BackColor = palette.SurfaceBackground;
+
+            if (treeView.ForeColor != palette.SurfaceForeground)
+                treeView.ForeColor = palette.SurfaceForeground;
 
             if (treeView.BorderStyle == BorderStyle.Fixed3D)
                 treeView.BorderStyle = BorderStyle.FixedSingle;
@@ -399,18 +416,13 @@ namespace Ankh.WpfPackage.Services
             if (userControl.Parent != null && userControl.Font != userControl.Parent.Font)
                 userControl.Font = userControl.Parent.Font;
 
-            Color color;
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_BACKGROUND, out color))
-            {
-                if (userControl.BackColor != color)
-                    userControl.BackColor = color;
-            }
+            AnkhThemePalette palette = ThemePalette;
 
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_TEXT, out color))
-            {
-                if (userControl.ForeColor != color)
-                    userControl.ForeColor = color;
-            }
+            if (userControl.BackColor != palette.SurfaceBackground)
+                userControl.BackColor = palette.SurfaceBackground;
+
+            if (userControl.ForeColor != palette.SurfaceForeground)
+                userControl.ForeColor = palette.SurfaceForeground;
 
             if (userControl.BorderStyle == BorderStyle.Fixed3D)
                 userControl.BorderStyle = BorderStyle.FixedSingle;
@@ -430,18 +442,13 @@ namespace Ankh.WpfPackage.Services
             if (form.Parent != null && form.Font != form.Parent.Font)
                 form.Font = form.Parent.Font;
 
-            Color color;
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_BACKGROUND, out color))
-            {
-                if (form.BackColor != color)
-                    form.BackColor = color;
-            }
+            AnkhThemePalette palette = ThemePalette;
 
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_TEXT, out color))
-            {
-                if (form.ForeColor != color)
-                    form.ForeColor = color;
-            }
+            if (form.BackColor != palette.SurfaceBackground)
+                form.BackColor = palette.SurfaceBackground;
+
+            if (form.ForeColor != palette.SurfaceForeground)
+                form.ForeColor = palette.SurfaceForeground;
 
             ApplyNativeCaptionTheme(form as Form);
         }
@@ -457,18 +464,13 @@ namespace Ankh.WpfPackage.Services
             if (panel.Parent != null && panel.Font != panel.Parent.Font)
                 panel.Font = panel.Parent.Font;
 
-            Color color;
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_BACKGROUND, out color))
-            {
-                if (panel.BackColor != color)
-                    panel.BackColor = color;
-            }
+            AnkhThemePalette palette = ThemePalette;
 
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_TEXT, out color))
-            {
-                if (panel.ForeColor != color)
-                    panel.ForeColor = color;
-            }
+            if (panel.BackColor != palette.SurfaceBackground)
+                panel.BackColor = palette.SurfaceBackground;
+
+            if (panel.ForeColor != palette.SurfaceForeground)
+                panel.ForeColor = palette.SurfaceForeground;
 
             if (panel.BorderStyle == BorderStyle.Fixed3D)
                 panel.BorderStyle = BorderStyle.FixedSingle;
@@ -490,46 +492,47 @@ namespace Ankh.WpfPackage.Services
             if (button.Parent != null && button.Font != button.Parent.Font)
                 button.Font = button.Parent.Font;
 
+            AnkhThemePalette palette = ThemePalette;
             bool darkButton = WinFormsNativeThemeLogic.ShouldUseDarkButtonRendering(
                 UseDarkNativeTheme);
 
-            if (darkButton && button.Parent != null)
+            Color foreColor = button.Enabled
+                ? palette.SurfaceForeground
+                : palette.DisabledText;
+
+            if (button.ForeColor != foreColor)
+                button.ForeColor = foreColor;
+
+            if (darkButton)
             {
-                // Native WinForms button painting can retain a light face even
-                // when IVsUIShell6.ThemeWindow reports success. In VS dark mode
-                // use explicit VS-derived colors so enabled and disabled buttons
-                // remain consistent with the dialog surface.
                 button.UseVisualStyleBackColor = false;
                 button.FlatStyle = FlatStyle.Flat;
 
-                Color backColor = ControlPaint.Light(button.Parent.BackColor, 0.05f);
-                Color borderColor = ControlPaint.Light(button.Parent.BackColor, 0.22f);
+                Color borderColor = palette.Border;
                 Form owner = button.FindForm();
 
                 if (owner != null
                     && ReferenceEquals(owner.AcceptButton, button)
                     && button.Enabled)
                 {
-                    borderColor = SystemColors.Highlight;
+                    borderColor = palette.FocusBorder;
                 }
 
-                if (button.BackColor != backColor)
-                    button.BackColor = backColor;
-
-                if (button.ForeColor != button.Parent.ForeColor)
-                    button.ForeColor = button.Parent.ForeColor;
+                if (button.BackColor != palette.InputBackground)
+                    button.BackColor = palette.InputBackground;
 
                 button.FlatAppearance.BorderSize = 1;
                 button.FlatAppearance.BorderColor = borderColor;
-                button.FlatAppearance.MouseOverBackColor =
-                    ControlPaint.Light(button.Parent.BackColor, 0.10f);
-                button.FlatAppearance.MouseDownBackColor =
-                    ControlPaint.Light(button.Parent.BackColor, 0.16f);
+                button.FlatAppearance.MouseOverBackColor = palette.HoverBackground;
+                button.FlatAppearance.MouseDownBackColor = palette.PressedBackground;
             }
             else
             {
                 button.FlatStyle = FlatStyle.Standard;
                 button.UseVisualStyleBackColor = true;
+
+                if (button.BackColor != palette.SurfaceBackground)
+                    button.BackColor = palette.SurfaceBackground;
 
                 if (button.IsHandleCreated)
                     VSThemeWindow(button.Handle, forDialog);
@@ -553,40 +556,27 @@ namespace Ankh.WpfPackage.Services
 
         void ThemeOne(PropertyGrid grid)
         {
-            Color clrTitle, clrBorder, clrText, clrBackground, clrFill, clrGrayText;
+            AnkhThemePalette palette = ThemePalette;
+            Color clrTitle;
 
             if (!VSColors.TryGetColor(VSCOLOR_BRANDEDUI_TITLE, out clrTitle))
-                clrTitle = SystemColors.WindowText;
-            if (!VSColors.TryGetColor(VSCOLOR_BRANDEDUI_BORDER, out clrBorder))
-                clrBorder = SystemColors.WindowFrame;
-            if (!VSColors.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_TEXT, out clrText))
-                clrText = SystemColors.WindowText;
-            if (!VSColors.TryGetColor(VSCOLOR_BRANDEDUI_BACKGROUND, out clrBackground))
-                clrBackground = SystemColors.InactiveBorder;
-            if (!VSColors.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_BACKGROUND, out clrFill))
-                clrFill = SystemColors.Control;
-            if (!VSColors.TryGetColor(VSCOLOR_GRAYTEXT, out clrGrayText))
-                clrGrayText = SystemColors.WindowText;
+                clrTitle = palette.SurfaceForeground;
 
-            grid.BackColor = clrFill;
+            grid.BackColor = palette.SurfaceBackground;
+            grid.HelpBackColor = palette.SurfaceBackground;
+            grid.ViewBackColor = palette.SurfaceBackground;
 
-            grid.HelpBackColor = clrFill;
-            grid.ViewBackColor = clrFill;
-
-            grid.ViewForeColor = clrText;
-            grid.HelpForeColor = clrText;
-            grid.LineColor = clrBackground;
+            grid.ViewForeColor = palette.SurfaceForeground;
+            grid.HelpForeColor = palette.SurfaceForeground;
+            grid.LineColor = palette.Border;
             grid.CategoryForeColor = clrTitle;
 
             if (VSVersion.VS2012OrLater)
             {
-                // New in 4.5 properties. Properly added for VS2012.
-                SetProperty(grid, "HelpBorderColor", clrFill);
-                SetProperty(grid, "ViewBorderColor", clrFill);
-                SetProperty(grid, "DisabledItemForeColor", clrGrayText);
-                SetProperty(grid, "CategorySplitterColor", clrBackground);
-
-                // The OS glyphs don't work in the dark theme. VS uses the same trick. (Unavailable in 4.0)
+                SetProperty(grid, "HelpBorderColor", palette.SurfaceBackground);
+                SetProperty(grid, "ViewBorderColor", palette.SurfaceBackground);
+                SetProperty(grid, "DisabledItemForeColor", palette.DisabledText);
+                SetProperty(grid, "CategorySplitterColor", palette.Border);
                 SetProperty(grid, "CanShowVisualStyleGlyphs", false);
             }
         }
@@ -601,11 +591,13 @@ namespace Ankh.WpfPackage.Services
             if (combo.Font != DialogFont)
                 combo.Font = DialogFont;
 
-            if (combo.BackColor != combo.Parent.BackColor)
-                combo.BackColor = combo.Parent.BackColor;
+            AnkhThemePalette palette = ThemePalette;
 
-            if (combo.ForeColor != combo.Parent.ForeColor)
-                combo.ForeColor = combo.Parent.ForeColor;
+            if (combo.BackColor != palette.InputBackground)
+                combo.BackColor = palette.InputBackground;
+
+            if (combo.ForeColor != palette.InputForeground)
+                combo.ForeColor = palette.InputForeground;
 
             combo.DrawItem -= ThemeComboDrawItem;
 
@@ -624,7 +616,10 @@ namespace Ankh.WpfPackage.Services
             DarkComboBoxPainter painter = _comboPainters.GetValue(
                 combo,
                 delegate(ComboBox value) { return new DarkComboBoxPainter(value); });
-            painter.SetDarkMode(UseDarkNativeTheme);
+            painter.SetTheme(
+                UseDarkNativeTheme,
+                palette.Border,
+                palette.DisabledText);
         }
 
         void ThemeComboDrawItem(object sender, DrawItemEventArgs e)
@@ -635,9 +630,14 @@ namespace Ankh.WpfPackage.Services
 
             bool editPortion = (e.State & DrawItemState.ComboBoxEdit) != 0;
             bool selected = (e.State & DrawItemState.Selected) != 0 && !editPortion;
+            AnkhThemePalette palette = ThemePalette;
 
-            Color backColor = selected ? SystemColors.Highlight : combo.BackColor;
-            Color foreColor = selected ? SystemColors.HighlightText : combo.ForeColor;
+            Color backColor = selected
+                ? palette.SelectionBackground
+                : combo.BackColor;
+            Color foreColor = selected
+                ? palette.SelectionForeground
+                : (combo.Enabled ? combo.ForeColor : palette.DisabledText);
 
             using (SolidBrush background = new SolidBrush(backColor))
                 e.Graphics.FillRectangle(background, e.Bounds);
@@ -678,22 +678,21 @@ namespace Ankh.WpfPackage.Services
             if (numeric.Font != DialogFont)
                 numeric.Font = DialogFont;
 
-            if (numeric.Parent != null)
-            {
-                if (numeric.BackColor != numeric.Parent.BackColor)
-                    numeric.BackColor = numeric.Parent.BackColor;
+            AnkhThemePalette palette = ThemePalette;
 
-                if (numeric.ForeColor != numeric.Parent.ForeColor)
-                    numeric.ForeColor = numeric.Parent.ForeColor;
-            }
+            if (numeric.BackColor != palette.InputBackground)
+                numeric.BackColor = palette.InputBackground;
+
+            if (numeric.ForeColor != palette.InputForeground)
+                numeric.ForeColor = palette.InputForeground;
 
             if (numeric.BorderStyle == BorderStyle.Fixed3D)
                 numeric.BorderStyle = BorderStyle.FixedSingle;
 
             foreach (Control child in numeric.Controls)
             {
-                child.BackColor = numeric.BackColor;
-                child.ForeColor = numeric.ForeColor;
+                child.BackColor = palette.InputBackground;
+                child.ForeColor = palette.InputForeground;
 
                 if (child.IsHandleCreated)
                 {
@@ -707,7 +706,10 @@ namespace Ankh.WpfPackage.Services
             DarkNumericUpDownPainter painter = _numericPainters.GetValue(
                 numeric,
                 delegate(NumericUpDown value) { return new DarkNumericUpDownPainter(value); });
-            painter.SetDarkMode(UseDarkNativeTheme);
+            painter.SetTheme(
+                UseDarkNativeTheme,
+                palette.Border,
+                palette.DisabledText);
         }
 
         void ThemeOne(SplitContainer panel)
@@ -719,25 +721,20 @@ namespace Ankh.WpfPackage.Services
             if (panel.Parent != null && panel.Font != panel.Parent.Font)
                 panel.Font = panel.Parent.Font;
 
-            Color color;
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_BACKGROUND, out color))
+            AnkhThemePalette palette = ThemePalette;
+
+            if (panel.BackColor != palette.SurfaceBackground)
             {
-                if (panel.BackColor != color)
-                {
-                    panel.BackColor = color;
-                    panel.Panel1.BackColor = color;
-                    panel.Panel2.BackColor = color;
-                }
+                panel.BackColor = palette.SurfaceBackground;
+                panel.Panel1.BackColor = palette.SurfaceBackground;
+                panel.Panel2.BackColor = palette.SurfaceBackground;
             }
 
-            if (ColorSvc.TryGetColor(__VSSYSCOLOREX.VSCOLOR_TOOLWINDOW_TEXT, out color))
+            if (panel.ForeColor != palette.SurfaceForeground)
             {
-                if (panel.ForeColor != color)
-                {
-                    panel.ForeColor = color;
-                    panel.Panel1.ForeColor = color;
-                    panel.Panel2.ForeColor = color;
-                }
+                panel.ForeColor = palette.SurfaceForeground;
+                panel.Panel1.ForeColor = palette.SurfaceForeground;
+                panel.Panel2.ForeColor = palette.SurfaceForeground;
             }
 
             if (panel.BorderStyle == BorderStyle.Fixed3D)
@@ -746,12 +743,7 @@ namespace Ankh.WpfPackage.Services
 
         void ThemeOne(IHasSplitterColor splitter)
         {
-            Color clrSplitter;
-
-            if (!VSColors.TryGetColor(VSCOLOR_THREEDFACE, out clrSplitter))
-                clrSplitter = SystemColors.InactiveBorder;
-
-            splitter.SplitterColor = clrSplitter;
+            splitter.SplitterColor = ThemePalette.Border;
         }
 
         private void SetProperty(PropertyGrid grid, string propertyName, object value)

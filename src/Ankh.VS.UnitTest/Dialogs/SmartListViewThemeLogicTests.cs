@@ -24,16 +24,16 @@ namespace AnkhSvn_UnitTestProject.Dialogs
         [TestCase(false, false, false, false)]
         [TestCase(true, true, false, false)]
         [TestCase(false, true, true, false)]
-        public void OwnerDrawHeaderOnlyForActiveDarkTheme(
+        public void OwnerDrawHeaderOnlyForActiveDarkSurface(
             bool themeCancelled,
-            bool themeDark,
+            bool darkSurface,
             bool highContrast,
             bool expected)
         {
             Assert.That(
                 SmartListViewThemeLogic.ShouldOwnerDrawDarkHeader(
                     themeCancelled,
-                    themeDark,
+                    darkSurface,
                     highContrast),
                 Is.EqualTo(expected));
         }

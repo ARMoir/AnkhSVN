@@ -229,16 +229,23 @@ namespace Ankh.UI.VSSelectionControls
         {
             _inVSTheming = !e.Cancel;
 
-            IAnkhCommandStates states = sender.GetService<IAnkhCommandStates>();
+            IWinFormsThemingService themer = sender.GetService<IWinFormsThemingService>();
+            AnkhThemePalette palette = themer != null ? themer.ThemePalette : null;
+            bool darkSurface = palette != null
+                ? palette.IsDarkSurface
+                : AnkhThemePalette.IsDark(BackColor);
+
             _useDarkNativeTheme = SmartTreeViewThemeLogic.ShouldUseDarkNativeTheme(
                 _inVSTheming,
-                states != null && states.ThemeDark,
+                darkSurface,
                 SystemInformation.HighContrast);
 
-            // TreeView handles are recreated while repositories and image lists
-            // are initialized. Preserve the current VS colors across those
-            // recreations instead of falling back to the Windows light theme.
-            if (_useDarkNativeTheme && Parent != null)
+            if (palette != null)
+            {
+                BackColor = palette.SurfaceBackground;
+                ForeColor = palette.SurfaceForeground;
+            }
+            else if (_useDarkNativeTheme && Parent != null)
             {
                 BackColor = Parent.BackColor;
                 ForeColor = Parent.ForeColor;
