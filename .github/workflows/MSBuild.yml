@@ -16,6 +16,8 @@ permissions:
 
 env:
   SOLUTION_FILE_PATH: build/src/AnkhSvn.sln
+  SLIKSVN_VERSION: 1.14.5
+  SLIKSVN_SHA256: 77D4FE02999DDA3BDC3A20E86243AE6EDE99AAF072B4C12B0CDEDB54D88E954A
 
 jobs:
   build:
@@ -30,9 +32,119 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v3
 
-    - name: Add Subversion to PATH
-      uses: ampscm/setup-subversion@v1
+    - name: Cache portable Subversion
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}\sliksvn-${{ env.SLIKSVN_VERSION }}
+        key: sliksvn-${{ runner.os }}-x64-${{ env.SLIKSVN_VERSION }}-${{ env.SLIKSVN_SHA256 }}
 
+    - name: Add Subversion to PATH
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+
+        $version = $env:SLIKSVN_VERSION
+        $expectedHash = $env:SLIKSVN_SHA256.ToUpperInvariant()
+        $svnRoot = Join-Path $env:RUNNER_TEMP "sliksvn-$version"
+
+        function Find-SvnBin([string]$root) {
+          if (-not (Test-Path $root)) { return $null }
+
+          $svn = Get-ChildItem $root -Recurse -Filter svn.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($null -eq $svn) { return $null }
+
+          $svnadmin = Join-Path $svn.Directory.FullName "svnadmin.exe"
+          if (-not (Test-Path $svnadmin)) { return $null }
+
+          return $svn.Directory.FullName
+        }
+
+        function Activate-Svn([string]$bin) {
+          Write-Host "Using Subversion from: $bin"
+          $bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          & (Join-Path $bin "svn.exe") --version --quiet
+          if ($LASTEXITCODE -ne 0) { throw "svn.exe verification failed." }
+
+          & (Join-Path $bin "svnadmin.exe") --version --quiet
+          if ($LASTEXITCODE -ne 0) { throw "svnadmin.exe verification failed." }
+        }
+
+        $cachedBin = Find-SvnBin $svnRoot
+        if ($cachedBin) {
+          Write-Host "Using cached portable SlikSVN."
+          Activate-Svn $cachedBin
+          exit 0
+        }
+
+        $archive = Join-Path $env:RUNNER_TEMP "Slik-Subversion-$version-x64.zip"
+        $officialUrl = "https://sliksvn.com/pub/Slik-Subversion-$version-x64.zip"
+        $installed = $false
+
+        for ($attempt = 1; $attempt -le 3 -and -not $installed; $attempt++) {
+          try {
+            Write-Host "Downloading SlikSVN from the official source (attempt $attempt of 3)..."
+            Remove-Item $archive -Force -ErrorAction SilentlyContinue
+            Remove-Item $svnRoot -Recurse -Force -ErrorAction SilentlyContinue
+
+            Invoke-WebRequest -Uri $officialUrl -OutFile $archive -UseBasicParsing -TimeoutSec 90
+
+            $actualHash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToUpperInvariant()
+            if ($actualHash -ne $expectedHash) {
+              throw "SlikSVN SHA256 mismatch. Expected $expectedHash but got $actualHash."
+            }
+
+            New-Item -ItemType Directory -Force -Path $svnRoot | Out-Null
+            Expand-Archive -Path $archive -DestinationPath $svnRoot -Force
+
+            $bin = Find-SvnBin $svnRoot
+            if (-not $bin) {
+              throw "The SlikSVN archive did not contain svn.exe and svnadmin.exe together."
+            }
+
+            Activate-Svn $bin
+            $installed = $true
+          }
+          catch {
+            Write-Warning "Official SlikSVN download attempt $attempt failed: $($_.Exception.Message)"
+            if ($attempt -lt 3) { Start-Sleep -Seconds (5 * $attempt) }
+          }
+        }
+
+        if ($installed) { exit 0 }
+
+        Write-Warning "Official SlikSVN download failed; falling back to Chocolatey."
+
+        for ($attempt = 1; $attempt -le 3 -and -not $installed; $attempt++) {
+          Write-Host "Chocolatey SlikSVN install attempt $attempt of 3..."
+          & choco install sliksvn --version $version -y --no-progress
+
+          if ($LASTEXITCODE -eq 0) {
+            $knownRoots = @(
+              "C:\Program Files\SlikSvn\bin",
+              "C:\Program Files (x86)\SlikSvn\bin",
+              "C:\Program Files\Subversion\bin",
+              "C:\Program Files (x86)\Subversion\bin"
+            )
+
+            foreach ($candidate in $knownRoots) {
+              if ((Test-Path (Join-Path $candidate "svn.exe")) -and
+                  (Test-Path (Join-Path $candidate "svnadmin.exe"))) {
+                Activate-Svn $candidate
+                $installed = $true
+                break
+              }
+            }
+          }
+
+          if (-not $installed -and $attempt -lt 3) {
+            Start-Sleep -Seconds (5 * $attempt)
+          }
+        }
+
+        if (-not $installed) {
+          throw "Unable to provision Subversion from the GitHub cache, official SlikSVN ZIP, or Chocolatey."
+        }
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v4.0
