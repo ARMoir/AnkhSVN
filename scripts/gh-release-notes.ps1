@@ -121,9 +121,11 @@ if ($previousTag) {
     $totalCommits = $null
 
     do {
+        $comparePath = "repos/{0}/compare/{1}...{2}?per_page=100&page={3}" -f $Repository, $previousTag, $TargetCommit, $page
+
         $compare = Invoke-GhJson -Arguments @(
             "api",
-            "repos/$Repository/compare/$previousTag...$TargetCommit?per_page=100&page=$page"
+            $comparePath
         )
 
         if ($page -eq 1) {
