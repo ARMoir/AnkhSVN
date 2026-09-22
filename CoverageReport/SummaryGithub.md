@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 9/21/2026 - 11:06:16 PM |
-| Coverage date: | 9/21/2026 - 11:05:56 PM - 9/21/2026 - 11:06:07 PM |
+| Generated on: | 9/22/2026 - 12:05:11 AM |
+| Coverage date: | 9/22/2026 - 12:04:50 AM - 9/22/2026 - 12:05:01 AM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 10 |
 | Classes: | 609 |
 | Files: | 677 |
-| **Line coverage:** | 9.1% (4265 of 46778) |
+| **Line coverage:** | 9.1% (4265 of 46789) |
 | Covered lines: | 4265 |
-| Uncovered lines: | 42513 |
-| Coverable lines: | 46778 |
-| Total lines: | 132043 |
-| **Branch coverage:** | 11.7% (2632 of 22455) |
+| Uncovered lines: | 42524 |
+| Coverable lines: | 46789 |
+| Total lines: | 132068 |
+| **Branch coverage:** | 11.7% (2632 of 22459) |
 | Covered branches: | 2632 |
-| Total branches: | 22455 |
+| Total branches: | 22459 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -493,7 +493,7 @@
 |Ankh.UI.PendingChanges.PCResources|35.5%|100%|
 |Ankh.UI.PendingChanges.PendingActivationPage|0%|0%|
 |Ankh.UI.PendingChanges.PendingChangesPage|0%|0%|
-|Ankh.UI.PendingChanges.PendingChangesToolControl|7.7%|2.9%|
+|Ankh.UI.PendingChanges.PendingChangesToolControl|7.3%|2.8%|
 |Ankh.UI.PendingChanges.PendingCommitsPage|0%|0%|
 |Ankh.UI.PendingChanges.PendingConflictsPage|0%|0%|
 |Ankh.UI.PendingChanges.PendingIssuesPage|0%|0%|
