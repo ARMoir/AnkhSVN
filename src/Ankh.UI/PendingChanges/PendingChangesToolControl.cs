@@ -62,6 +62,8 @@ namespace Ankh.UI.PendingChanges
             recentChangesButton.Image = VSVersion.VS2012OrLater ? PCResources.RecentChanges : PCResources.RecentChangesOld;
             conflictsButton.Image = VSVersion.VS2012OrLater ? PCResources.Conflicts : PCResources.ConflictsOld;
 
+            ApplyNavigationLayout();
+
             pendingChangesTabs.BackColorChanged += delegate { RefreshNavigationIcons(); };
             pendingChangesTabs.DpiChangedAfterParent += delegate { RefreshNavigationIcons(); };
             Disposed += delegate { DisposeNavigationIcons(); };
@@ -297,11 +299,34 @@ namespace Ankh.UI.PendingChanges
             else
                 pendingChangesTabs.Dock = DockStyle.Left;
 
+            ApplyNavigationLayout();
+
             if (Context != null)
             {
                 IVsUIShell ui = Context.GetService<IVsUIShell>(typeof(SVsUIShell));
                 if (ui != null)
                     ui.UpdateCommandUI(0);
+            }
+        }
+
+        void ApplyNavigationLayout()
+        {
+            // Keep the navigation rail visually aligned with modern Visual
+            // Studio tool-window chrome: an inset strip, comfortable hit
+            // targets, and a small gap between adjacent navigation buttons.
+            // The active-state renderer then draws inside these bounds instead
+            // of touching the edge of the tool window.
+            pendingChangesTabs.Padding = new Padding(3);
+
+            bool horizontal = pendingChangesTabs.Dock == DockStyle.Bottom;
+            Padding itemMargin = horizontal
+                ? new Padding(2, 0, 2, 0)
+                : new Padding(0, 2, 0, 2);
+
+            foreach (ToolStripItem item in pendingChangesTabs.Items)
+            {
+                item.Padding = new Padding(2);
+                item.Margin = itemMargin;
             }
         }
 

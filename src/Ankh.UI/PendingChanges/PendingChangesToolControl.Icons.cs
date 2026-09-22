@@ -52,8 +52,8 @@ namespace Ankh.UI.PendingChanges
                 StructSize = Marshal.SizeOf(typeof(ImageAttributes)),
                 ImageType = (uint)_UIImageType.IT_Bitmap,
                 Format = (uint)_UIDataFormat.DF_WinForms,
-                LogicalWidth = 32,
-                LogicalHeight = 32,
+                LogicalWidth = 24,
+                LogicalHeight = 24,
                 Dpi = dpi,
                 Background = unchecked((uint)background.ToArgb()),
                 Flags = unchecked((uint)(_ImageAttributesFlags.IAF_RequiredFlags | _ImageAttributesFlags.IAF_Background))

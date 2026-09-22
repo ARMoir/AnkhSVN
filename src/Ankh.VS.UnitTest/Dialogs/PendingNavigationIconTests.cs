@@ -31,7 +31,7 @@ namespace AnkhSvn_UnitTestProject.Dialogs
             {
                 Assert.That(result, Is.Not.SameAs(source));
                 Assert.That(requested.Dpi, Is.EqualTo(144));
-                Assert.That(requested.LogicalWidth, Is.EqualTo(32));
+                Assert.That(requested.LogicalWidth, Is.EqualTo(24));
                 Assert.That(requested.Background, Is.EqualTo(unchecked((uint)background.ToArgb())));
                 Assert.That(requested.Flags & unchecked((uint)_ImageAttributesFlags.IAF_Background), Is.Not.Zero);
                 source.Dispose();
