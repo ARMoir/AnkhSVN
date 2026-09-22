@@ -113,9 +113,18 @@ jobs:
               New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
 
               Write-Host "Installing verified official SlikSVN MSI into the Actions cache..."
-              & msiexec.exe /i $msi.FullName /qn /norestart INSTALLLEVEL=300 "INSTALLLOCATION=$installRoot"
-              if ($LASTEXITCODE -ne 0) {
-                throw "SlikSVN MSI installation failed with exit code $LASTEXITCODE."
+              $msiArgs = @(
+                "/i",
+                "`"$($msi.FullName)`"",
+                "/qn",
+                "/norestart",
+                "INSTALLLEVEL=300",
+                "INSTALLLOCATION=`"$installRoot`""
+              )
+
+              $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList $msiArgs -Wait -PassThru
+              if ($msiProcess.ExitCode -notin @(0, 3010)) {
+                throw "SlikSVN MSI installation failed with exit code $($msiProcess.ExitCode)."
               }
 
               $bin = Find-SvnBin $installRoot
