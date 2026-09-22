@@ -40,6 +40,17 @@ namespace AnkhSvn_UnitTestProject.Dialogs
         }
 
 
+        [TestCase(96, 36)]
+        [TestCase(120, 45)]
+        [TestCase(144, 54)]
+        [TestCase(192, 72)]
+        public void NavigationStripThicknessScalesWithDpi(int dpi, int expected)
+        {
+            Assert.That(
+                PendingChangesToolControl.GetNavigationStripThickness(dpi),
+                Is.EqualTo(expected));
+        }
+
         [Test]
         public void PendingChangeMonikerUsesNavigationRenderPipeline()
         {
