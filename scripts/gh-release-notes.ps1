@@ -173,16 +173,16 @@ foreach ($commit in $commits) {
 }
 
 $highlights = @($entries | Where-Object Category -eq "Highlights" | ForEach-Object {
-    "- $($_.Subject) ([`$($_.ShortSha)`]($($_.Url)))"
+    "- $($_.Subject) ([$($_.ShortSha)]($($_.Url)))"
 })
 $fixes = @($entries | Where-Object Category -eq "Fixes" | ForEach-Object {
-    "- $($_.Subject) ([`$($_.ShortSha)`]($($_.Url)))"
+    "- $($_.Subject) ([$($_.ShortSha)]($($_.Url)))"
 })
 $engineering = @($entries | Where-Object Category -eq "Engineering" | ForEach-Object {
-    "- $($_.Subject) ([`$($_.ShortSha)`]($($_.Url)))"
+    "- $($_.Subject) ([$($_.ShortSha)]($($_.Url)))"
 })
 $other = @($entries | Where-Object Category -eq "Other" | ForEach-Object {
-    "- $($_.Subject) ([`$($_.ShortSha)`]($($_.Url)))"
+    "- $($_.Subject) ([$($_.ShortSha)]($($_.Url)))"
 })
 
 $issueNumbers = New-Object System.Collections.Generic.HashSet[int]
