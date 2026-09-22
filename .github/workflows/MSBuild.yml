@@ -36,7 +36,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ runner.temp }}\sliksvn-${{ env.SLIKSVN_VERSION }}
-        key: sliksvn-${{ runner.os }}-x64-${{ env.SLIKSVN_VERSION }}-${{ env.SLIKSVN_SHA256 }}
+        key: sliksvn-v2-${{ runner.os }}-x64-${{ env.SLIKSVN_VERSION }}-${{ env.SLIKSVN_SHA256 }}
 
     - name: Add Subversion to PATH
       shell: pwsh
@@ -97,9 +97,32 @@ jobs:
             New-Item -ItemType Directory -Force -Path $svnRoot | Out-Null
             Expand-Archive -Path $archive -DestinationPath $svnRoot -Force
 
+            # The official ZIP contains the signed MSI installer rather than a
+            # ready-to-run bin directory. Install it into the cached temp
+            # location so CI does not depend on Chocolatey being available.
             $bin = Find-SvnBin $svnRoot
             if (-not $bin) {
-              throw "The SlikSVN archive did not contain svn.exe and svnadmin.exe together."
+              $msi = Get-ChildItem $svnRoot -Recurse -Filter "*.msi" -File -ErrorAction SilentlyContinue |
+                Select-Object -First 1
+
+              if (-not $msi) {
+                throw "The verified SlikSVN archive contained neither CLI binaries nor an MSI installer."
+              }
+
+              $installRoot = Join-Path $svnRoot "installed"
+              New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
+
+              Write-Host "Installing verified official SlikSVN MSI into the Actions cache..."
+              & msiexec.exe /i $msi.FullName /qn /norestart INSTALLLEVEL=300 "INSTALLLOCATION=$installRoot"
+              if ($LASTEXITCODE -ne 0) {
+                throw "SlikSVN MSI installation failed with exit code $LASTEXITCODE."
+              }
+
+              $bin = Find-SvnBin $installRoot
+            }
+
+            if (-not $bin) {
+              throw "The verified SlikSVN package did not provision svn.exe and svnadmin.exe."
             }
 
             Activate-Svn $bin
@@ -130,7 +153,18 @@ jobs:
             foreach ($candidate in $knownRoots) {
               if ((Test-Path (Join-Path $candidate "svn.exe")) -and
                   (Test-Path (Join-Path $candidate "svnadmin.exe"))) {
-                Activate-Svn $candidate
+                # Persist the fallback installation into the same Actions cache
+                # so a successful fallback is not needed again on later runs.
+                $fallbackRoot = Join-Path $svnRoot "chocolatey"
+                New-Item -ItemType Directory -Force -Path $fallbackRoot | Out-Null
+                Copy-Item (Join-Path $candidate "*") $fallbackRoot -Recurse -Force
+
+                $cachedFallback = Find-SvnBin $fallbackRoot
+                if (-not $cachedFallback) {
+                  throw "Chocolatey installed SlikSVN, but the cached copy could not be verified."
+                }
+
+                Activate-Svn $cachedFallback
                 $installed = $true
                 break
               }
