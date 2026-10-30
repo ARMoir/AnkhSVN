@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/30/2026 - 8:00:38 PM |
-| Coverage date: | 10/30/2026 - 8:00:18 PM - 10/30/2026 - 8:00:30 PM |
+| Generated on: | 10/30/2026 - 8:15:08 PM |
+| Coverage date: | 10/30/2026 - 8:14:43 PM - 10/30/2026 - 8:14:58 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 11 |
 | Classes: | 633 |
 | Files: | 685 |
-| **Line coverage:** | 28.5% (14093 of 49350) |
+| **Line coverage:** | 28.5% (14093 of 49345) |
 | Covered lines: | 14093 |
-| Uncovered lines: | 35257 |
-| Coverable lines: | 49350 |
-| Total lines: | 136610 |
-| **Branch coverage:** | 22.8% (5381 of 23499) |
+| Uncovered lines: | 35252 |
+| Coverable lines: | 49345 |
+| Total lines: | 136606 |
+| **Branch coverage:** | 22.8% (5381 of 23501) |
 | Covered branches: | 5381 |
-| Total branches: | 23499 |
+| Total branches: | 23501 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -38,7 +38,7 @@
 |Ankh.Commands.Cleanup|12.1%|11.1%|
 |Ankh.Commands.CommandBase|50%||
 |Ankh.Commands.CommandStrings|0%|0%|
-|Ankh.Commands.CreatePatch|8.1%|12.5%|
+|Ankh.Commands.CreatePatch|8.1%|11.5%|
 |Ankh.Commands.DiffLocalItem|5.9%|11.2%|
 |Ankh.Commands.DiffLocalItemLogic|96.1%|97.6%|
 |Ankh.Commands.DiffLocalItemSelectionInfo|70.2%|0%|
@@ -266,7 +266,7 @@
 |Ankh.Scc.SettingMap.SccTranslatePathInfo|0%|0%|
 |Ankh.Scc.SolutionExplorerClipboardItem|0%|0%|
 |Ankh.Scc.StatusCache.Commands.FileStatusCleanup|10%|0%|
-|Ankh.Scc.StatusCache.SvnStatusCache|44.5%|38.3%|
+|Ankh.Scc.StatusCache.SvnStatusCache|44.8%|38.3%|
 |Ankh.Scc.SvnConflictArtifactLogic|90.1%|81.5%|
 |Ankh.Scc.SvnSccContext|0%|0%|
 |Ankh.Scc.SvnSccProjectMap|0%|0%|
@@ -600,7 +600,7 @@
 |Ankh.UI.SvnLog.Commands.LogOpenIssue|17.3%|16.6%|
 |Ankh.UI.SvnLog.Commands.RevertChanges|6.4%|2.3%|
 |Ankh.UI.SvnLog.Commands.ShowChangedPaths|45.4%|50%|
-|Ankh.UI.SvnLog.Commands.ShowChanges|7%|6.5%|
+|Ankh.UI.SvnLog.Commands.ShowChanges|7.1%|6.5%|
 |Ankh.UI.SvnLog.Commands.ShowLogMessage|45.4%|50%|
 |Ankh.UI.SvnLog.Commands.ShowRevisionProperties|5.2%|6.2%|
 |Ankh.UI.SvnLog.EditLogMessageDialog|94.2%|100%|
