@@ -6,7 +6,7 @@ AnkhSVN now targets **Visual Studio 2022 and later**. The pre-VS2022 package, x8
 
 - Visual Studio 2022 or later.
 - The **Visual Studio extension development** workload.
-- .NET Framework 4.7.2 targeting support.
+- .NET Framework 4.8 targeting support.
 - Git.
 - A Subversion command-line client is recommended for development and is installed by CI.
 
