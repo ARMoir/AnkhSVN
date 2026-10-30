@@ -3,20 +3,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/30/2026 - 7:09:17 PM |
-| Coverage date: | 10/30/2026 - 7:08:47 PM - 10/30/2026 - 7:09:06 PM |
+| Generated on: | 10/30/2026 - 7:18:30 PM |
+| Coverage date: | 10/30/2026 - 7:18:01 PM - 10/30/2026 - 7:18:19 PM |
 | Parser: | MultiReport (4x Cobertura) |
 | Assemblies: | 11 |
 | Classes: | 633 |
 | Files: | 685 |
-| **Line coverage:** | 28.5% (14096 of 49355) |
-| Covered lines: | 14096 |
-| Uncovered lines: | 35259 |
-| Coverable lines: | 49355 |
-| Total lines: | 136625 |
-| **Branch coverage:** | 22.9% (5384 of 23505) |
-| Covered branches: | 5384 |
-| Total branches: | 23505 |
+| **Line coverage:** | 28.5% (14093 of 49351) |
+| Covered lines: | 14093 |
+| Uncovered lines: | 35258 |
+| Coverable lines: | 49351 |
+| Total lines: | 136609 |
+| **Branch coverage:** | 22.8% (5381 of 23501) |
+| Covered branches: | 5381 |
+| Total branches: | 23501 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 </details>
@@ -631,7 +631,7 @@
 |Ankh.UI.VSSelectionControls.SmartTreeView|33.5%|28.8%|
 |Ankh.UI.VSSelectionControls.SmartTreeViewThemeLogic|100%|100%|
 |Ankh.UI.VSSelectionControls.TreeViewWithSelection`1|2.2%|0%|
-|Ankh.UI.WizardFramework.Wizard|90.4%|82.7%|
+|Ankh.UI.WizardFramework.Wizard|90.6%|83.1%|
 |Ankh.UI.WizardFramework.WizardMessage|85.7%||
 |Ankh.UI.WizardFramework.WizardPage|81.7%|85.7%|
 |Ankh.UI.WizardFramework.WizardPageChangingEventArgs|100%||
