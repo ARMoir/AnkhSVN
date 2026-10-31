@@ -22,8 +22,6 @@ env:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      NuGetPackageSourceCredentials_ARMoir: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }};ValidAuthenticationTypes=Basic
 
     steps:
     - name: Git Checkout
