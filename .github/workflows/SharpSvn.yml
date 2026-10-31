@@ -2,11 +2,6 @@ name: Publish pinned SharpSvn
 
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/25-pinned-sharpsvn]
-    paths:
-      - '.github/workflows/SharpSvn.yml'
-      - 'scripts/Publish-SharpSvnPrerelease.ps1'
 
 permissions:
   contents: read
