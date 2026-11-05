@@ -31,25 +31,12 @@ namespace Ankh.VSPackage
     // The command routing at package level
     public partial class AnkhSvnPackage : IOleCommandTarget
     {
-        static bool GuidRefIsNull(ref Guid pguidCmdGroup)
+        static unsafe bool GuidRefIsNull(ref Guid pguidCmdGroup)
         {
-            // According to MSDN the Guid for the command group can be null and in this case the default
-            // command group should be used. Given the interop definition of IOleCommandTarget, the only way
-            // to detect a null guid is to try to access it and catch the NullReferenceExeption.
-            Guid commandGroup;
-            try
-            {
-                commandGroup = pguidCmdGroup;
-            }
-            catch (NullReferenceException)
-            {
-                // Here we assume that the only reason for the exception is a null guidGroup.
-                // We do not handle the default command group as definied in the spec for IOleCommandTarget,
-                // so we have to return OLECMDERR_E_NOTSUPPORTED.
-                return true;
-            }
-
-            return false;
+            // IOleCommandTarget permits a null native pointer for the default command group.
+            // The COM interop signature exposes it as ref Guid, so inspect the address
+            // without dereferencing it. We do not support the default command group.
+            return &pguidCmdGroup == null;
         }
 
         /// <summary>
